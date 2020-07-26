@@ -1,0 +1,78 @@
+#ifndef __LIGHTCXX_GUARD_CSTDDEF
+#define __LIGHTCXX_GUARD_CSTDDEF
+
+#include <__lightcxx/__builtins.h>
+#include <__lightcxx/__type_traits_builtins.h>
+
+#define NULL _Light_NULL
+
+#define offsetof(__type, __member) __builtin_offsetof(__type, __member)
+
+namespace std {
+
+using ptrdiff_t = decltype(static_cast<int*>(nullptr) - static_cast<int*>(nullptr));
+
+using size_t = decltype(sizeof(void*));
+
+using max_align_t = _Light_MAX_ALIGN_T;
+
+using nullptr_t = decltype(nullptr);
+
+enum class byte : unsigned char {};
+
+template<class _T>
+requires(_Light_IS_INTEGRAL(_T)) constexpr byte operator<<(byte __b, _T __shift) noexcept {
+    return static_cast<byte>(static_cast<unsigned int>(__b) << __shift);
+}
+
+template<class _T>
+requires(_Light_IS_INTEGRAL(_T)) constexpr byte& operator<<=(byte& __b, _T __shift) noexcept {
+    return __b = __b << __shift;
+}
+
+template<class _T>
+requires(_Light_IS_INTEGRAL(_T)) constexpr byte operator>>(byte __b, _T __shift) noexcept {
+    return static_cast<byte>(static_cast<unsigned int>(__b) >> __shift);
+}
+
+template<class _T>
+requires(_Light_IS_INTEGRAL(_T)) constexpr byte& operator>>=(byte& __b, _T __shift) noexcept {
+    return __b = __b >> __shift;
+}
+
+constexpr byte operator|(byte __l, byte __r) noexcept {
+    return static_cast<byte>(static_cast<unsigned int>(__l) | static_cast<unsigned int>(__r));
+}
+
+constexpr byte& operator|=(byte& __l, byte __r) noexcept {
+    return __l = __l | __r;
+}
+
+constexpr byte operator&(byte __l, byte __r) noexcept {
+    return static_cast<byte>(static_cast<unsigned int>(__l) & static_cast<unsigned int>(__r));
+}
+
+constexpr byte& operator&=(byte& __l, byte __r) noexcept {
+    return __l = __l & __r;
+}
+
+constexpr byte operator^(byte __l, byte __r) noexcept {
+    return static_cast<byte>(static_cast<unsigned int>(__l) ^ static_cast<unsigned int>(__r));
+}
+
+constexpr byte& operator^=(byte& __l, byte __r) noexcept {
+    return __l = __l ^ __r;
+}
+
+constexpr byte operator~(byte __b) noexcept {
+    return static_cast<byte>(~static_cast<unsigned int>(__b));
+}
+
+template<class _T>
+requires(_Light_IS_INTEGRAL(_T)) constexpr _T to_integer(byte __b) noexcept {
+    return static_cast<_T>(__b);
+}
+
+}  // namespace std
+
+#endif

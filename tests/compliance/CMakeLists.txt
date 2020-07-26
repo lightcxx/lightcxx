@@ -1,0 +1,6 @@
+add_compliance_test(17.2.1 header_cstddef_synopsis)
+add_compliance_test(17.2.2 header_cstdlib_synopsis OUTPUT_CONTAINS "::std::system")
+add_compliance_test(17.2.3 null_pointers)
+add_compliance_test(17.2.4 sizes_alignments_and_offsets)
+add_compliance_test(17.2.5 byte_type_operations)
+add_compliance_test(17.2.5 non_integer_type.nc NO_COMPILE 9)

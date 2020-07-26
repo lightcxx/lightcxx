@@ -1,0 +1,16 @@
+#ifndef __LIGHTCXX_GUARD_EXCEPTION
+#define __LIGHTCXX_GUARD_EXCEPTION
+
+namespace std {
+
+using terminate_handler = void(*)();
+
+[[noreturn]] void terminate() noexcept;
+
+terminate_handler set_terminate(terminate_handler __f) noexcept;
+
+terminate_handler get_terminate() noexcept;
+
+}
+
+#endif

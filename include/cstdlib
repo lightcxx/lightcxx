@@ -1,0 +1,106 @@
+#ifndef __LIGHTCXX_GUARD_CSTDDEF
+#define __LIGHTCXX_GUARD_CSTDDEF
+
+#include <__lightcxx/__builtins.h>
+
+namespace _Light {
+
+extern "C" using _CAtExitHandler = void();
+extern "C++" using _AtExitHandler = void();
+extern "C" using _CComparePred = int(const void*, const void*);
+extern "C++" using _ComparePred = int(const void*, const void*);
+
+int _Light_mb_cur_max();
+
+}  // namespace _Light
+
+#define NULL _Light_NULL
+#define EXIT_FAILURE 1
+#define EXIT_SUCCESS 0
+#define RAND_MAX 2147483647
+#define MB_CUR_MAX (::_Light::_Light_mb_cur_max())
+
+namespace std {
+
+using size_t = decltype(sizeof(void*));
+
+[[noreturn]] void abort() noexcept;
+
+[[noreturn]] void _Exit(int __status) noexcept;
+
+int atexit(_Light::_CAtExitHandler* __func) noexcept;
+int atexit(_Light::_AtExitHandler* __func) noexcept;
+[[noreturn]] void exit(int __status);
+
+int at_quick_exit(_Light::_CAtExitHandler* __func) noexcept;
+int at_quick_exit(_Light::_AtExitHandler* __func) noexcept;
+[[noreturn]] void quick_exit(int __status) noexcept;
+
+char* getenv(const char* __name);
+int system(const char* __string);
+
+void* aligned_alloc(size_t __alignment, size_t __size);
+void* calloc(size_t __n, size_t __size);
+void free(void* __ptr);
+void* malloc(size_t __size);
+void* realloc(void* __ptr, size_t __size);
+
+double atof(const char* __str);
+int atoi(const char* __str);
+long atol(const char* __str);
+long long atoll(const char* __str);
+double strtod(const char* __str, char** __end);
+float strtof(const char* __str, char** __end);
+long double strtold(const char* __str, char** __end);
+long strtol(const char* __str, char** __end, int __base);
+long long strtoll(const char* __str, char** __end, int __base);
+unsigned long strtoul(const char* __str, char** __end, int __base);
+unsigned long long strtoull(const char* __str, char** __end, int __base);
+
+int mblen(const char* __s, size_t __n);
+int mbtowc(wchar_t* __pwc, const char* __s, size_t __n);
+int wctomb(char* __s, wchar_t __wchar);
+size_t mbstowcs(wchar_t* __pwcs, const char* __s, size_t __n);
+size_t wcstombs(char* __s, const wchar_t* __pwcs, size_t __n);
+
+void* bsearch(
+  const void* __key, const void* __base, size_t __n, size_t __size, _Light::_CComparePred* __cmp);
+void* bsearch(
+  const void* __key, const void* __base, size_t __n, size_t __size, _Light::_ComparePred* __cmp);
+
+void qsort(void* __base, size_t __n, size_t __size, _Light::_CComparePred* __cmp);
+void qsort(void* __base, size_t __n, size_t __size, _Light::_ComparePred* __cmp);
+
+int rand();
+void srand(unsigned int __seed);
+
+int abs(int __j);
+long abs(long __j);
+long long abs(long long __j);
+float abs(float __j);
+double abs(double __j);
+long double abs(long double __j);
+long labs(long __j);
+long long llabs(long long __j);
+
+struct div_t {
+    int quot, rem;
+};
+
+struct ldiv_t {
+    long quot, rem;
+};
+
+struct lldiv_t {
+    long long quot, rem;
+};
+
+div_t div(int __num, int __den);
+ldiv_t div(long __num, long __den);
+lldiv_t div(long long __num, long long __den);
+ldiv_t ldiv(long __num, long __den);
+lldiv_t lldiv(long long __num, long long __den);
+
+}  // namespace std
+
+#endif
