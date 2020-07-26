@@ -16,7 +16,7 @@ function(add_compliance_test SECTION NAME)
         endif ()
     else ()
         foreach (fail_index RANGE ${ARGS_NO_COMPILE})
-            set(test_name test.compliance.${SECTION}.${NAME}_${fail_index})
+            set(test_name compliance.${SECTION}.${NAME}_${fail_index})
             add_executable(${test_name}
                     ${CMAKE_SOURCE_DIR}/tests/compliance/${SECTION}/${NAME}.cpp)
             target_link_libraries(${test_name} PUBLIC lightcxx_testing)
