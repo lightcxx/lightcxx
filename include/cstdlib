@@ -10,15 +10,15 @@ extern "C++" using _AtExitHandler = void();
 extern "C" using _CComparePred = int(const void*, const void*);
 extern "C++" using _ComparePred = int(const void*, const void*);
 
-int _Light_mb_cur_max();
+int _MBCurMax();
 
 }  // namespace _Light
 
-#define NULL _Light_NULL
+#define NULL 0L
 #define EXIT_FAILURE 1
 #define EXIT_SUCCESS 0
 #define RAND_MAX 2147483647
-#define MB_CUR_MAX (::_Light::_Light_mb_cur_max())
+#define MB_CUR_MAX (::_Light::_MBCurMax())
 
 namespace std {
 

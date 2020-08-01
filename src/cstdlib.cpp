@@ -21,7 +21,7 @@ _AtExitHandlerPtr __quick_exit_handlers[32]{};
 
 namespace _Light {
 
-int _Light_mb_cur_max() {
+int _MBCurMax() {
     return MB_CUR_MAX;
 }
 

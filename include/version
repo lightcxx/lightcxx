@@ -68,7 +68,7 @@
 // also in <functional> TODO
 #define __cpp_lib_boyer_moore_searcher 201603L
 
-// also in <cstddef> TODO
+// also in <cstddef>
 #define __cpp_lib_byte 201603L
 
 // also in <atomic>, <filesystem>, <istream>, <limits>, <locale>, <ostream>, <string>,

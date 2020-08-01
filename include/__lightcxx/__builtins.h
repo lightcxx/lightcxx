@@ -1,8 +1,10 @@
 #ifndef __LIGHTCXX_GUARD_LIGHTCXX_BUILTINS_H
 #define __LIGHTCXX_GUARD_LIGHTCXX_BUILTINS_H
 
-#define _Light_NULL __null
+namespace _Light {
 
-#define _Light_MAX_ALIGN_T long double
+using _MaxAlignT = long double;
+
+}
 
 #endif
