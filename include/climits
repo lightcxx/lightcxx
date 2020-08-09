@@ -1,0 +1,7 @@
+#ifndef __LIGHTCXX_GUARD_CLIMITS
+#define __LIGHTCXX_GUARD_CLIMITS
+
+// TODO: Don't include C headers in the C++ headers.
+#include <limits.h>
+
+#endif

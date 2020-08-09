@@ -80,14 +80,14 @@ void LightCXXTest::run() noexcept {
     const char8_t* s = u8"z\u00df\u6c34\u0001f34c";
     ::std::mblen((const char*)s, 11);
     ::std::mbtowc((wchar_t*)nullptr, (const char*)s, 11);
-    char* chrs = (char*)::std::malloc(MB_CUR_MAX);
-    ::std::wctomb(chrs, L'A');
-    const char* mbstr = "\x7a\xc3\x9f\xe6\xb0\xb4\xf0\x9f\x8d\x8c";
-    wchar_t wstr[20];
-    ::std::mbstowcs(wstr, mbstr, 20);
-    char mbstr_cpy[20];
-    ::std::wcstombs(mbstr_cpy, wstr, 20);
-    ::std::free(chrs);
+    char* characters = (char*)::std::malloc(MB_CUR_MAX);
+    ::std::wctomb(characters, L'A');
+    const char* multibyte_string = "\x7a\xc3\x9f\xe6\xb0\xb4\xf0\x9f\x8d\x8c";
+    wchar_t wide_string[20];
+    ::std::mbstowcs(wide_string, multibyte_string, 20);
+    char multibyte_string_copy[20];
+    ::std::wcstombs(multibyte_string_copy, wide_string, 20);
+    ::std::free(characters);
 
     int a[] = {5, 2, 4, 1, 3};
     ::std::qsort(a, 5, sizeof(int), [](const void* a, const void* b) {

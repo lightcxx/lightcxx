@@ -1,0 +1,7 @@
+#ifndef __LIGHTCXX_GUARD_CFLOAT
+#define __LIGHTCXX_GUARD_CFLOAT
+
+// TODO: Don't include C headers in the C++ headers.
+#include <float.h>
+
+#endif

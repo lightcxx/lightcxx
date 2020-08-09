@@ -3,9 +3,9 @@
 #include "lightcxx_test.h"
 
 struct StandardLayoutStructure {
-    int a;
+    [[maybe_unused]] int a;
     int b;
-    float c;
+    [[maybe_unused]] float c;
 };
 
 void LightCXXTest::run() noexcept {
