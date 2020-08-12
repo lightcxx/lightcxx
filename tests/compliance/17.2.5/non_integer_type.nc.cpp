@@ -1,3 +1,5 @@
+//EXPECT:NO_COMPILE 9
+
 #include <cstddef>
 
 #include "testing/test.h"

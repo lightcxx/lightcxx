@@ -12,7 +12,7 @@ void expect(bool condition, const char* message = "") noexcept;
     static_assert(__VA_ARGS__)
 
 template<class T, class U>
-consteval void expectType(U&& val) noexcept {
+constexpr void expectType(U&& val) noexcept {
     static_assert(IsSameType<T, decltype(val)>::value, "Invalid type.");
 }
 

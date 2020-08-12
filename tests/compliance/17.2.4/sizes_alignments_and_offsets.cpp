@@ -12,9 +12,9 @@ void Testing::run() {
     STATIC_EXPECT(offsetof(StandardLayoutStructure, c) == sizeof(int) + sizeof(int), "offsetof");
     STATIC_EXPECT(noexcept(offsetof(StandardLayoutStructure, c)), "offsetof noexcept");
 
-    // TODO: Test that ptrdiff_t is signed.
+    static_assert(Testing::IsSignedIntegerType<::std::ptrdiff_t>);
 
-    // TODO: Test that size_t is unsigned.
+    static_assert(Testing::IsUnsignedIntegerType<::std::size_t>);
 
     STATIC_EXPECT(alignof(::std::max_align_t) >= alignof(long double));
     STATIC_EXPECT(alignof(::std::max_align_t) >= alignof(long long));

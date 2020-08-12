@@ -1,3 +1,5 @@
+//EXPECT:OUTPUT_CONTAINS "::std::system"
+
 #include <cstdlib>
 
 #include "testing/test.h"

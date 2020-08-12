@@ -1,3 +1,7 @@
+//EXPECT:SIGNAL_CODE 6
+//EXPECT:OUTPUT_CONTAINS "success: third atexit\nsuccess: second atexit\nsuccess: terminate\n"
+//EXPECT:OUTPUT_NOT_CONTAINS "fail"
+
 #include <cstdlib>
 #include <exception>
 
