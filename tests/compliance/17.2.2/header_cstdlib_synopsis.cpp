@@ -1,6 +1,6 @@
 #include <cstdlib>
 
-#include "lightcxx_test.h"
+#include "testing/test.h"
 
 namespace std {
 
@@ -18,7 +18,7 @@ bool operator==(const lldiv_t& d1, const lldiv_t& d2) {
 
 }  // namespace std
 
-void LightCXXTest::run() noexcept {
+void Testing::run() {
     constexpr void* n = NULL;
     STATIC_EXPECT(n == nullptr, "NULL");
     expectType<int&&>(MB_CUR_MAX);

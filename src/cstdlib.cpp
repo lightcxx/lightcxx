@@ -45,7 +45,11 @@ int at_quick_exit(_Light::_AtExitHandler* func) noexcept {
 }
 
 [[noreturn]] void exit(int status) {
-    ::exit(status);
+    try {
+        ::exit(status);
+    } catch(...) {
+        ::std::terminate();
+    }
 }
 
 [[noreturn]] void _Exit(int status) noexcept {
@@ -54,10 +58,10 @@ int at_quick_exit(_Light::_AtExitHandler* func) noexcept {
 
 [[noreturn]] void quick_exit(int status) noexcept {
     auto index = atomic_load_explicit(&__num_quick_exit_handlers, memory_order_acquire);
-    if (index >= 32) index = 31;
-    for (; index >= 0; --index) {
+    if (index > 32) index = 32;
+    for (; index > 0; --index) {
         try {
-            __quick_exit_handlers[index]();
+            __quick_exit_handlers[index - 1]();
         } catch (...) { ::std::terminate(); }
     }
     _Exit(status);

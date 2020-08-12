@@ -1,12 +1,12 @@
 #include <cstddef>
 
-#include "lightcxx_test.h"
+#include "testing/test.h"
 
 struct Aggregate {
     [[maybe_unused]] int x;
 };
 
-void LightCXXTest::run() noexcept {
+void Testing::run() {
     ::std::byte b{3};
     const char* str;
     Aggregate ag;

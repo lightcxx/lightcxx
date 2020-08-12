@@ -1,6 +1,6 @@
 #include <climits>
 
-#include "lightcxx_test.h"
+#include "testing/test.h"
 
 #ifndef CHAR_BIT
 #error "CHAR_BIT is not defined."
@@ -78,5 +78,5 @@
 #error "ULLONG_MAX is not defined."
 #endif
 
-void LightCXXTest::run() noexcept {
+void Testing::run() {
 }

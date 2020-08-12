@@ -1,8 +1,8 @@
 #include <version>
 
-#include "lightcxx_test.h"
+#include "testing/test.h"
 
-void LightCXXTest::run() noexcept {
+void Testing::run() {
     expectTypeAndValue<long&&>(__cpp_lib_addressof_constexpr, 201603L, "addressof_constexpr");
     expectTypeAndValue<long&&>(
       __cpp_lib_allocator_traits_is_always_equal, 201411L, "allocator_traits_is_always_equal");

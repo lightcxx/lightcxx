@@ -1,8 +1,8 @@
 #include <limits>
 
-#include "lightcxx_test.h"
+#include "testing/test.h"
 
-void LightCXXTest::run() noexcept {
+void Testing::run() {
     constexpr auto indeterminate_1 = ::std::float_denorm_style::denorm_indeterminate;
     constexpr auto indeterminate_2 = ::std::denorm_indeterminate;
     expectTypeAndValue<const ::std::float_denorm_style&>(indeterminate_1, -1);

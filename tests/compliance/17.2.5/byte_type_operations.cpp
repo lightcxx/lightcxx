@@ -1,8 +1,8 @@
 #include <cstddef>
 
-#include "lightcxx_test.h"
+#include "testing/test.h"
 
-void LightCXXTest::run() noexcept {
+void Testing::run() {
 #define TEST_BYTE_OPS_WITH_VALID_INT_TYPE(T)                                                       \
     STATIC_EXPECT(::std::byte{8} == ::std::byte{4} << (T)1, "<< (" #T ")");                        \
     STATIC_EXPECT(                                                                                 \

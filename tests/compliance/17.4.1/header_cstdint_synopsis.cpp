@@ -1,6 +1,6 @@
 #include <cstdint>
 
-#include "lightcxx_test.h"
+#include "testing/test.h"
 
 #ifndef INT_FAST8_MIN
 #error "INT_FAST8_MIN is not defined."
@@ -198,135 +198,116 @@
 #error "UINTMAX_C is not defined."
 #endif
 
-template<class T, class U>
-struct IsSameType {
-    static constexpr bool value = false;
-};
-template<class T>
-struct IsSameType<T, T> {
-    static constexpr bool value = true;
-};
-
-template<class T, class... Args>
-constexpr bool IsOneOf = (IsSameType<T, Args>::value || ...);
-
-template<class T>
-constexpr bool IsSignedIntegerType = IsOneOf<T, signed char, short, int, long, long long>;
-
-template<class T>
-constexpr bool IsUnsignedIntegerType
-  = IsOneOf<T, unsigned char, unsigned short, unsigned int, unsigned long, unsigned long long>;
-
-void LightCXXTest::run() noexcept {
+void Testing::run() {
     [[maybe_unused]] constexpr ::std::int8_t i8{};
     static_assert(sizeof(i8) == 1);
-    static_assert(IsSignedIntegerType<::std::int8_t>);
+    static_assert(Testing::IsSignedIntegerType<::std::int8_t>);
 
     [[maybe_unused]] constexpr ::std::int16_t i16{};
     static_assert(sizeof(i16) == 2);
-    static_assert(IsSignedIntegerType<::std::int16_t>);
+    static_assert(Testing::IsSignedIntegerType<::std::int16_t>);
 
     [[maybe_unused]] constexpr ::std::int32_t i32{};
     static_assert(sizeof(i32) == 4);
-    static_assert(IsSignedIntegerType<::std::int32_t>);
+    static_assert(Testing::IsSignedIntegerType<::std::int32_t>);
 
     [[maybe_unused]] constexpr ::std::int64_t i64{};
     static_assert(sizeof(i64) == 8);
-    static_assert(IsSignedIntegerType<::std::int64_t>);
+    static_assert(Testing::IsSignedIntegerType<::std::int64_t>);
 
     [[maybe_unused]] constexpr ::std::int_fast8_t if8{};
     static_assert(sizeof(if8) == 1);
-    static_assert(IsSignedIntegerType<::std::int_fast8_t>);
+    static_assert(Testing::IsSignedIntegerType<::std::int_fast8_t>);
 
     [[maybe_unused]] constexpr ::std::int_fast16_t if16{};
     static_assert(sizeof(if16) == 2);
-    static_assert(IsSignedIntegerType<::std::int_fast16_t>);
+    static_assert(Testing::IsSignedIntegerType<::std::int_fast16_t>);
 
     [[maybe_unused]] constexpr ::std::int_fast32_t if32{};
     static_assert(sizeof(if32) == 4);
-    static_assert(IsSignedIntegerType<::std::int_fast32_t>);
+    static_assert(Testing::IsSignedIntegerType<::std::int_fast32_t>);
 
     [[maybe_unused]] constexpr ::std::int_fast64_t if64{};
     static_assert(sizeof(if64) == 8);
-    static_assert(IsSignedIntegerType<::std::int_fast64_t>);
+    static_assert(Testing::IsSignedIntegerType<::std::int_fast64_t>);
 
     [[maybe_unused]] constexpr ::std::int_least8_t il8{};
     static_assert(sizeof(il8) >= 1);
-    static_assert(IsSignedIntegerType<::std::int_least8_t>);
+    static_assert(Testing::IsSignedIntegerType<::std::int_least8_t>);
 
     [[maybe_unused]] constexpr ::std::int_least16_t il16{};
     static_assert(sizeof(il16) >= 2);
-    static_assert(IsSignedIntegerType<::std::int_least16_t>);
+    static_assert(Testing::IsSignedIntegerType<::std::int_least16_t>);
 
     [[maybe_unused]] constexpr ::std::int_least32_t il32{};
     static_assert(sizeof(il32) >= 4);
-    static_assert(IsSignedIntegerType<::std::int_least32_t>);
+    static_assert(Testing::IsSignedIntegerType<::std::int_least32_t>);
 
     [[maybe_unused]] constexpr ::std::int_least64_t il64{};
     static_assert(sizeof(il64) >= 8);
-    static_assert(IsSignedIntegerType<::std::int_least64_t>);
+    static_assert(Testing::IsSignedIntegerType<::std::int_least64_t>);
 
     [[maybe_unused]] constexpr ::std::intptr_t ip{};
     static_assert(sizeof(ip) >= 8);
-    static_assert(IsSignedIntegerType<::std::intptr_t>);
+    static_assert(Testing::IsSignedIntegerType<::std::intptr_t>);
 
     [[maybe_unused]] constexpr ::std::intmax_t im{};
     static_assert(sizeof(im) >= 8);
-    static_assert(IsSignedIntegerType<::std::intmax_t>);
+    static_assert(Testing::IsSignedIntegerType<::std::intmax_t>);
 
     [[maybe_unused]] constexpr ::std::uint8_t ui8{};
     static_assert(sizeof(ui8) == 1);
-    static_assert(IsUnsignedIntegerType<::std::uint8_t>);
+    static_assert(Testing::IsUnsignedIntegerType<::std::uint8_t>);
 
     [[maybe_unused]] constexpr ::std::uint16_t ui16{};
     static_assert(sizeof(ui16) == 2);
-    static_assert(IsUnsignedIntegerType<::std::uint16_t>);
+    static_assert(Testing::IsUnsignedIntegerType<::std::uint16_t>);
 
     [[maybe_unused]] constexpr ::std::uint32_t ui32{};
     static_assert(sizeof(ui32) == 4);
-    static_assert(IsUnsignedIntegerType<::std::uint32_t>);
+    static_assert(Testing::IsUnsignedIntegerType<::std::uint32_t>);
 
     [[maybe_unused]] constexpr ::std::uint64_t ui64{};
     static_assert(sizeof(ui64) == 8);
-    static_assert(IsUnsignedIntegerType<::std::uint64_t>);
+    static_assert(Testing::IsUnsignedIntegerType<::std::uint64_t>);
 
     [[maybe_unused]] constexpr ::std::uint_fast8_t uif8{};
     static_assert(sizeof(uif8) == 1);
-    static_assert(IsUnsignedIntegerType<::std::uint_fast8_t>);
+    static_assert(Testing::IsUnsignedIntegerType<::std::uint_fast8_t>);
 
     [[maybe_unused]] constexpr ::std::uint_fast16_t uif16{};
     static_assert(sizeof(uif16) == 2);
-    static_assert(IsUnsignedIntegerType<::std::uint_fast16_t>);
+    static_assert(Testing::IsUnsignedIntegerType<::std::uint_fast16_t>);
 
     [[maybe_unused]] constexpr ::std::uint_fast32_t uif32{};
     static_assert(sizeof(uif32) == 4);
-    static_assert(IsUnsignedIntegerType<::std::uint_fast32_t>);
+    static_assert(Testing::IsUnsignedIntegerType<::std::uint_fast32_t>);
 
     [[maybe_unused]] constexpr ::std::uint_fast64_t uif64{};
     static_assert(sizeof(uif64) == 8);
-    static_assert(IsUnsignedIntegerType<::std::uint_fast64_t>);
+    static_assert(Testing::IsUnsignedIntegerType<::std::uint_fast64_t>);
 
     [[maybe_unused]] constexpr ::std::uint_least8_t uil8{};
     static_assert(sizeof(uil8) >= 1);
-    static_assert(IsUnsignedIntegerType<::std::uint_least8_t>);
+    static_assert(Testing::IsUnsignedIntegerType<::std::uint_least8_t>);
 
     [[maybe_unused]] constexpr ::std::uint_least16_t uil16{};
     static_assert(sizeof(uil16) >= 2);
-    static_assert(IsUnsignedIntegerType<::std::uint_least16_t>);
+    static_assert(Testing::IsUnsignedIntegerType<::std::uint_least16_t>);
 
     [[maybe_unused]] constexpr ::std::uint_least32_t uil32{};
     static_assert(sizeof(uil32) >= 4);
-    static_assert(IsUnsignedIntegerType<::std::uint_least32_t>);
+    static_assert(Testing::IsUnsignedIntegerType<::std::uint_least32_t>);
 
     [[maybe_unused]] constexpr ::std::uint_least64_t uil64{};
     static_assert(sizeof(uil64) >= 8);
-    static_assert(IsUnsignedIntegerType<::std::uint_least64_t>);
+    static_assert(Testing::IsUnsignedIntegerType<::std::uint_least64_t>);
 
     [[maybe_unused]] constexpr ::std::uintptr_t uip{};
     static_assert(sizeof(uip) >= 8);
-    static_assert(IsUnsignedIntegerType<::std::uintptr_t>);
+    static_assert(Testing::IsUnsignedIntegerType<::std::uintptr_t>);
 
     [[maybe_unused]] constexpr ::std::uintmax_t uim{};
     static_assert(sizeof(uim) >= 8);
-    static_assert(IsUnsignedIntegerType<::std::uintmax_t>);
+    static_assert(Testing::IsUnsignedIntegerType<::std::uintmax_t>);
 }

@@ -1,13 +1,13 @@
 #include <cstddef>
 
-#include "lightcxx_test.h"
+#include "testing/test.h"
 
 struct S {
     [[maybe_unused]] int a;
     [[maybe_unused]] int b;
 };
 
-void LightCXXTest::run() noexcept {
+void Testing::run() {
     constexpr void* n = NULL;
     STATIC_EXPECT(n == nullptr, "NULL");
     STATIC_EXPECT(offsetof(::S, a) == 0, "offsetof");

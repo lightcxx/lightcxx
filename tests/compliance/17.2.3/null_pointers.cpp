@@ -1,8 +1,8 @@
 #include <cstddef>
 
-#include "lightcxx_test.h"
+#include "testing/test.h"
 
-void LightCXXTest::run() noexcept {
+void Testing::run() {
     constexpr void* null = NULL;
     STATIC_EXPECT(null == nullptr, "NULL");
 

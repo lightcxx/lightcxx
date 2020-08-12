@@ -1,13 +1,13 @@
 #include <limits>
 
-#include "lightcxx_test.h"
+#include "testing/test.h"
 
 struct Custom {
     [[maybe_unused]] int x;
     [[maybe_unused]] int y;
 };
 
-void LightCXXTest::run() noexcept {
+void Testing::run() {
     [[maybe_unused]] constexpr ::std::float_round_style fr_style{};
     [[maybe_unused]] constexpr ::std::float_denorm_style fd_style{};
 

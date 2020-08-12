@@ -1,6 +1,6 @@
 #include <cfloat>
 
-#include "lightcxx_test.h"
+#include "testing/test.h"
 
 #ifndef FLT_ROUNDS
 #error "FLT_ROUNDS is not defined."
@@ -162,5 +162,5 @@
 #error "LDBL_TRUE_MIN is not defined."
 #endif
 
-void LightCXXTest::run() noexcept {
+void Testing::run() {
 }

@@ -1,6 +1,6 @@
 #include <cstddef>
 
-#include "lightcxx_test.h"
+#include "testing/test.h"
 
 struct StandardLayoutStructure {
     [[maybe_unused]] int a;
@@ -8,7 +8,7 @@ struct StandardLayoutStructure {
     [[maybe_unused]] float c;
 };
 
-void LightCXXTest::run() noexcept {
+void Testing::run() {
     STATIC_EXPECT(offsetof(StandardLayoutStructure, c) == sizeof(int) + sizeof(int), "offsetof");
     STATIC_EXPECT(noexcept(offsetof(StandardLayoutStructure, c)), "offsetof noexcept");
 
