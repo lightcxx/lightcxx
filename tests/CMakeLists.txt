@@ -1,9 +1,7 @@
 enable_testing()
 add_custom_target(check ${CMAKE_CTEST_COMMAND} --output-on-failure)
+add_dependencies(check lightcxx_testing process_safe_wrapper)
 
-add_executable(wrap_test wrap_test.c)
-add_dependencies(check wrap_test)
+include(LightCXXTests.cmake)
 
-include(ComplianceTests.cmake)
-
-scan_for_compliance_tests(${CMAKE_CURRENT_SOURCE_DIR}/compliance)
+scan_for_lightcxx_tests(${CMAKE_CURRENT_SOURCE_DIR}/compliance)

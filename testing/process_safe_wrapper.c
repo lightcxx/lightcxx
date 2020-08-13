@@ -18,11 +18,11 @@ int main(int argc, char** argv) {
     wait(&status);
     printf("\n----\n");
     if (WIFSIGNALED(status)) {
-        printf("TEST EXITED BY SIGNAL: %d\n", WTERMSIG(status));
+        printf("PROCESS EXITED BY SIGNAL: %d\n", WTERMSIG(status));
     } else if (WIFEXITED(status)) {
-        printf("TEST EXITED WITH CODE: %d\n", WEXITSTATUS(status));
+        printf("PROCESS EXITED WITH CODE: %d\n", WEXITSTATUS(status));
     } else {
-        printf("TEST EXITED BY UNKNOWN MEANS.\n");
+        printf("PROCESS EXITED BY UNKNOWN MEANS.\n");
     }
     return 0;
 }
