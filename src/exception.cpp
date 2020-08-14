@@ -1,32 +1,27 @@
 #include <exception>
 
 #include <cstdlib>
-// TODO: Remove dependency on C's <stdatomic.h> once <atomic> is implemented.
-#include <stdatomic.h>
 
-namespace {
-
-atomic_intptr_t __terminate_handler = 0;
-
-}
+#include "handler.h"
 
 namespace std {
 
-terminate_handler set_terminate(terminate_handler __f) noexcept {
-    const auto handler = reinterpret_cast<intptr_t>(__f);
-    return reinterpret_cast<terminate_handler>(
-      atomic_exchange_explicit(&__terminate_handler, handler, memory_order_acq_rel));
+namespace {
+_Light::Handler<terminate_handler> global_terminate_handler;
 }
 
-terminate_handler get_terminate() noexcept {
-    return reinterpret_cast<terminate_handler>(
-      atomic_load_explicit(&__terminate_handler, memory_order_acquire));
+terminate_handler set_terminate(terminate_handler f) noexcept {
+    return global_terminate_handler.set(f);
 }
+
+terminate_handler get_terminate() noexcept { return global_terminate_handler.get(); }
 
 [[noreturn]] void terminate() noexcept {
     const auto handler = get_terminate();
-    if (handler) { reinterpret_cast<terminate_handler>(handler)(); }
-    ::std::abort();
+    if (handler) { handler(); }
+    std::abort();
 }
+
+const char* exception::what() const noexcept { return "exception"; }
 
 }  // namespace std

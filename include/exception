@@ -11,6 +11,17 @@ terminate_handler set_terminate(terminate_handler __f) noexcept;
 
 terminate_handler get_terminate() noexcept;
 
+class exception {
+  public:
+    exception() noexcept = default;
+    exception(const exception&) noexcept = default;
+    exception& operator=(const exception&) noexcept = default;
+
+    virtual ~exception() = default;
+
+    virtual const char* what() const noexcept;
+};
+
 }
 
 #endif

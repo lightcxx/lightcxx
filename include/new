@@ -1,0 +1,91 @@
+#ifndef __LIGHTCXX_GUARD_NEW
+#define __LIGHTCXX_GUARD_NEW
+
+#include <exception>
+
+namespace std {
+
+using size_t = decltype(sizeof(void*));
+
+class bad_alloc : public exception {
+  public:
+    const char* what() const noexcept override;
+};
+
+class bad_array_new_length : public bad_alloc {
+  public:
+    const char* what() const noexcept override;
+};
+
+struct destroying_delete_t {
+    explicit destroying_delete_t() = default;
+};
+constexpr destroying_delete_t destroying_delete{};
+
+enum class align_val_t : size_t {};
+
+struct nothrow_t {
+    explicit nothrow_t() = default;
+};
+extern const nothrow_t nothrow;
+
+using new_handler = void (*)();
+new_handler get_new_handler() noexcept;
+new_handler set_new_handler(new_handler __handler) noexcept;
+
+template<class _T>
+[[nodiscard]] constexpr _T* launder(_T* __ptr) noexcept {
+// TODO: Honor the "Mandates:" clause after type_traits is implemented.
+//    static_assert (!(is_function_v<_T>), "launder called for a function type" );
+//    static_assert (!(is_same_v<void, typename remove_cv_t<_T>>), "launder called for void pointer");
+
+#if __has_builtin(__builtin_launder)
+    return __builtin_launder(__ptr);
+#else
+    return __ptr;
+#endif
+}
+
+constexpr size_t hardware_destructive_interference_size = 64;
+constexpr size_t hardware_constructive_interference_size = 64;
+
+}  // namespace std
+
+[[nodiscard]] void* operator new(std::size_t __size);
+[[nodiscard]] void* operator new(std::size_t __size, std::align_val_t __align);
+[[nodiscard]] void* operator new(std::size_t __size, const std::nothrow_t& __nothrow) noexcept;
+[[nodiscard]] void* operator new(std::size_t __size,
+                                 std::align_val_t __align,
+                                 const std::nothrow_t& __nothrow) noexcept;
+
+void operator delete(void* __ptr) noexcept;
+void operator delete(void* __ptr, std::size_t __size) noexcept;
+void operator delete(void* __ptr, std::align_val_t __align) noexcept;
+void operator delete(void* __ptr, std::size_t __size, std::align_val_t __align) noexcept;
+void operator delete(void* __ptr, const std::nothrow_t& __nothrow) noexcept;
+void operator delete(void* __ptr,
+                     std::align_val_t __align,
+                     const std::nothrow_t& __nothrow) noexcept;
+
+[[nodiscard]] void* operator new[](std::size_t __size);
+[[nodiscard]] void* operator new[](std::size_t __size, std::align_val_t __align);
+[[nodiscard]] void* operator new[](std::size_t __size, const std::nothrow_t& __nothrow) noexcept;
+[[nodiscard]] void* operator new[](std::size_t __size,
+                                   std::align_val_t __align,
+                                   const std::nothrow_t& __nothrow) noexcept;
+
+void operator delete[](void* __ptr) noexcept;
+void operator delete[](void* __ptr, std::size_t __size) noexcept;
+void operator delete[](void* __ptr, std::align_val_t __align) noexcept;
+void operator delete[](void* __ptr, std::size_t __size, std::align_val_t __align) noexcept;
+void operator delete[](void* __ptr, const std::nothrow_t& __nothrow) noexcept;
+void operator delete[](void* __ptr,
+                       std::align_val_t __align,
+                       const std::nothrow_t& __nothrow) noexcept;
+
+[[nodiscard]] void* operator new(std::size_t __size, void* __ptr) noexcept;
+[[nodiscard]] void* operator new[](std::size_t __size, void* __ptr) noexcept;
+void operator delete(void* __ptr, void*) noexcept;
+void operator delete[](void* __ptr, void*) noexcept;
+
+#endif
