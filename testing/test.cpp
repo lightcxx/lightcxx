@@ -39,6 +39,15 @@ void expect(bool condition, const char* message, ...) noexcept {
     }
 }
 
+void step(const char* message, ...) noexcept {
+    fprintf(stderr, "STEP: ");
+    va_list args;
+    va_start(args, message);
+    vfprintf(stderr, message, args);
+    va_end(args);
+    fprintf(stderr, "\n");
+}
+
 }  // namespace Testing
 
 int main() {

@@ -1,9 +1,7 @@
 //EXPECT:EXIT_CODE 4
-//EXPECT:OUTPUT_CONTAINS "success: at_quick_exit\n"
+//EXPECT:STEPS "at_quick_exit"
 
 #include <cstdlib>
-
-#include <stdio.h>
 
 #include "testing/test.h"
 
@@ -23,7 +21,7 @@ void Testing::run() {
 
     ::std::atexit([] { fail("atexit"); });
 
-    ::std::at_quick_exit([] { fprintf(stderr, "success: at_quick_exit\n"); });
+    ::std::at_quick_exit([] { step("at_quick_exit"); });
 
     ::std::quick_exit(4);
 }

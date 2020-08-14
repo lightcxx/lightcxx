@@ -1,5 +1,3 @@
-//EXPECT:OUTPUT_CONTAINS "::std::system"
-
 #include <cstdlib>
 
 #include "testing/test.h"
@@ -31,7 +29,9 @@ void Testing::run() {
     STATIC_EXPECT((::std::size_t)5 == 5, "size_t");
 
     [[maybe_unused]] const auto env_var = ::std::getenv("ENV_VAR");
-    ::std::system("echo ::std::system");
+    [[maybe_unused]] const auto system_lambda = []() {
+        return ::std::system("echo ::std::system");
+    };
 
     // We don't actually want to call these, just see that they compile.
     [[maybe_unused]] auto abort_lambda = []() {

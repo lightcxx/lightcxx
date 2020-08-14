@@ -1,9 +1,6 @@
-//EXPECT:EXIT_CODE 0
-//EXPECT:OUTPUT_CONTAINS "1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15\n16\n15\n14\n13\n12\n11\n10\n9\n8\n7\n6\n5\n4\n3\n2\n1\n0\n"
+//EXPECT:STEPS "1;2;3;4;5;6;7;8;9;10;11;12;13;14;15;16;15;14;13;12;11;10;9;8;7;6;5;4;3;2;1;0"
 
 #include <cstdlib>
-
-#include <stdio.h>
 
 #include "testing/test.h"
 
@@ -13,13 +10,13 @@ void Testing::run() {
     for (int i = 1; i <= 16; i++) {
         ::std::atexit([]() {
           --at_exit_callback_index;
-          fprintf(stderr, "%d\n", at_exit_callback_index);
+          step("%d", at_exit_callback_index);
         });
     }
     for (int i = 1; i <= 16; i++) {
         ::std::atexit([]() {
           ++at_exit_callback_index;
-          fprintf(stderr, "%d\n", at_exit_callback_index);
+          step("%d", at_exit_callback_index);
         });
     }
 }

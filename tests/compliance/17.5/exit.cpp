@@ -1,22 +1,20 @@
 //EXPECT:EXIT_CODE 4
-//EXPECT:OUTPUT_CONTAINS "success: destructor of inline_thread_local\nsuccess: atexit\nsuccess: destructor of inline_static\nsuccess: destructor of global\n"
+//EXPECT:STEPS "~inline_thread_local;atexit;~inline_static;~global"
 
 #include <cstdlib>
-
-#include <stdio.h>
 
 #include "testing/test.h"
 
 struct FailPrinter {
     const char* name;
 
-    ~FailPrinter() { Testing::fail("destructor of %s", name); }
+    ~FailPrinter() { Testing::fail("~%s", name); }
 };
 
 struct SuccessPrinter {
     const char* name = "local";
 
-    ~SuccessPrinter() { fprintf(stderr, "success: destructor of %s\n", name); }
+    ~SuccessPrinter() { Testing::step("~%s", name); }
 };
 
 [[maybe_unused]] SuccessPrinter global{.name = "global"};
@@ -27,7 +25,7 @@ void Testing::run() {
     [[maybe_unused]] thread_local SuccessPrinter inline_t_local{.name = "inline_thread_local"};
     [[maybe_unused]] FailPrinter local;
 
-    ::std::atexit([] { fprintf(stderr, "success: atexit\n"); });
+    ::std::atexit([] { step("atexit"); });
 
     ::std::at_quick_exit([] { fail("at_quick_exit"); });
 

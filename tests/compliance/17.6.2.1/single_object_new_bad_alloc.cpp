@@ -1,14 +1,13 @@
-//EXPECT:OUTPUT_CONTAINS "success: called ::malloc\nsuccess: throw bad_alloc"
+//EXPECT:STEPS "malloc;throw"
 
 #include <new>
-#include <stdio.h>
 
 #include "testing/test.h"
 
 void Testing::run() {
     mock_malloc.replace([](std::size_t size) -> void* {
-        expect(size == 264, "::malloc size");
-        fprintf(stderr, "success: called ::malloc\n");
+        expect(size == 256, "::malloc size");
+        step("malloc");
         return nullptr;
     });
 
@@ -16,7 +15,7 @@ void Testing::run() {
         [[maybe_unused]] const auto const_ptr = ::operator new(256);
         fail("did not throw");
     } catch(std::bad_alloc& exception) {
-        fprintf(stderr, "success: throw bad_alloc");
+        step("throw");
     } catch(...) {
         fail("did not throw bad_alloc");
     }

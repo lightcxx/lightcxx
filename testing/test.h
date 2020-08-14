@@ -10,6 +10,8 @@ void fail(const char* message = "", ...) noexcept;
 
 void expect(bool condition, const char* message = "", ...) noexcept;
 
+void step(const char* message, ...) noexcept;
+
 #define STATIC_EXPECT(...)                                                                         \
     ::Testing::expect(__VA_ARGS__);                                                                \
     static_assert(__VA_ARGS__)
