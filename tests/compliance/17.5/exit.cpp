@@ -1,6 +1,5 @@
 //EXPECT:EXIT_CODE 4
 //EXPECT:OUTPUT_CONTAINS "success: destructor of inline_thread_local\nsuccess: atexit\nsuccess: destructor of inline_static\nsuccess: destructor of global\n"
-//EXPECT:OUTPUT_NOT_CONTAINS "fail"
 
 #include <cstdlib>
 
@@ -11,7 +10,7 @@
 struct FailPrinter {
     const char* name;
 
-    ~FailPrinter() { fprintf(stderr, "fail: destructor of %s\n", name); }
+    ~FailPrinter() { Testing::fail("destructor of %s", name); }
 };
 
 struct SuccessPrinter {
@@ -30,7 +29,7 @@ void Testing::run() {
 
     ::std::atexit([] { fprintf(stderr, "success: atexit\n"); });
 
-    ::std::at_quick_exit([] { fprintf(stderr, "fail: at_quick_exit\n"); });
+    ::std::at_quick_exit([] { fail("at_quick_exit"); });
 
     ::std::exit(4);
 

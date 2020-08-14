@@ -1,6 +1,5 @@
 //EXPECT:SIGNAL_CODE 6
 //EXPECT:OUTPUT_CONTAINS "success: third atexit\nsuccess: second atexit\nsuccess: terminate\n"
-//EXPECT:OUTPUT_NOT_CONTAINS "fail"
 
 #include <cstdlib>
 #include <exception>
@@ -15,7 +14,7 @@ void Testing::run() {
         ::std::abort();
     });
 
-    ::std::atexit([] { fprintf(stderr, "fail: first atexit\n"); });
+    ::std::atexit([] { fail("first atexit"); });
     ::std::atexit([] {
         fprintf(stderr, "success: second atexit\n");
         throw 5;

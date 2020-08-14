@@ -10,11 +10,9 @@ function(add_lightcxx_test filename section name)
                 string(REPLACE "\\n" "\n" ${argument} "${CMAKE_MATCH_1}")
             endif ()
         endforeach()
-        foreach(argument OUTPUT_CONTAINS OUTPUT_NOT_CONTAINS)
-            if (line MATCHES "^//EXPECT:${argument} \"(.*)\"$")
-                string(REPLACE "\\n" "\n" ${argument} "${CMAKE_MATCH_1}")
-            endif ()
-        endforeach()
+        if (line MATCHES "^//EXPECT:OUTPUT_CONTAINS \"(.*)\"$")
+            string(REPLACE "\\n" "\n" OUTPUT_CONTAINS "${CMAKE_MATCH_1}")
+        endif ()
     endforeach ()
 
     if (NO_COMPILE)
@@ -39,38 +37,23 @@ function(add_lightcxx_test filename section name)
 
     set(test_name compliance.${section}.${name})
     add_executable(${test_name} ${filename})
-    target_link_libraries(${test_name} lightcxx_testing)
-    if (EXIT_CODE OR SIGNAL_CODE OR OUTPUT_CONTAINS OR OUTPUT_NOT_CONTAINS)
-        add_test(NAME ${test_name} COMMAND process_safe_wrapper $<TARGET_FILE:${test_name}>)
-    else ()
-        add_test(NAME ${test_name} COMMAND ${test_name})
-    endif ()
+    target_link_libraries(${test_name} lightcxx_testing lightcxx_mock)
+    add_test(
+            NAME ${test_name}
+            COMMAND process_safe_wrapper
+            $<TARGET_FILE:${test_name}>)
     add_dependencies(check ${test_name})
 
-    if (OUTPUT_NOT_CONTAINS)
-        set_tests_properties(${test_name} PROPERTIES FAIL_REGULAR_EXPRESSION
-                "${OUTPUT_NOT_CONTAINS}")
-    endif ()
-
-    if (OUTPUT_CONTAINS)
-        if (EXIT_CODE)
-            set_tests_properties(${test_name} PROPERTIES PASS_REGULAR_EXPRESSION
-                    "${OUTPUT_CONTAINS}.*\n----\nPROCESS EXITED WITH CODE: ${EXIT_CODE}")
-        elseif (SIGNAL_CODE)
-            set_tests_properties(${test_name} PROPERTIES PASS_REGULAR_EXPRESSION
-                    "${OUTPUT_CONTAINS}.*\n----\nPROCESS EXITED BY SIGNAL: ${SIGNAL_CODE}")
-        else ()
-            set_tests_properties(${test_name} PROPERTIES PASS_REGULAR_EXPRESSION
-                    "${OUTPUT_CONTAINS}")
-        endif ()
+    set_tests_properties(${test_name} PROPERTIES FAIL_REGULAR_EXPRESSION "EXPECTATION FAILED")
+    if (EXIT_CODE)
+        set_tests_properties(${test_name} PROPERTIES PASS_REGULAR_EXPRESSION
+                "${OUTPUT_CONTAINS}.*\n----\nPROCESS EXITED WITH CODE: ${EXIT_CODE}")
+    elseif (SIGNAL_CODE)
+        set_tests_properties(${test_name} PROPERTIES PASS_REGULAR_EXPRESSION
+                "${OUTPUT_CONTAINS}.*\n----\nPROCESS EXITED BY SIGNAL: ${SIGNAL_CODE}")
     else ()
-        if (EXIT_CODE)
-            set_tests_properties(${test_name} PROPERTIES PASS_REGULAR_EXPRESSION
-                    "\n----\nPROCESS EXITED WITH CODE: ${EXIT_CODE}")
-        elseif (SIGNAL_CODE)
-            set_tests_properties(${test_name} PROPERTIES PASS_REGULAR_EXPRESSION
-                    "\n----\nPROCESS EXITED BY SIGNAL: ${SIGNAL_CODE}")
-        endif ()
+        set_tests_properties(${test_name} PROPERTIES PASS_REGULAR_EXPRESSION
+                "${OUTPUT_CONTAINS}.*\n----\nPROCESS EXITED WITH CODE: 0")
     endif ()
 endfunction()
 

@@ -2,10 +2,13 @@
 #define _LIGHTCXX_GUARD_TESTING_TEST_H
 
 #include "testing/meta.h"
+#include "testing/mock.h"
 
 namespace Testing {
 
-void expect(bool condition, const char* message = "") noexcept;
+void fail(const char* message = "", ...) noexcept;
+
+void expect(bool condition, const char* message = "", ...) noexcept;
 
 #define STATIC_EXPECT(...)                                                                         \
     ::Testing::expect(__VA_ARGS__);                                                                \

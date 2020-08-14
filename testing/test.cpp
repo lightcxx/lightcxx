@@ -1,5 +1,6 @@
 #include "testing/test.h"
 
+#include <stdarg.h>
 #include <stdio.h>
 
 namespace {
@@ -10,10 +11,30 @@ int exit_code = 0;
 
 namespace Testing {
 
-void expect(bool condition, const char* message) noexcept {
+void fail(const char* message, ...) noexcept {
+    fprintf(stderr, "EXPECTATION FAILED");
+    if (message[0] != '\0') {
+        fprintf(stderr, ": ");
+        va_list args;
+        va_start(args, message);
+        vfprintf(stderr, message, args);
+        va_end(args);
+    }
+    fprintf(stderr, "\n");
+    exit_code = 1;
+}
+
+void expect(bool condition, const char* message, ...) noexcept {
     if (!condition) {
-        fprintf(
-          stderr, "Expectation failed.%s%s\n", (message[0] == '\0' ? "" : " Message: "), message);
+        fprintf(stderr, "EXPECTATION FAILED");
+        if (message[0] != '\0') {
+            fprintf(stderr, ": ");
+            va_list args;
+            va_start(args, message);
+            vfprintf(stderr, message, args);
+            va_end(args);
+        }
+        fprintf(stderr, "\n");
         exit_code = 1;
     }
 }

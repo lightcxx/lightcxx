@@ -1,16 +1,15 @@
 //EXPECT:SIGNAL_CODE 6
-//EXPECT:OUTPUT_NOT_CONTAINS "fail"
 
 #include <cstdlib>
-
-#include <stdio.h>
 
 #include "testing/test.h"
 
 struct FailPrinter {
     const char* name = "local";
 
-    ~FailPrinter() { fprintf(stderr, "fail: destructor of %s\n", name); }
+    ~FailPrinter() {
+        Testing::fail("destructor of %s", name);
+    }
 };
 
 [[maybe_unused]] FailPrinter global{.name = "global"};
@@ -21,9 +20,9 @@ void Testing::run() {
     [[maybe_unused]] thread_local FailPrinter inline_t_local{.name = "inline_thread_local"};
     [[maybe_unused]] FailPrinter local;
 
-    ::std::atexit([] { fprintf(stderr, "fail: atexit\n"); });
+    ::std::atexit([] { fail("atexit"); });
 
-    ::std::at_quick_exit([] { fprintf(stderr, "fail: at_quick_exit\n"); });
+    ::std::at_quick_exit([] { fail("at_quick_exit"); });
 
     ::std::abort();
 }

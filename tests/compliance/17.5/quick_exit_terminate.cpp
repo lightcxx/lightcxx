@@ -1,6 +1,5 @@
 //EXPECT:SIGNAL_CODE 6
 //EXPECT:OUTPUT_CONTAINS "success: third at_quick_exit\nsuccess: second at_quick_exit\nsuccess: terminate\n"
-//EXPECT:OUTPUT_NOT_CONTAINS "fail"
 
 #include <cstdlib>
 #include <exception>
@@ -15,7 +14,7 @@ void Testing::run() {
         ::std::abort();
     });
 
-    ::std::at_quick_exit([] { fprintf(stderr, "fail: first at_quick_exit\n"); });
+    ::std::at_quick_exit([] { fail("first at_quick_exit"); });
     ::std::at_quick_exit([] {
         fprintf(stderr, "success: second at_quick_exit\n");
         throw 5;
