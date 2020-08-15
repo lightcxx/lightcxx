@@ -1,4 +1,4 @@
-//EXPECT:SIGNAL_CODE 6
+//EXPECT:EXIT KILLED BY SIGNAL SIGABRT
 
 #include <cstdlib>
 

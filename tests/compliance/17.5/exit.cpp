@@ -1,4 +1,4 @@
-//EXPECT:EXIT_CODE 4
+//EXPECT:EXIT CODE = 4
 //EXPECT:STEPS "~inline_thread_local;atexit;~inline_static;~global"
 
 #include <cstdlib>

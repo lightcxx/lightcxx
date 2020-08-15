@@ -1,4 +1,4 @@
-//EXPECT:SIGNAL_CODE 6
+//EXPECT:EXIT KILLED BY SIGNAL SIGABRT
 //EXPECT:STEPS "third at_quick_exit;second at_quick_exit;terminate"
 
 #include <cstdlib>
