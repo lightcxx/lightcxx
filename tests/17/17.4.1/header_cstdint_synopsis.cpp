@@ -216,19 +216,19 @@ void Testing::run() {
     static_assert(Testing::IsSignedIntegerType<::std::int64_t>);
 
     [[maybe_unused]] constexpr ::std::int_fast8_t if8{};
-    static_assert(sizeof(if8) == 1);
+    static_assert(sizeof(if8) >= 1);
     static_assert(Testing::IsSignedIntegerType<::std::int_fast8_t>);
 
     [[maybe_unused]] constexpr ::std::int_fast16_t if16{};
-    static_assert(sizeof(if16) == 2);
+    static_assert(sizeof(if16) >= 2);
     static_assert(Testing::IsSignedIntegerType<::std::int_fast16_t>);
 
     [[maybe_unused]] constexpr ::std::int_fast32_t if32{};
-    static_assert(sizeof(if32) == 4);
+    static_assert(sizeof(if32) >= 4);
     static_assert(Testing::IsSignedIntegerType<::std::int_fast32_t>);
 
     [[maybe_unused]] constexpr ::std::int_fast64_t if64{};
-    static_assert(sizeof(if64) == 8);
+    static_assert(sizeof(if64) >= 8);
     static_assert(Testing::IsSignedIntegerType<::std::int_fast64_t>);
 
     [[maybe_unused]] constexpr ::std::int_least8_t il8{};
@@ -272,19 +272,19 @@ void Testing::run() {
     static_assert(Testing::IsUnsignedIntegerType<::std::uint64_t>);
 
     [[maybe_unused]] constexpr ::std::uint_fast8_t uif8{};
-    static_assert(sizeof(uif8) == 1);
+    static_assert(sizeof(uif8) >= 1);
     static_assert(Testing::IsUnsignedIntegerType<::std::uint_fast8_t>);
 
     [[maybe_unused]] constexpr ::std::uint_fast16_t uif16{};
-    static_assert(sizeof(uif16) == 2);
+    static_assert(sizeof(uif16) >= 2);
     static_assert(Testing::IsUnsignedIntegerType<::std::uint_fast16_t>);
 
     [[maybe_unused]] constexpr ::std::uint_fast32_t uif32{};
-    static_assert(sizeof(uif32) == 4);
+    static_assert(sizeof(uif32) >= 4);
     static_assert(Testing::IsUnsignedIntegerType<::std::uint_fast32_t>);
 
     [[maybe_unused]] constexpr ::std::uint_fast64_t uif64{};
-    static_assert(sizeof(uif64) == 8);
+    static_assert(sizeof(uif64) >= 8);
     static_assert(Testing::IsUnsignedIntegerType<::std::uint_fast64_t>);
 
     [[maybe_unused]] constexpr ::std::uint_least8_t uil8{};

@@ -21,10 +21,10 @@ bool operator==(const lldiv_t& d1, const lldiv_t& d2) {
 void Testing::run() {
     constexpr void* n = NULL;
     STATIC_EXPECT(n == nullptr, "NULL");
-    expectType<int&&>(MB_CUR_MAX);
-    expectType<int&&>(RAND_MAX);
-    expectType<int&&>(EXIT_SUCCESS);
-    expectType<int&&>(EXIT_FAILURE);
+    [[maybe_unused]] const auto cur_max = MB_CUR_MAX;
+    [[maybe_unused]] constexpr auto rand_max = RAND_MAX;
+    [[maybe_unused]] constexpr auto exit_success = EXIT_SUCCESS;
+    [[maybe_unused]] constexpr auto exit_failure = EXIT_FAILURE;
     expect(EXIT_SUCCESS != EXIT_FAILURE, "exit status macros");
     STATIC_EXPECT((::std::size_t)5 == 5, "size_t");
 

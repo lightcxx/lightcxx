@@ -1,0 +1,23 @@
+version: "3"
+
+services:
+  ubuntu_20.04:
+    image: lightcxx/ubuntu_20.04
+    build:
+      context: .
+      dockerfile: docker/ubuntu_20.04.Dockerfile
+
+  test-clang_10-ubuntu_20.04:
+    depends_on: [ubuntu_20.04]
+    image: lightcxx/ubuntu_20.04
+    volumes: [.:/code]
+    environment: [CC=clang,CXX=clang++]
+    command: /code/docker/run_tests.sh clang_10-ubuntu_20.04
+
+# TODO: This doesn't work yet.
+#  test-gcc_9-ubuntu_20.04:
+#    depends_on: [ubuntu_20.04]
+#    image: lightcxx/ubuntu_20.04
+#    volumes: [.:/code]
+#    environment: [CC=gcc,CXX=g++]
+#    command: /code/docker/run_tests.sh gcc_9-ubuntu_20.04
