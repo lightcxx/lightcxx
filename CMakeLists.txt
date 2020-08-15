@@ -17,6 +17,7 @@ target_link_options(lightcxx PUBLIC --no-standard-libraries)
 target_link_libraries(lightcxx PUBLIC c PUBLIC c++abi)
 
 if (LIGHTCXX_ENABLE_TESTS)
+    enable_testing()
     add_subdirectory(testing)
     add_subdirectory(tests)
 endif ()
