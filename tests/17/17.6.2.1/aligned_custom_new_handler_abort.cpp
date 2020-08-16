@@ -7,7 +7,7 @@
 #include "testing/test.h"
 
 void Testing::run() {
-    mock_aligned_alloc.replace([](std::size_t align, std::size_t size) -> void* {
+    libc.aligned_alloc.replace([](std::size_t align, std::size_t size) -> void* {
         step("aligned_alloc");
         return nullptr;
     });

@@ -7,7 +7,7 @@
 #include "testing/test.h"
 
 void Testing::run() {
-    mock_malloc.replace([](std::size_t size) -> void* {
+    libc.malloc.replace([](std::size_t size) -> void* {
         step("malloc");
         return nullptr;
     });

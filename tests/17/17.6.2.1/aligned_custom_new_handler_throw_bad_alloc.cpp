@@ -5,7 +5,7 @@
 #include "testing/test.h"
 
 void Testing::run() {
-    mock_aligned_alloc.replace([](std::size_t align, std::size_t size) -> void* {
+    libc.aligned_alloc.replace([](std::size_t align, std::size_t size) -> void* {
         expect(align == 128, "::aligned_alloc alignment");
         expect(size == 256, "::aligned_alloc size");
         step("aligned_alloc");

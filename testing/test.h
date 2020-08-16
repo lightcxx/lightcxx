@@ -1,8 +1,8 @@
 #ifndef _LIGHTCXX_GUARD_TESTING_TEST_H
 #define _LIGHTCXX_GUARD_TESTING_TEST_H
 
+#include "testing/interceptor.h"
 #include "testing/meta.h"
-#include "testing/mock.h"
 
 namespace Testing {
 

@@ -1,5 +1,5 @@
-#ifndef _LIGHTCXX_GUARD_TESTING_MOCK_H
-#define _LIGHTCXX_GUARD_TESTING_MOCK_H
+#ifndef _LIGHTCXX_GUARD_TESTING_INTERCEPTOR_H
+#define _LIGHTCXX_GUARD_TESTING_INTERCEPTOR_H
 
 #include <stdlib.h>
 
@@ -8,10 +8,10 @@ namespace Testing {
 void* find_next_symbol(const char* name);
 
 template<class F>
-class CFunctionMock;
+class CFunctionInterceptor;
 
 template<class R, class... Args>
-class CFunctionMock<R(Args...)> {
+class CFunctionInterceptor<R(Args...)> {
     using F = R(Args...);
     using Replacement = R(void*, void*, Args...);
 
@@ -22,7 +22,7 @@ class CFunctionMock<R(Args...)> {
     Replacement* replacement = nullptr;
 
   public:
-    explicit CFunctionMock(const char* symbol): symbol(symbol) {}
+    [[maybe_unused]] CFunctionInterceptor(const char* symbol): symbol(symbol) {}
 
     void reset() {
         raw_replacement = nullptr;
@@ -35,7 +35,8 @@ class CFunctionMock<R(Args...)> {
         raw_replacement_state = reinterpret_cast<void*>(&state);
         raw_replacement = reinterpret_cast<void*>(repl);
         replacement = [](void* raw_repl, void* raw_state, Args... args) {
-            return reinterpret_cast<R (*)(T&, Args...)>(raw_repl)(*reinterpret_cast<T*>(raw_state), args...);
+            return reinterpret_cast<R (*)(T&, Args...)>(raw_repl)(*reinterpret_cast<T*>(raw_state),
+                                                                  args...);
         };
     }
 
@@ -57,13 +58,15 @@ class CFunctionMock<R(Args...)> {
             return original(args...);
         }
     }
-
-  private:
 };
 
-extern CFunctionMock<void*(::size_t)> mock_malloc;
-extern CFunctionMock<void(void*)> mock_free;
-extern CFunctionMock<void*(::size_t, ::size_t)> mock_aligned_alloc;
+struct LibCInterceptors {
+    CFunctionInterceptor<void*(::size_t)> malloc;
+    CFunctionInterceptor<void(void*)> free;
+    CFunctionInterceptor<void*(::size_t, ::size_t)> aligned_alloc;
+};
+
+extern LibCInterceptors libc;
 
 }  // namespace Testing
 
