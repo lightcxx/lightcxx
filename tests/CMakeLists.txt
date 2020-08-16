@@ -1,5 +1,8 @@
-add_custom_target(check ${CMAKE_CTEST_COMMAND} --output-on-failure)
-add_dependencies(check lightcxx_testing lightcxx_mock process_safe_wrapper)
+add_custom_target(check ${CMAKE_CTEST_COMMAND} --output-on-failure
+        DEPENDS lightcxx_testing lightcxx_mock process_safe_wrapper
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+add_custom_target(check_and_upload ${CMAKE_CTEST_COMMAND} -D Experimental
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 
 include(LightCXXTests.cmake)
 

@@ -22,7 +22,7 @@ else ()
 endif ()
 
 if (LIGHTCXX_ENABLE_TESTS)
-    enable_testing()
+    include(CTest)
     add_subdirectory(testing)
     add_subdirectory(tests)
 endif ()
