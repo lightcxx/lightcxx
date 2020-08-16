@@ -3,7 +3,7 @@
 
 namespace std {
 
-using terminate_handler = void(*)();
+using terminate_handler = void (*)();
 
 [[noreturn]] void terminate() noexcept;
 
@@ -22,6 +22,6 @@ class exception {
     virtual const char* what() const noexcept;
 };
 
-}
+}  // namespace std
 
 #endif

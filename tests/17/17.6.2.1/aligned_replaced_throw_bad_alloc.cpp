@@ -1,4 +1,4 @@
-//EXPECT:STEPS "new;catch"
+// EXPECT:STEPS "new;catch"
 
 #include <new>
 
@@ -16,7 +16,7 @@ void Testing::run() {
     });
 
     try {
-        [[maybe_unused]] const auto const_ptr = ::operator new(256, std::align_val_t{128});
+        [[maybe_unused]] const auto const_ptr = ::operator new (256, std::align_val_t{128});
         fail("did not throw");
     } catch (std::bad_alloc& exception) { step("catch"); } catch (...) {
         fail("did not throw bad_alloc");

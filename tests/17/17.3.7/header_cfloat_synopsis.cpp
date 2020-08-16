@@ -162,5 +162,4 @@
 #error "LDBL_TRUE_MIN is not defined."
 #endif
 
-void Testing::run() {
-}
+void Testing::run() {}

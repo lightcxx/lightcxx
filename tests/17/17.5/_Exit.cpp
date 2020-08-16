@@ -1,4 +1,4 @@
-//EXPECT:EXIT CODE = 4
+// EXPECT:EXIT CODE = 4
 
 #include <cstdlib>
 
@@ -7,7 +7,9 @@
 struct FailPrinter {
     const char* name = "local";
 
-    ~FailPrinter() { Testing::fail("destructor of %s", name); }
+    ~FailPrinter() {
+        Testing::fail("destructor of %s", name);
+    }
 };
 
 [[maybe_unused]] FailPrinter global{.name = "global"};

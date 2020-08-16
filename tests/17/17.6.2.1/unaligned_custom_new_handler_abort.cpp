@@ -1,10 +1,10 @@
-//EXPECT:EXIT KILLED BY SIGNAL SIGABRT
-//EXPECT:STEPS "malloc;new_handler"
+// EXPECT:EXIT KILLED BY SIGNAL SIGABRT
+// EXPECT:STEPS "malloc;new_handler"
 
 #include <new>
 
-#include <stdlib.h>
 #include "testing/test.h"
+#include <stdlib.h>
 
 void Testing::run() {
     libc.malloc.replace([](std::size_t size) -> void* {

@@ -22,6 +22,6 @@ template<class T>
 constexpr bool IsUnsignedIntegerType
   = IsOneOf<T, unsigned char, unsigned short, unsigned int, unsigned long, unsigned long long>;
 
-}
+}  // namespace Testing
 
 #endif

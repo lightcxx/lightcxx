@@ -1,4 +1,4 @@
-//EXPECT:STEPS "aligned_alloc 1;new_handler 1;aligned_alloc 2;new_handler 2;aligned_alloc 3;new_handler 3"
+// EXPECT:STEPS "alloc 1;new_handler 1;alloc 2;new_handler 2;alloc 3;new_handler 3"
 
 #include <new>
 
@@ -10,7 +10,7 @@ int times_new_handler_called = 0;
 void Testing::run() {
     libc.aligned_alloc.replace([](std::size_t, std::size_t) -> void* {
         ++times_aligned_alloc_called;
-        step("aligned_alloc %d", times_aligned_alloc_called);
+        step("alloc %d", times_aligned_alloc_called);
         return nullptr;
     });
     std::set_new_handler([]() {
@@ -21,7 +21,7 @@ void Testing::run() {
         }
     });
 
-    const auto const_ptr = ::operator new(256, std::align_val_t{128});
+    const auto const_ptr = ::operator new (256, std::align_val_t{128});
     expectType<void* const&>(const_ptr);
     ::operator delete(const_ptr);
 }

@@ -35,9 +35,10 @@ new_handler set_new_handler(new_handler __handler) noexcept;
 
 template<class _T>
 [[nodiscard]] constexpr _T* launder(_T* __ptr) noexcept {
-// TODO: Honor the "Mandates:" clause after type_traits is implemented.
-//    static_assert (!(is_function_v<_T>), "launder called for a function type" );
-//    static_assert (!(is_same_v<void, typename remove_cv_t<_T>>), "launder called for void pointer");
+    // TODO: Honor the "Mandates:" clause after type_traits is implemented.
+    //    static_assert (!(is_function_v<_T>), "launder called for a function type" );
+    //    static_assert (!(is_same_v<void, typename remove_cv_t<_T>>), "launder called for void
+    //    pointer");
 
 #if __has_builtin(__builtin_launder)
     return __builtin_launder(__ptr);

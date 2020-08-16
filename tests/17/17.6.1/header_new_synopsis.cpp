@@ -8,7 +8,9 @@ consteval ::std::destroying_delete_t delete_f(::std::destroying_delete_t) {
     return ::std::destroying_delete_t{};
 }
 
-::std::nothrow_t nothrow_f(::std::nothrow_t) { return ::std::nothrow_t{}; }
+::std::nothrow_t nothrow_f(::std::nothrow_t) {
+    return ::std::nothrow_t{};
+}
 
 void Testing::run() {
     [[maybe_unused]] ::std::bad_alloc b_alloc;

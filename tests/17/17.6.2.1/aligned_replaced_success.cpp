@@ -1,4 +1,4 @@
-//EXPECT:STEPS "new;delete"
+// EXPECT:STEPS "new;delete"
 
 #include <new>
 
@@ -20,7 +20,7 @@ void Testing::run() {
         ::abort();
     });
 
-    auto ptr = ::operator new(256, std::align_val_t{128});
+    auto ptr = ::operator new (256, std::align_val_t{128});
     expectType<void*&>(ptr);
     ::operator delete(ptr);
 }

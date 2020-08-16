@@ -1,4 +1,4 @@
-//EXPECT:NO_COMPILE 9
+// EXPECT:NO_COMPILE 9
 
 #include <cstddef>
 

@@ -1,4 +1,4 @@
-//EXPECT:STEPS "malloc 1;new_handler 1;malloc 2;new_handler 2;malloc 3;new_handler 3"
+// EXPECT:STEPS "malloc 1;new_handler 1;malloc 2;new_handler 2;malloc 3;new_handler 3"
 
 #include <new>
 

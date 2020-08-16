@@ -29,29 +29,20 @@ void Testing::run() {
     STATIC_EXPECT((::std::size_t)5 == 5, "size_t");
 
     [[maybe_unused]] const auto env_var = ::std::getenv("ENV_VAR");
-    [[maybe_unused]] const auto system_lambda = []() {
-        return ::std::system("echo ::std::system");
-    };
+    [[maybe_unused]] const auto system_lambda
+      = []() { return ::std::system("echo ::std::system"); };
 
     // We don't actually want to call these, just see that they compile.
-    [[maybe_unused]] auto abort_lambda = []() {
-        ::std::abort();
-    };
+    [[maybe_unused]] auto abort_lambda = []() { ::std::abort(); };
     [[maybe_unused]] auto exit_lambda = []() {
-        ::std::atexit([]() {
-            ::std::system("echo exited");
-        });
+        ::std::atexit([]() { ::std::system("echo exited"); });
         ::std::exit(10);
     };
     [[maybe_unused]] auto quick_exit_lambda = []() {
-        ::std::at_quick_exit([]() {
-            ::std::system("echo exited");
-        });
+        ::std::at_quick_exit([]() { ::std::system("echo exited"); });
         ::std::quick_exit(10);
     };
-    [[maybe_unused]] auto Exit_lambda = []() {
-        ::std::_Exit(10);
-    };
+    [[maybe_unused]] auto Exit_lambda = []() { ::std::_Exit(10); };
 
     const auto malloc_ptr = ::std::malloc(16);
     expectType<void* const&>(malloc_ptr);
@@ -92,9 +83,8 @@ void Testing::run() {
     ::std::free(characters);
 
     int a[] = {5, 2, 4, 1, 3};
-    ::std::qsort(a, 5, sizeof(int), [](const void* a, const void* b) {
-        return *((int*)a) - *((int*)b);
-    });
+    ::std::qsort(
+      a, 5, sizeof(int), [](const void* a, const void* b) { return *((int*)a) - *((int*)b); });
     expect(a[0] == 1 && a[1] == 2 && a[2] == 3 && a[3] == 4 && a[4] == 5, "qsort");
 
     int key = 2;

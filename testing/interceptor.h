@@ -54,7 +54,9 @@ class CFunctionInterceptor<R(Args...)> {
         if (replacement) {
             return replacement(raw_replacement, raw_replacement_state, args...);
         } else {
-            if (!original) { original = reinterpret_cast<F*>(find_next_symbol(symbol)); }
+            if (!original) {
+                original = reinterpret_cast<F*>(find_next_symbol(symbol));
+            }
             return original(args...);
         }
     }
