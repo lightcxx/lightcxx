@@ -9,6 +9,7 @@ add_library(lightcxx STATIC
         ${CMAKE_CURRENT_SOURCE_DIR}/src/cstdlib.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/exception.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/new.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/typeinfo.cpp
         )
 target_include_directories(lightcxx PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_include_directories(lightcxx INTERFACE SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/include)

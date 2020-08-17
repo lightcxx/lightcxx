@@ -173,3 +173,13 @@ void* operator new[](std::size_t, void* ptr) noexcept {
 void operator delete(void*, void*) noexcept {}
 
 void operator delete[](void*, void*) noexcept {}
+
+// Add these so compilers using the Itanium ABI will throw lightcxx's implementation of
+// bad_array_new_length
+namespace __cxxabiv1 {
+
+[[noreturn]] [[maybe_unused]] extern "C" void __cxa_throw_bad_array_new_length() {
+    throw std::bad_array_new_length();
+}
+
+}

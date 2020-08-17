@@ -35,7 +35,7 @@ void expect(bool condition, const char* message, ...) noexcept {
             va_end(args);
         }
         fprintf(stderr, "\n");
-        exit_code = 1;
+        ::_Exit(1);
     }
 }
 
@@ -48,9 +48,15 @@ void step(const char* message, ...) noexcept {
     fprintf(stderr, "\n");
 }
 
+__attribute__((__weak__)) void run() {}
+
+__attribute__((__weak__)) void runWithArgs(int argc, char** argv) {
+    run();
+}
+
 }  // namespace Testing
 
-int main() {
-    Testing::run();
+int main(int argc, char** argv) {
+    Testing::runWithArgs(argc, argv);
     return exit_code;
 }

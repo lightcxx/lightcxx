@@ -28,6 +28,7 @@ void expectTypeAndValue(U&& val, V&& expected, const char* message = "") noexcep
 }
 
 void run();
+void runWithArgs(int argc, char** argv);
 
 }  // namespace Testing
 
