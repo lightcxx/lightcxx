@@ -4,7 +4,7 @@ services:
   ubuntu_20.04:
     image: lightcxx/ubuntu_20.04
     build:
-      context: ..
+      context: .
       dockerfile: ubuntu_20.04.Dockerfile
 
   test-clang_10-ubuntu_20.04:

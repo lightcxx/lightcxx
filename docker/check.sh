@@ -3,10 +3,9 @@
 set -e
 
 mkdir -p ./build/$1
-cmake -H. -B./build/$1
-cd ./build/$1
+cmake -G Ninja -H. -B./build/$1
 if [[ -z "${UPLOAD_TO_CDASH}" ]]; then
-  make -j8 check_and_upload
+  cmake --build ./build/$1 --target check_and_upload
 else
-  make -j8 check
+  cmake --build ./build/$1 --target check
 fi

@@ -18,8 +18,8 @@ RUN tar -zxf cmake-3.16.4-Linux-x86_64.tar.gz
 RUN mv cmake-3.16.4-Linux-x86_64 /usr/cmake
 RUN rm cmake-3.16.4-Linux-x86_64.tar.gz
 
-RUN apt-get -y install make
 RUN apt-get -y install libtinfo5
+RUN apt-get install ninja-build
 
 ENV LIBRARY_PATH $LIBRARY_PATH:/usr/clang/lib
 ENV LD_LIBRARY_PATH $LD_LIBRARY_PATH:/usr/clang/lib
