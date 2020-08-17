@@ -1,0 +1,57 @@
+#ifndef __LIGHTCXX_GUARD_SOURCE_LOCATION
+#define __LIGHTCXX_GUARD_SOURCE_LOCATION
+
+#include <cstdint>
+
+namespace std {
+
+struct source_location {
+    // TODO: consteval
+    static constexpr source_location current(source_location ret
+                                             = source_location(__builtin_LINE(),
+                                                               __builtin_COLUMN(),
+                                                               __builtin_FILE(),
+                                                               __builtin_FUNCTION())) noexcept {
+        return ret;
+    }
+
+    constexpr source_location(): source_location(0, 0, "", "") {}
+    constexpr source_location(const source_location&) noexcept = default;
+    constexpr source_location(source_location&&) noexcept = default;
+    constexpr source_location& operator=(const source_location&) noexcept = default;
+    constexpr source_location& operator=(source_location&&) noexcept = default;
+
+    // source location field access
+    constexpr uint_least32_t line() const noexcept {
+        return __line;
+    }
+
+    constexpr uint_least32_t column() const noexcept {
+        return __column;
+    }
+
+    constexpr const char* file_name() const noexcept {
+        return __file_name;
+    }
+
+    constexpr const char* function_name() const noexcept {
+        return __function_name;
+    }
+
+  private:
+    constexpr source_location(uint_least32_t __line,
+                              uint_least32_t __column,
+                              const char* __file_name,
+                              const char* __function_name)
+            : __line(__line), __column(__column), __file_name(__file_name),
+              __function_name(__function_name) {}
+
+    uint_least32_t __line;
+    uint_least32_t __column;
+    const char* __file_name;
+    const char* __function_name;
+};
+
+}  // namespace std
+
+#endif
