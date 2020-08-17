@@ -12,6 +12,9 @@
 #endif
 #endif
 
+#ifdef NULL
+#undef NULL  // We make our own!
+#endif
 #define NULL 0L
 
 #define offsetof(__type, __member) __builtin_offsetof(__type, __member)
