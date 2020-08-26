@@ -25,11 +25,23 @@ class type_info {
 
 class bad_cast : public exception {
   public:
+    bad_cast() noexcept;
+    bad_cast(const bad_cast&) noexcept;
+    bad_cast& operator=(const bad_cast&) noexcept;
+
+    ~bad_cast() noexcept override;
+
     const char* what() const noexcept override;
 };
 
 class bad_typeid : public exception {
   public:
+    bad_typeid() noexcept;
+    bad_typeid(const bad_typeid&) noexcept;
+    bad_typeid& operator=(const bad_typeid&) noexcept;
+
+    ~bad_typeid() noexcept override;
+
     const char* what() const noexcept override;
 };
 

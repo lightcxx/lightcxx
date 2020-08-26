@@ -1,4 +1,4 @@
-#include <typeinfo>
+#include "typeinfo"
 
 namespace std {
 
@@ -20,26 +20,28 @@ const char* type_info::name() const noexcept {
     return __name;
 }
 
+bad_cast::bad_cast() noexcept = default;
+
+bad_cast::bad_cast(const bad_cast&) noexcept = default;
+
+bad_cast& bad_cast::operator=(const bad_cast&) noexcept = default;
+
+bad_cast::~bad_cast() noexcept = default;
+
 const char* bad_cast::what() const noexcept {
     return "bad_cast";
 }
+
+bad_typeid::bad_typeid() noexcept = default;
+
+bad_typeid::bad_typeid(const bad_typeid&) noexcept = default;
+
+bad_typeid& bad_typeid::operator=(const bad_typeid&) noexcept = default;
+
+bad_typeid::~bad_typeid() noexcept = default;
 
 const char* bad_typeid::what() const noexcept {
     return "bad_typeid";
 }
 
 }  // namespace std
-
-// Add these so compilers using the Itanium ABI will throw lightcxx's implementations of
-// bad_cast and bad_typeid
-namespace __cxxabiv1 {
-
-[[noreturn]] [[maybe_unused]] extern "C" void __cxa_bad_cast() {
-    throw std::bad_cast();
-}
-
-[[noreturn]] [[maybe_unused]] extern "C" void __cxa_bad_typeid() {
-    throw std::bad_typeid();
-}
-
-}  // namespace __cxxabiv1

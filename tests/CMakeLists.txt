@@ -1,6 +1,8 @@
+add_custom_target(build_all_tests echo "Built all tests!"
+        DEPENDS lightcxx_testing process_safe_wrapper)
+
 add_custom_target(check ${CMAKE_CTEST_COMMAND} --output-on-failure
-        DEPENDS lightcxx_testing process_safe_wrapper
-        WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+        DEPENDS build_all_tests WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 add_custom_target(check_and_upload ${CMAKE_CTEST_COMMAND} -D Experimental
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 
@@ -28,6 +30,9 @@ function(add_lightcxx_test filename section name)
             string(LENGTH "${CMAKE_MATCH_3}" ARGUMENTS_LEN)
             math(EXPR ARGUMENTS_LEN "${ARGUMENTS_LEN} - 2")
             string(SUBSTRING "${CMAKE_MATCH_3}" 1 ${ARGUMENTS_LEN} ARGUMENTS)
+        elseif ("${keyword}" STREQUAL "REQUEST" AND "${argument}" STREQUAL "SKIP")
+            message(STATUS "Skipping test ${section}.${name}. Reason: ${CMAKE_MATCH_3}")
+            set(SKIP_TEST TRUE)
         endif ()
     endforeach ()
 
@@ -40,13 +45,15 @@ function(add_lightcxx_test filename section name)
             set_target_properties(${test_name} PROPERTIES
                     EXCLUDE_FROM_ALL TRUE
                     EXCLUDE_FROM_DEFAULT_BUILD TRUE)
-            add_test(NAME ${test_name}
-                    COMMAND ${CMAKE_COMMAND}
-                    --build .
-                    --target ${test_name}
-                    --config $<CONFIGURATION>
-                    WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-            set_tests_properties(${test_name} PROPERTIES WILL_FAIL TRUE)
+            if (NOT SKIP_TEST)
+                add_test(NAME ${test_name}
+                        COMMAND ${CMAKE_COMMAND}
+                        --build .
+                        --target ${test_name}
+                        --config $<CONFIGURATION>
+                        WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+                set_tests_properties(${test_name} PROPERTIES WILL_FAIL TRUE)
+            endif ()
         endforeach ()
         return()
     endif ()
@@ -54,14 +61,15 @@ function(add_lightcxx_test filename section name)
     set(test_name ${section}.${name})
     add_executable(${test_name} ${filename})
     target_link_libraries(${test_name} lightcxx_testing)
-    add_test(
-            NAME ${test_name}
-            COMMAND process_safe_wrapper
-            $<TARGET_FILE:${test_name}> ${ARGUMENTS})
-    add_dependencies(check ${test_name})
-
-    set_tests_properties(${test_name} PROPERTIES FAIL_REGULAR_EXPRESSION "EXPECTATION FAILED")
-    set_tests_properties(${test_name} PROPERTIES PASS_REGULAR_EXPRESSION "^${STEPS}\n----\nPROCESS EXIT ${EXIT}")
+    if (NOT SKIP_TEST)
+        add_test(
+                NAME ${test_name}
+                COMMAND process_safe_wrapper
+                $<TARGET_FILE:${test_name}> ${ARGUMENTS})
+        add_dependencies(build_all_tests ${test_name})
+        set_tests_properties(${test_name} PROPERTIES FAIL_REGULAR_EXPRESSION "EXPECTATION FAILED")
+        set_tests_properties(${test_name} PROPERTIES PASS_REGULAR_EXPRESSION "^${STEPS}\n----\nPROCESS EXIT ${EXIT}")
+    endif ()
 endfunction()
 
 function(scan_for_lightcxx_tests directory)

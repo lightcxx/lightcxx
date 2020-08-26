@@ -1,7 +1,35 @@
 #ifndef __LIGHTCXX_GUARD_EXCEPTION
 #define __LIGHTCXX_GUARD_EXCEPTION
 
+#include <__lightcxx/__named_requirements.h>
+#include <memory>
+#include <type_traits>
+
 namespace std {
+
+using nullptr_t = decltype(nullptr);
+
+class exception {
+  public:
+    exception() noexcept;
+    exception(const exception&) noexcept;
+    exception& operator=(const exception&) noexcept;
+
+    virtual ~exception() noexcept;
+
+    virtual const char* what() const noexcept;
+};
+
+class bad_exception : public exception {
+  public:
+    bad_exception() noexcept;
+    bad_exception(const bad_exception&) noexcept;
+    bad_exception& operator=(const bad_exception&) noexcept;
+
+    ~bad_exception() noexcept override;
+
+    const char* what() const noexcept override;
+};
 
 using terminate_handler = void (*)();
 
@@ -11,16 +39,95 @@ terminate_handler set_terminate(terminate_handler __f) noexcept;
 
 terminate_handler get_terminate() noexcept;
 
-class exception {
+int uncaught_exceptions() noexcept;
+
+class exception_ptr;
+
+exception_ptr current_exception() noexcept;
+
+[[noreturn]] void rethrow_exception(exception_ptr __ptr);
+
+class exception_ptr {
   public:
-    exception() noexcept = default;
-    exception(const exception&) noexcept = default;
-    exception& operator=(const exception&) noexcept = default;
+    exception_ptr() noexcept;
+    exception_ptr(nullptr_t) noexcept;
+    exception_ptr(const exception_ptr&) noexcept;
+    exception_ptr& operator=(const exception_ptr&) noexcept;
+    ~exception_ptr() noexcept;
 
-    virtual ~exception() = default;
+    explicit operator bool() const noexcept {
+        return __ptr != nullptr;
+    }
 
-    virtual const char* what() const noexcept;
+    friend inline bool operator==(const exception_ptr& __lhs, const exception_ptr& __rhs) noexcept {
+        return __lhs.__ptr == __rhs.__ptr;
+    }
+
+    friend inline bool operator!=(const exception_ptr& __lhs, const exception_ptr& __rhs) noexcept {
+        return !(__lhs == __rhs);
+    }
+
+    friend exception_ptr current_exception() noexcept;
+    friend void rethrow_exception(exception_ptr __ptr);
+
+  private:
+    void* __ptr = nullptr;
+
+    explicit exception_ptr(void* __ptr);
 };
+
+template<class _E>
+exception_ptr make_exception_ptr(_E __e) noexcept {
+    try {
+        throw __e;
+    } catch (...) { return current_exception(); }
+}
+
+class nested_exception {
+  public:
+    nested_exception() noexcept;
+    nested_exception(const nested_exception&) noexcept;
+    nested_exception& operator=(const nested_exception&) noexcept;
+    virtual ~nested_exception();
+
+    [[noreturn]] void rethrow_nested() const;
+    exception_ptr nested_ptr() const noexcept;
+
+  private:
+    exception_ptr __nested_ptr;
+};
+
+namespace _Light {
+
+template<class _T>
+struct _WithNested : public _T, public nested_exception {
+    explicit _WithNested(const _T& __t): _T(__t) {}
+};
+
+}  // namespace _Light
+
+template<class _T>
+[[noreturn]] void throw_with_nested(_T&& __t) {
+    using _U = decay_t<_T>;
+    _Light::_Cpp17CopyConstructible::__assert<_U>();
+    if constexpr (is_class_v<_U> && !is_final_v<_U> && !is_base_of_v<nested_exception, _U>) {
+        throw _Light::_WithNested<_U>(forward<_T>(__t));
+    } else {
+        throw forward<_T>(__t);
+    }
+}
+
+template<class _E>
+void rethrow_if_nested(const _E& __e) {
+    if constexpr (is_polymorphic_v<_E>) {
+        if constexpr (!is_base_of_v<nested_exception,
+                                    _E> || is_convertible_v<const _E*, const nested_exception*>) {
+            if (const auto __n_exc = dynamic_cast<const nested_exception*>(addressof(__e))) {
+                __n_exc->rethrow_nested();
+            }
+        }
+    }
+}
 
 }  // namespace std
 

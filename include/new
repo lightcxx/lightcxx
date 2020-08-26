@@ -9,11 +9,23 @@ using size_t = decltype(sizeof(void*));
 
 class bad_alloc : public exception {
   public:
+    bad_alloc() noexcept;
+    bad_alloc(const bad_alloc&) noexcept;
+    bad_alloc& operator=(const bad_alloc&) noexcept;
+
+    ~bad_alloc() noexcept override;
+
     const char* what() const noexcept override;
 };
 
 class bad_array_new_length : public bad_alloc {
   public:
+    bad_array_new_length() noexcept;
+    bad_array_new_length(const bad_array_new_length&) noexcept;
+    bad_array_new_length& operator=(const bad_array_new_length&) noexcept;
+
+    ~bad_array_new_length() noexcept override;
+
     const char* what() const noexcept override;
 };
 
@@ -35,10 +47,8 @@ new_handler set_new_handler(new_handler __handler) noexcept;
 
 template<class _T>
 [[nodiscard]] constexpr _T* launder(_T* __ptr) noexcept {
-    // TODO: Honor the "Mandates:" clause after type_traits is implemented.
-    //    static_assert (!(is_function_v<_T>), "launder called for a function type" );
-    //    static_assert (!(is_same_v<void, typename remove_cv_t<_T>>), "launder called for void
-    //    pointer");
+    static_assert(!(is_function_v<_T>), "launder called for a function type");
+    static_assert(!(is_same_v<void, remove_cv_t<_T>>), "launder called for void pointer");
 
 #if __has_builtin(__builtin_launder)
     return __builtin_launder(__ptr);

@@ -1,4 +1,4 @@
-#include <cstdlib>
+#include "cstdlib"
 
 // Un-define this so we can get it from the LibC implementation.
 #undef MB_CUR_MAX
@@ -11,6 +11,8 @@
 #include <exception>
 
 #include "handler.h"
+
+namespace std {
 
 namespace _Light {
 
@@ -28,8 +30,6 @@ int _MBCurMax() {
 }
 
 }  // namespace _Light
-
-namespace std {
 
 [[noreturn]] void abort() noexcept {
     ::abort();
@@ -142,11 +142,11 @@ unsigned long long strtoull(const char* str, char** end, int base) {
     return ::strtoull(str, end, base);
 }
 
-int mblen(const char* s, std::size_t n) {
+int mblen(const char* s, size_t n) {
     return ::mblen(s, n);
 }
 
-int mbtowc(wchar_t* pwc, const char* s, std::size_t n) {
+int mbtowc(wchar_t* pwc, const char* s, size_t n) {
     return ::mbtowc(pwc, s, n);
 }
 
@@ -154,20 +154,20 @@ int wctomb(char* s, wchar_t wchar) {
     return ::wctomb(s, wchar);
 }
 
-std::size_t mbstowcs(wchar_t* pwcs, const char* s, std::size_t n) {
+size_t mbstowcs(wchar_t* pwcs, const char* s, size_t n) {
     return ::mbstowcs(pwcs, s, n);
 }
 
-std::size_t wcstombs(char* s, const wchar_t* pwcs, std::size_t n) {
+size_t wcstombs(char* s, const wchar_t* pwcs, size_t n) {
     return ::wcstombs(s, pwcs, n);
 }
 
 void* bsearch(
-  const void* key, const void* base, std::size_t n, std::size_t size, _Light::_ComparePred* cmp) {
+  const void* key, const void* base, size_t n, size_t size, _Light::_ComparePred* cmp) {
     return ::bsearch(key, base, n, size, cmp);
 }
 
-void qsort(void* base, std::size_t n, std::size_t size, _Light::_ComparePred* cmp) {
+void qsort(void* base, size_t n, size_t size, _Light::_ComparePred* cmp) {
     return ::qsort(base, n, size, cmp);
 }
 
@@ -211,7 +211,7 @@ long long llabs(long long j) {
     return ::llabs(j);
 }
 
-std::div_t div(int num, int den) {
+div_t div(int num, int den) {
     const auto result = ::div(num, den);
     return {
       .quot = result.quot,
@@ -219,7 +219,7 @@ std::div_t div(int num, int den) {
     };
 }
 
-std::ldiv_t div(long num, long den) {
+ldiv_t div(long num, long den) {
     const auto result = ::ldiv(num, den);
     return {
       .quot = result.quot,
@@ -227,7 +227,7 @@ std::ldiv_t div(long num, long den) {
     };
 }
 
-std::lldiv_t div(long long num, long long den) {
+lldiv_t div(long long num, long long den) {
     const auto result = ::lldiv(num, den);
     return {
       .quot = result.quot,
@@ -235,7 +235,7 @@ std::lldiv_t div(long long num, long long den) {
     };
 }
 
-std::ldiv_t ldiv(long num, long den) {
+ldiv_t ldiv(long num, long den) {
     const auto result = ::ldiv(num, den);
     return {
       .quot = result.quot,
@@ -243,7 +243,7 @@ std::ldiv_t ldiv(long num, long den) {
     };
 }
 
-std::lldiv_t lldiv(long long num, long long den) {
+lldiv_t lldiv(long long num, long long den) {
     const auto result = ::lldiv(num, den);
     return {
       .quot = result.quot,

@@ -1,0 +1,16 @@
+#ifndef __LIGHTCXX_GUARD_MEMORY
+#define __LIGHTCXX_GUARD_MEMORY
+
+namespace std {
+
+template<class _Tp>
+constexpr _Tp* addressof(_Tp& __x) noexcept {
+    return __builtin_addressof(__x);
+}
+
+template<class _Tp>
+[[maybe_unused]] constexpr _Tp* addressof(const _Tp&&) noexcept = delete;
+
+}  // namespace std
+
+#endif

@@ -1,4 +1,4 @@
-#include <new>
+#include "new"
 
 #include <stdlib.h>
 
@@ -6,9 +6,26 @@
 
 namespace std {
 
+bad_alloc::bad_alloc() noexcept = default;
+
+bad_alloc::bad_alloc(const bad_alloc&) noexcept = default;
+
+bad_alloc& bad_alloc::operator=(const bad_alloc&) noexcept = default;
+
+bad_alloc::~bad_alloc() noexcept = default;
+
 const char* bad_alloc::what() const noexcept {
     return "bad_alloc";
 }
+
+bad_array_new_length::bad_array_new_length() noexcept = default;
+
+bad_array_new_length::bad_array_new_length(const bad_array_new_length&) noexcept = default;
+
+bad_array_new_length&
+  bad_array_new_length::operator=(const bad_array_new_length&) noexcept = default;
+
+bad_array_new_length::~bad_array_new_length() noexcept = default;
 
 const char* bad_array_new_length::what() const noexcept {
     return "bad_array_new_length";
@@ -173,13 +190,3 @@ void* operator new[](std::size_t, void* ptr) noexcept {
 void operator delete(void*, void*) noexcept {}
 
 void operator delete[](void*, void*) noexcept {}
-
-// Add these so compilers using the Itanium ABI will throw lightcxx's implementation of
-// bad_array_new_length
-namespace __cxxabiv1 {
-
-[[noreturn]] [[maybe_unused]] extern "C" void __cxa_throw_bad_array_new_length() {
-    throw std::bad_array_new_length();
-}
-
-}

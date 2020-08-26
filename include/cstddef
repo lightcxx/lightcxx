@@ -1,8 +1,7 @@
 #ifndef __LIGHTCXX_GUARD_CSTDDEF
 #define __LIGHTCXX_GUARD_CSTDDEF
 
-#include <__lightcxx/__builtins.h>
-#include <__lightcxx/__type_traits_builtins.h>
+#include <type_traits>
 
 #ifndef __cpp_lib_byte
 #define __cpp_lib_byte 201603L
@@ -28,29 +27,29 @@ using ptrdiff_t = decltype(static_cast<int*>(nullptr) - static_cast<int*>(nullpt
 
 using size_t = decltype(sizeof(void*));
 
-using max_align_t = _Light::_MaxAlignT;
+using max_align_t = long double;
 
 using nullptr_t = decltype(nullptr);
 
 enum class byte : unsigned char {};
 
 template<class _T>
-requires(_Light::_IsIntegral<_T>) constexpr byte operator<<(byte __b, _T __shift) noexcept {
+requires(is_integral_v<_T>) constexpr byte operator<<(byte __b, _T __shift) noexcept {
     return static_cast<byte>(static_cast<unsigned int>(__b) << __shift);
 }
 
 template<class _T>
-requires(_Light::_IsIntegral<_T>) constexpr byte& operator<<=(byte& __b, _T __shift) noexcept {
+requires(is_integral_v<_T>) constexpr byte& operator<<=(byte& __b, _T __shift) noexcept {
     return __b = __b << __shift;
 }
 
 template<class _T>
-requires(_Light::_IsIntegral<_T>) constexpr byte operator>>(byte __b, _T __shift) noexcept {
+requires(is_integral_v<_T>) constexpr byte operator>>(byte __b, _T __shift) noexcept {
     return static_cast<byte>(static_cast<unsigned int>(__b) >> __shift);
 }
 
 template<class _T>
-requires(_Light::_IsIntegral<_T>) constexpr byte& operator>>=(byte& __b, _T __shift) noexcept {
+requires(is_integral_v<_T>) constexpr byte& operator>>=(byte& __b, _T __shift) noexcept {
     return __b = __b >> __shift;
 }
 
@@ -83,7 +82,7 @@ constexpr byte operator~(byte __b) noexcept {
 }
 
 template<class _T>
-requires(_Light::_IsIntegral<_T>) constexpr _T to_integer(byte __b) noexcept {
+requires(is_integral_v<_T>) constexpr _T to_integer(byte __b) noexcept {
     return static_cast<_T>(__b);
 }
 

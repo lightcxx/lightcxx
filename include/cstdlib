@@ -1,7 +1,7 @@
 #ifndef __LIGHTCXX_GUARD_CSTDDEF
 #define __LIGHTCXX_GUARD_CSTDDEF
 
-#include <__lightcxx/__builtins.h>
+namespace std {
 
 namespace _Light {
 
@@ -13,14 +13,6 @@ extern "C++" using _ComparePred = int(const void*, const void*);
 int _MBCurMax();
 
 }  // namespace _Light
-
-#define NULL 0L
-#define EXIT_FAILURE 1
-#define EXIT_SUCCESS 0
-#define RAND_MAX 2147483647
-#define MB_CUR_MAX (::_Light::_MBCurMax())
-
-namespace std {
 
 using size_t = decltype(sizeof(void*));
 
@@ -102,5 +94,25 @@ ldiv_t ldiv(long __num, long __den);
 lldiv_t lldiv(long long __num, long long __den);
 
 }  // namespace std
+
+#ifndef NULL
+#define NULL 0L
+#endif
+
+#ifndef EXIT_SUCCESS
+#define EXIT_SUCCESS 0
+#endif
+
+#ifndef EXIT_FAILURE
+#define EXIT_FAILURE 1
+#endif
+
+#ifndef RAND_MAX
+#define RAND_MAX 2147483647
+#endif
+
+#ifndef MB_CUR_MAX
+#define MB_CUR_MAX (::std::_Light::_MBCurMax())
+#endif
 
 #endif

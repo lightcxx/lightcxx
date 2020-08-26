@@ -4,7 +4,7 @@
 // TODO: Remove dependency on C's <stdatomic.h> once <atomic> is implemented.
 #include <stdatomic.h>
 
-namespace _Light {
+namespace std::_Light {
 
 template<class H>
 class Handler {
