@@ -2,9 +2,6 @@
 
 set -e
 
-echo "Installing git hooks..."
-cp commit-hooks/* .git/hooks
-
 mkdir -p .downloads
 rm -rf .downloads
 mkdir -p .downloads
