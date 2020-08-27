@@ -1,4 +1,4 @@
-// REQUEST:SKIP "TODO: Enable this after implementing <thread>."
+// REQUEST:SKIP "Enable this after implementing <thread>."
 // EXPECT:STEPS "after_ctor;terminate"
 // EXPECT:EXIT KILLED BY SIGNAL SIGABRT
 

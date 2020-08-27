@@ -143,8 +143,6 @@ struct numeric_limits<bool> {
     static constexpr float_round_style round_style = round_toward_zero;
 };
 
-// TODO: Implement 17.3.5 (.1 and .2).
-
 template<>
 struct numeric_limits<char> : numeric_limits<void*> {};
 

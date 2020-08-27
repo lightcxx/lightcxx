@@ -1,4 +1,4 @@
-// REQUEST:SKIP "TODO: Enable this after implementing parallel algorithms and execution policies."
+// REQUEST:SKIP "Enable this after implementing parallel algorithms and execution policies."
 // EXPECT:STEPS "algo_access_func;terminate"
 // EXPECT:EXIT KILLED BY SIGNAL SIGABRT
 
