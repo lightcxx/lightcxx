@@ -21,6 +21,6 @@ class Handler {
     }
 };
 
-}  // namespace _Light
+}  // namespace std::_Light
 
 #endif

@@ -17,6 +17,6 @@ struct _Cpp17CopyConstructible {
     }
 };
 
-}
+}  // namespace std::_Light
 
 #endif

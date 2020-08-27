@@ -3,902 +3,902 @@
 
 // also in <memory>
 #ifndef __cpp_lib_addressof_constexpr
-#  define __cpp_lib_addressof_constexpr 201603L
+#define __cpp_lib_addressof_constexpr 201603L
 #elif __cpp_lib_addressof_constexpr != 201603L
-#  error "Conflicting versions for __cpp_lib_addressof_constexpr"
+#error "Conflicting versions for __cpp_lib_addressof_constexpr"
 #endif
 
 // also in <memory>, <scoped_allocator>, <string>, <deque>, <forward_list>, <list>, <vector>, <map>,
 // <set>, <unordered_map>, <unordered_set>
 #ifndef __cpp_lib_allocator_traits_is_always_equal
-#  define __cpp_lib_allocator_traits_is_always_equal 201411L
+#define __cpp_lib_allocator_traits_is_always_equal 201411L
 #elif __cpp_lib_allocator_traits_is_always_equal != 201411L
-#  error "Conflicting versions for __cpp_lib_allocator_traits_is_always_equal"
+#error "Conflicting versions for __cpp_lib_allocator_traits_is_always_equal"
 #endif
 
 // also in <any>
 #ifndef __cpp_lib_any
-#  define __cpp_lib_any 201606L
+#define __cpp_lib_any 201606L
 #elif __cpp_lib_any != 201606L
-#  error "Conflicting versions for __cpp_lib_any"
+#error "Conflicting versions for __cpp_lib_any"
 #endif
 
 // also in <tuple>
 #ifndef __cpp_lib_apply
-#  define __cpp_lib_apply 201603L
+#define __cpp_lib_apply 201603L
 #elif __cpp_lib_apply != 201603L
-#  error "Conflicting versions for __cpp_lib_apply"
+#error "Conflicting versions for __cpp_lib_apply"
 #endif
 
 // also in <iterator>, <array>
 #ifndef __cpp_lib_array_constexpr
-#  define __cpp_lib_array_constexpr 201811L
+#define __cpp_lib_array_constexpr 201811L
 #elif __cpp_lib_array_constexpr != 201811L
-#  error "Conflicting versions for __cpp_lib_array_constexpr"
+#error "Conflicting versions for __cpp_lib_array_constexpr"
 #endif
 
 // also in <utility>
 #ifndef __cpp_lib_as_const
-#  define __cpp_lib_as_const 201510L
+#define __cpp_lib_as_const 201510L
 #elif __cpp_lib_as_const != 201510L
-#  error "Conflicting versions for __cpp_lib_as_const"
+#error "Conflicting versions for __cpp_lib_as_const"
 #endif
 
 // also in <memory>
 #ifndef __cpp_lib_assume_aligned
-#  define __cpp_lib_assume_aligned 201811L
+#define __cpp_lib_assume_aligned 201811L
 #elif __cpp_lib_assume_aligned != 201811L
-#  error "Conflicting versions for __cpp_lib_assume_aligned"
+#error "Conflicting versions for __cpp_lib_assume_aligned"
 #endif
 
 // also in <atomic>
 #ifndef __cpp_lib_atomic_flag_test
-#  define __cpp_lib_atomic_flag_test 201907L
+#define __cpp_lib_atomic_flag_test 201907L
 #elif __cpp_lib_atomic_flag_test != 201907L
-#  error "Conflicting versions for __cpp_lib_atomic_flag_test"
+#error "Conflicting versions for __cpp_lib_atomic_flag_test"
 #endif
 
 // also in <atomic>
 #ifndef __cpp_lib_atomic_float
-#  define __cpp_lib_atomic_float 201711L
+#define __cpp_lib_atomic_float 201711L
 #elif __cpp_lib_atomic_float != 201711L
-#  error "Conflicting versions for __cpp_lib_atomic_float"
+#error "Conflicting versions for __cpp_lib_atomic_float"
 #endif
 
 // also in <atomic>
 #ifndef __cpp_lib_atomic_is_always_lock_free
-#  define __cpp_lib_atomic_is_always_lock_free 201603L
+#define __cpp_lib_atomic_is_always_lock_free 201603L
 #elif __cpp_lib_atomic_is_always_lock_free != 201603L
-#  error "Conflicting versions for __cpp_lib_atomic_is_always_lock_free"
+#error "Conflicting versions for __cpp_lib_atomic_is_always_lock_free"
 #endif
 
 // also in <atomic>
 #ifndef __cpp_lib_atomic_lock_free_type_aliases
-#  define __cpp_lib_atomic_lock_free_type_aliases 201907L
+#define __cpp_lib_atomic_lock_free_type_aliases 201907L
 #elif __cpp_lib_atomic_lock_free_type_aliases != 201907L
-#  error "Conflicting versions for __cpp_lib_atomic_lock_free_type_aliases"
+#error "Conflicting versions for __cpp_lib_atomic_lock_free_type_aliases"
 #endif
 
 // also in <atomic>
 #ifndef __cpp_lib_atomic_ref
-#  define __cpp_lib_atomic_ref 201806L
+#define __cpp_lib_atomic_ref 201806L
 #elif __cpp_lib_atomic_ref != 201806L
-#  error "Conflicting versions for __cpp_lib_atomic_ref"
+#error "Conflicting versions for __cpp_lib_atomic_ref"
 #endif
 
 // also in <memory>
 #ifndef __cpp_lib_atomic_shared_ptr
-#  define __cpp_lib_atomic_shared_ptr 201711L
+#define __cpp_lib_atomic_shared_ptr 201711L
 #elif __cpp_lib_atomic_shared_ptr != 201711L
-#  error "Conflicting versions for __cpp_lib_atomic_shared_ptr"
+#error "Conflicting versions for __cpp_lib_atomic_shared_ptr"
 #endif
 
 // also in <atomic>, <memory>
 #ifndef __cpp_lib_atomic_value_initialization
-#  define __cpp_lib_atomic_value_initialization 201911L
+#define __cpp_lib_atomic_value_initialization 201911L
 #elif __cpp_lib_atomic_value_initialization != 201911L
-#  error "Conflicting versions for __cpp_lib_atomic_value_initialization"
+#error "Conflicting versions for __cpp_lib_atomic_value_initialization"
 #endif
 
 // also in <atomic>
 #ifndef __cpp_lib_atomic_wait
-#  define __cpp_lib_atomic_wait 201907L
+#define __cpp_lib_atomic_wait 201907L
 #elif __cpp_lib_atomic_wait != 201907L
-#  error "Conflicting versions for __cpp_lib_atomic_wait"
+#error "Conflicting versions for __cpp_lib_atomic_wait"
 #endif
 
 // also in <barrier>
 #ifndef __cpp_lib_barrier
-#  define __cpp_lib_barrier 201907L
+#define __cpp_lib_barrier 201907L
 #elif __cpp_lib_barrier != 201907L
-#  error "Conflicting versions for __cpp_lib_barrier"
+#error "Conflicting versions for __cpp_lib_barrier"
 #endif
 
 // also in <functional>
 #ifndef __cpp_lib_bind_front
-#  define __cpp_lib_bind_front 201907L
+#define __cpp_lib_bind_front 201907L
 #elif __cpp_lib_bind_front != 201907L
-#  error "Conflicting versions for __cpp_lib_bind_front"
+#error "Conflicting versions for __cpp_lib_bind_front"
 #endif
 
 // also in <bit>
 #ifndef __cpp_lib_bit_cast
-#  define __cpp_lib_bit_cast 201806L
+#define __cpp_lib_bit_cast 201806L
 #elif __cpp_lib_bit_cast != 201806L
-#  error "Conflicting versions for __cpp_lib_bit_cast"
+#error "Conflicting versions for __cpp_lib_bit_cast"
 #endif
 
 // also in <bit>
 #ifndef __cpp_lib_bitops
-#  define __cpp_lib_bitops 201907L
+#define __cpp_lib_bitops 201907L
 #elif __cpp_lib_bitops != 201907L
-#  error "Conflicting versions for __cpp_lib_bitops"
+#error "Conflicting versions for __cpp_lib_bitops"
 #endif
 
 // also in <type_traits>
 #ifndef __cpp_lib_bool_constant
-#  define __cpp_lib_bool_constant 201505L
+#define __cpp_lib_bool_constant 201505L
 #elif __cpp_lib_bool_constant != 201505L
-#  error "Conflicting versions for __cpp_lib_bool_constant"
+#error "Conflicting versions for __cpp_lib_bool_constant"
 #endif
 
 // also in <type_traits>
 #ifndef __cpp_lib_bounded_array_traits
-#  define __cpp_lib_bounded_array_traits 201902L
+#define __cpp_lib_bounded_array_traits 201902L
 #elif __cpp_lib_bounded_array_traits != 201902L
-#  error "Conflicting versions for __cpp_lib_bounded_array_traits"
+#error "Conflicting versions for __cpp_lib_bounded_array_traits"
 #endif
 
 // also in <functional>
 #ifndef __cpp_lib_boyer_moore_searcher
-#  define __cpp_lib_boyer_moore_searcher 201603L
+#define __cpp_lib_boyer_moore_searcher 201603L
 #elif __cpp_lib_boyer_moore_searcher != 201603L
-#  error "Conflicting versions for __cpp_lib_boyer_moore_searcher"
+#error "Conflicting versions for __cpp_lib_boyer_moore_searcher"
 #endif
 
 // also in <cstddef>
 #ifndef __cpp_lib_byte
-#  define __cpp_lib_byte 201603L
+#define __cpp_lib_byte 201603L
 #elif __cpp_lib_byte != 201603L
-#  error "Conflicting versions for __cpp_lib_byte"
+#error "Conflicting versions for __cpp_lib_byte"
 #endif
 
 // also in <atomic>, <filesystem>, <istream>, <limits>, <locale>, <ostream>, <string>,
 // <string_view>
 #ifndef __cpp_lib_char8_t
-#  define __cpp_lib_char8_t 201907L
+#define __cpp_lib_char8_t 201907L
 #elif __cpp_lib_char8_t != 201907L
-#  error "Conflicting versions for __cpp_lib_char8_t"
+#error "Conflicting versions for __cpp_lib_char8_t"
 #endif
 
 // also in <chrono>
 #ifndef __cpp_lib_chrono
-#  define __cpp_lib_chrono 201907L
+#define __cpp_lib_chrono 201907L
 #elif __cpp_lib_chrono != 201907L
-#  error "Conflicting versions for __cpp_lib_chrono"
+#error "Conflicting versions for __cpp_lib_chrono"
 #endif
 
 // also in <chrono>
 #ifndef __cpp_lib_chrono_udls
-#  define __cpp_lib_chrono_udls 201304L
+#define __cpp_lib_chrono_udls 201304L
 #elif __cpp_lib_chrono_udls != 201304L
-#  error "Conflicting versions for __cpp_lib_chrono_udls"
+#error "Conflicting versions for __cpp_lib_chrono_udls"
 #endif
 
 // also in <algorithm>
 #ifndef __cpp_lib_clamp
-#  define __cpp_lib_clamp 201603L
+#define __cpp_lib_clamp 201603L
 #elif __cpp_lib_clamp != 201603L
-#  error "Conflicting versions for __cpp_lib_clamp"
+#error "Conflicting versions for __cpp_lib_clamp"
 #endif
 
 // also in <complex>
 #ifndef __cpp_lib_complex_udls
-#  define __cpp_lib_complex_udls 201309L
+#define __cpp_lib_complex_udls 201309L
 #elif __cpp_lib_complex_udls != 201309L
-#  error "Conflicting versions for __cpp_lib_complex_udls"
+#error "Conflicting versions for __cpp_lib_complex_udls"
 #endif
 
 // also in <concepts>
 #ifndef __cpp_lib_concepts
-#  define __cpp_lib_concepts 202002L
+#define __cpp_lib_concepts 202002L
 #elif __cpp_lib_concepts != 202002L
-#  error "Conflicting versions for __cpp_lib_concepts"
+#error "Conflicting versions for __cpp_lib_concepts"
 #endif
 
 // also in <algorithm>
 #ifndef __cpp_lib_constexpr_algorithms
-#  define __cpp_lib_constexpr_algorithms 201806L
+#define __cpp_lib_constexpr_algorithms 201806L
 #elif __cpp_lib_constexpr_algorithms != 201806L
-#  error "Conflicting versions for __cpp_lib_constexpr_algorithms"
+#error "Conflicting versions for __cpp_lib_constexpr_algorithms"
 #endif
 
 // also in <complex>
 #ifndef __cpp_lib_constexpr_complex
-#  define __cpp_lib_constexpr_complex 201711L
+#define __cpp_lib_constexpr_complex 201711L
 #elif __cpp_lib_constexpr_complex != 201711L
-#  error "Conflicting versions for __cpp_lib_constexpr_complex"
+#error "Conflicting versions for __cpp_lib_constexpr_complex"
 #endif
 
 // also in <memory>
 #ifndef __cpp_lib_constexpr_dynamic_alloc
-#  define __cpp_lib_constexpr_dynamic_alloc 201907L
+#define __cpp_lib_constexpr_dynamic_alloc 201907L
 #elif __cpp_lib_constexpr_dynamic_alloc != 201907L
-#  error "Conflicting versions for __cpp_lib_constexpr_dynamic_alloc"
+#error "Conflicting versions for __cpp_lib_constexpr_dynamic_alloc"
 #endif
 
 // also in <functional>
 #ifndef __cpp_lib_constexpr_functional
-#  define __cpp_lib_constexpr_functional 201907L
+#define __cpp_lib_constexpr_functional 201907L
 #elif __cpp_lib_constexpr_functional != 201907L
-#  error "Conflicting versions for __cpp_lib_constexpr_functional"
+#error "Conflicting versions for __cpp_lib_constexpr_functional"
 #endif
 
 // also in <iterator>
 #ifndef __cpp_lib_constexpr_iterator
-#  define __cpp_lib_constexpr_iterator 201811L
+#define __cpp_lib_constexpr_iterator 201811L
 #elif __cpp_lib_constexpr_iterator != 201811L
-#  error "Conflicting versions for __cpp_lib_constexpr_iterator"
+#error "Conflicting versions for __cpp_lib_constexpr_iterator"
 #endif
 
 // also in <memory>
 #ifndef __cpp_lib_constexpr_memory
-#  define __cpp_lib_constexpr_memory 201811L
+#define __cpp_lib_constexpr_memory 201811L
 #elif __cpp_lib_constexpr_memory != 201811L
-#  error "Conflicting versions for __cpp_lib_constexpr_memory"
+#error "Conflicting versions for __cpp_lib_constexpr_memory"
 #endif
 
 // also in <numeric>
 #ifndef __cpp_lib_constexpr_numeric
-#  define __cpp_lib_constexpr_numeric 201911L
+#define __cpp_lib_constexpr_numeric 201911L
 #elif __cpp_lib_constexpr_numeric != 201911L
-#  error "Conflicting versions for __cpp_lib_constexpr_numeric"
+#error "Conflicting versions for __cpp_lib_constexpr_numeric"
 #endif
 
 // also in <string>
 #ifndef __cpp_lib_constexpr_string
-#  define __cpp_lib_constexpr_string 201907L
+#define __cpp_lib_constexpr_string 201907L
 #elif __cpp_lib_constexpr_string != 201907L
-#  error "Conflicting versions for __cpp_lib_constexpr_string"
+#error "Conflicting versions for __cpp_lib_constexpr_string"
 #endif
 
 // also in <string_view>
 #ifndef __cpp_lib_constexpr_string_view
-#  define __cpp_lib_constexpr_string_view 201811L
+#define __cpp_lib_constexpr_string_view 201811L
 #elif __cpp_lib_constexpr_string_view != 201811L
-#  error "Conflicting versions for __cpp_lib_constexpr_string_view"
+#error "Conflicting versions for __cpp_lib_constexpr_string_view"
 #endif
 
 // also in <tuple>
 #ifndef __cpp_lib_constexpr_tuple
-#  define __cpp_lib_constexpr_tuple 201811L
+#define __cpp_lib_constexpr_tuple 201811L
 #elif __cpp_lib_constexpr_tuple != 201811L
-#  error "Conflicting versions for __cpp_lib_constexpr_tuple"
+#error "Conflicting versions for __cpp_lib_constexpr_tuple"
 #endif
 
 // also in <utility>
 #ifndef __cpp_lib_constexpr_utility
-#  define __cpp_lib_constexpr_utility 201811L
+#define __cpp_lib_constexpr_utility 201811L
 #elif __cpp_lib_constexpr_utility != 201811L
-#  error "Conflicting versions for __cpp_lib_constexpr_utility"
+#error "Conflicting versions for __cpp_lib_constexpr_utility"
 #endif
 
 // also in <vector>
 #ifndef __cpp_lib_constexpr_vector
-#  define __cpp_lib_constexpr_vector 201907L
+#define __cpp_lib_constexpr_vector 201907L
 #elif __cpp_lib_constexpr_vector != 201907L
-#  error "Conflicting versions for __cpp_lib_constexpr_vector"
+#error "Conflicting versions for __cpp_lib_constexpr_vector"
 #endif
 
 // also in <coroutine>
 #ifndef __cpp_lib_coroutine
-#  define __cpp_lib_coroutine 201902L
+#define __cpp_lib_coroutine 201902L
 #elif __cpp_lib_coroutine != 201902L
-#  error "Conflicting versions for __cpp_lib_coroutine"
+#error "Conflicting versions for __cpp_lib_coroutine"
 #endif
 
 // also in <new>
 #ifndef __cpp_lib_destroying_delete
-#  define __cpp_lib_destroying_delete 201806L
+#define __cpp_lib_destroying_delete 201806L
 #elif __cpp_lib_destroying_delete != 201806L
-#  error "Conflicting versions for __cpp_lib_destroying_delete"
+#error "Conflicting versions for __cpp_lib_destroying_delete"
 #endif
 
 // also in <memory>
 #ifndef __cpp_lib_enable_shared_from_this
-#  define __cpp_lib_enable_shared_from_this 201603L
+#define __cpp_lib_enable_shared_from_this 201603L
 #elif __cpp_lib_enable_shared_from_this != 201603L
-#  error "Conflicting versions for __cpp_lib_enable_shared_from_this"
+#error "Conflicting versions for __cpp_lib_enable_shared_from_this"
 #endif
 
 // also in <bit>
 #ifndef __cpp_lib_endian
-#  define __cpp_lib_endian 201907L
+#define __cpp_lib_endian 201907L
 #elif __cpp_lib_endian != 201907L
-#  error "Conflicting versions for __cpp_lib_endian"
+#error "Conflicting versions for __cpp_lib_endian"
 #endif
 
 // also in <string>, <deque>, <forward_list>, <list>, <vector>, <map>, <set>, <unordered_map>,
 // <unordered_set>
 #ifndef __cpp_lib_erase_if
-#  define __cpp_lib_erase_if 202002L
+#define __cpp_lib_erase_if 202002L
 #elif __cpp_lib_erase_if != 202002L
-#  error "Conflicting versions for __cpp_lib_erase_if"
+#error "Conflicting versions for __cpp_lib_erase_if"
 #endif
 
 // also in <utility>
 #ifndef __cpp_lib_exchange_function
-#  define __cpp_lib_exchange_function 201304L
+#define __cpp_lib_exchange_function 201304L
 #elif __cpp_lib_exchange_function != 201304L
-#  error "Conflicting versions for __cpp_lib_exchange_function"
+#error "Conflicting versions for __cpp_lib_exchange_function"
 #endif
 
 // also in <execution>
 #ifndef __cpp_lib_execution
-#  define __cpp_lib_execution 201902L
+#define __cpp_lib_execution 201902L
 #elif __cpp_lib_execution != 201902L
-#  error "Conflicting versions for __cpp_lib_execution"
+#error "Conflicting versions for __cpp_lib_execution"
 #endif
 
 // also in <filesystem>
 #ifndef __cpp_lib_filesystem
-#  define __cpp_lib_filesystem 201703L
+#define __cpp_lib_filesystem 201703L
 #elif __cpp_lib_filesystem != 201703L
-#  error "Conflicting versions for __cpp_lib_filesystem"
+#error "Conflicting versions for __cpp_lib_filesystem"
 #endif
 
 // also in <format>
 #ifndef __cpp_lib_format
-#  define __cpp_lib_format 201907L
+#define __cpp_lib_format 201907L
 #elif __cpp_lib_format != 201907L
-#  error "Conflicting versions for __cpp_lib_format"
+#error "Conflicting versions for __cpp_lib_format"
 #endif
 
 // also in <numeric>
 #ifndef __cpp_lib_gcd_lcm
-#  define __cpp_lib_gcd_lcm 201606L
+#define __cpp_lib_gcd_lcm 201606L
 #elif __cpp_lib_gcd_lcm != 201606L
-#  error "Conflicting versions for __cpp_lib_gcd_lcm"
+#error "Conflicting versions for __cpp_lib_gcd_lcm"
 #endif
 
 // also in <map>, <set>
 #ifndef __cpp_lib_generic_associative_lookup
-#  define __cpp_lib_generic_associative_lookup 201304L
+#define __cpp_lib_generic_associative_lookup 201304L
 #elif __cpp_lib_generic_associative_lookup != 201304L
-#  error "Conflicting versions for __cpp_lib_generic_associative_lookup"
+#error "Conflicting versions for __cpp_lib_generic_associative_lookup"
 #endif
 
 // also in <unordered_map>, <unordered_set>
 #ifndef __cpp_lib_generic_unordered_lookup
-#  define __cpp_lib_generic_unordered_lookup 201811L
+#define __cpp_lib_generic_unordered_lookup 201811L
 #elif __cpp_lib_generic_unordered_lookup != 201811L
-#  error "Conflicting versions for __cpp_lib_generic_unordered_lookup"
+#error "Conflicting versions for __cpp_lib_generic_unordered_lookup"
 #endif
 
 // also in <new>
 #ifndef __cpp_lib_hardware_interference_size
-#  define __cpp_lib_hardware_interference_size 201703L
+#define __cpp_lib_hardware_interference_size 201703L
 #elif __cpp_lib_hardware_interference_size != 201703L
-#  error "Conflicting versions for __cpp_lib_hardware_interference_size"
+#error "Conflicting versions for __cpp_lib_hardware_interference_size"
 #endif
 
 // also in <type_traits>
 #ifndef __cpp_lib_has_unique_object_representations
-#  define __cpp_lib_has_unique_object_representations 201606L
+#define __cpp_lib_has_unique_object_representations 201606L
 #elif __cpp_lib_has_unique_object_representations != 201606L
-#  error "Conflicting versions for __cpp_lib_has_unique_object_representations"
+#error "Conflicting versions for __cpp_lib_has_unique_object_representations"
 #endif
 
 // also in <cmath>
 #ifndef __cpp_lib_hypot
-#  define __cpp_lib_hypot 201603L
+#define __cpp_lib_hypot 201603L
 #elif __cpp_lib_hypot != 201603L
-#  error "Conflicting versions for __cpp_lib_hypot"
+#error "Conflicting versions for __cpp_lib_hypot"
 #endif
 
 // also in <forward_list>, <list>, <vector>
 #ifndef __cpp_lib_incomplete_container_elements
-#  define __cpp_lib_incomplete_container_elements 201505L
+#define __cpp_lib_incomplete_container_elements 201505L
 #elif __cpp_lib_incomplete_container_elements != 201505L
-#  error "Conflicting versions for __cpp_lib_incomplete_container_elements"
+#error "Conflicting versions for __cpp_lib_incomplete_container_elements"
 #endif
 
 // also in <bit>
 #ifndef __cpp_lib_int_pow2
-#  define __cpp_lib_int_pow2 202002L
+#define __cpp_lib_int_pow2 202002L
 #elif __cpp_lib_int_pow2 != 202002L
-#  error "Conflicting versions for __cpp_lib_int_pow2"
+#error "Conflicting versions for __cpp_lib_int_pow2"
 #endif
 
 // also in <utility>
 #ifndef __cpp_lib_integer_comparison_functions
-#  define __cpp_lib_integer_comparison_functions 202002L
+#define __cpp_lib_integer_comparison_functions 202002L
 #elif __cpp_lib_integer_comparison_functions != 202002L
-#  error "Conflicting versions for __cpp_lib_integer_comparison_functions"
+#error "Conflicting versions for __cpp_lib_integer_comparison_functions"
 #endif
 
 // also in <utility>
 #ifndef __cpp_lib_integer_sequence
-#  define __cpp_lib_integer_sequence 201304L
+#define __cpp_lib_integer_sequence 201304L
 #elif __cpp_lib_integer_sequence != 201304L
-#  error "Conflicting versions for __cpp_lib_integer_sequence"
+#error "Conflicting versions for __cpp_lib_integer_sequence"
 #endif
 
 // also in <type_traits>
 #ifndef __cpp_lib_integral_constant_callable
-#  define __cpp_lib_integral_constant_callable 201304L
+#define __cpp_lib_integral_constant_callable 201304L
 #elif __cpp_lib_integral_constant_callable != 201304L
-#  error "Conflicting versions for __cpp_lib_integral_constant_callable"
+#error "Conflicting versions for __cpp_lib_integral_constant_callable"
 #endif
 
 // also in <cmath>, <numeric>
 #ifndef __cpp_lib_interpolate
-#  define __cpp_lib_interpolate 201902L
+#define __cpp_lib_interpolate 201902L
 #elif __cpp_lib_interpolate != 201902L
-#  error "Conflicting versions for __cpp_lib_interpolate"
+#error "Conflicting versions for __cpp_lib_interpolate"
 #endif
 
 // also in <functional>
 #ifndef __cpp_lib_invoke
-#  define __cpp_lib_invoke 201411L
+#define __cpp_lib_invoke 201411L
 #elif __cpp_lib_invoke != 201411L
-#  error "Conflicting versions for __cpp_lib_invoke"
+#error "Conflicting versions for __cpp_lib_invoke"
 #endif
 
 // also in <type_traits>
 #ifndef __cpp_lib_is_aggregate
-#  define __cpp_lib_is_aggregate 201703L
+#define __cpp_lib_is_aggregate 201703L
 #elif __cpp_lib_is_aggregate != 201703L
-#  error "Conflicting versions for __cpp_lib_is_aggregate"
+#error "Conflicting versions for __cpp_lib_is_aggregate"
 #endif
 
 // also in <type_traits>
 #ifndef __cpp_lib_is_constant_evaluated
-#  define __cpp_lib_is_constant_evaluated 201811L
+#define __cpp_lib_is_constant_evaluated 201811L
 #elif __cpp_lib_is_constant_evaluated != 201811L
-#  error "Conflicting versions for __cpp_lib_is_constant_evaluated"
+#error "Conflicting versions for __cpp_lib_is_constant_evaluated"
 #endif
 
 // also in <type_traits>
 #ifndef __cpp_lib_is_final
-#  define __cpp_lib_is_final 201402L
+#define __cpp_lib_is_final 201402L
 #elif __cpp_lib_is_final != 201402L
-#  error "Conflicting versions for __cpp_lib_is_final"
+#error "Conflicting versions for __cpp_lib_is_final"
 #endif
 
 // also in <type_traits>
 #ifndef __cpp_lib_is_invocable
-#  define __cpp_lib_is_invocable 201703L
+#define __cpp_lib_is_invocable 201703L
 #elif __cpp_lib_is_invocable != 201703L
-#  error "Conflicting versions for __cpp_lib_is_invocable"
+#error "Conflicting versions for __cpp_lib_is_invocable"
 #endif
 
 // also in <type_traits>
 #ifndef __cpp_lib_is_layout_compatible
-#  define __cpp_lib_is_layout_compatible 201907L
+#define __cpp_lib_is_layout_compatible 201907L
 #elif __cpp_lib_is_layout_compatible != 201907L
-#  error "Conflicting versions for __cpp_lib_is_layout_compatible"
+#error "Conflicting versions for __cpp_lib_is_layout_compatible"
 #endif
 
 // also in <type_traits>
 #ifndef __cpp_lib_is_nothrow_convertible
-#  define __cpp_lib_is_nothrow_convertible 201806L
+#define __cpp_lib_is_nothrow_convertible 201806L
 #elif __cpp_lib_is_nothrow_convertible != 201806L
-#  error "Conflicting versions for __cpp_lib_is_nothrow_convertible"
+#error "Conflicting versions for __cpp_lib_is_nothrow_convertible"
 #endif
 
 // also in <type_traits>
 #ifndef __cpp_lib_is_null_pointer
-#  define __cpp_lib_is_null_pointer 201309L
+#define __cpp_lib_is_null_pointer 201309L
 #elif __cpp_lib_is_null_pointer != 201309L
-#  error "Conflicting versions for __cpp_lib_is_null_pointer"
+#error "Conflicting versions for __cpp_lib_is_null_pointer"
 #endif
 
 // also in <type_traits>
 #ifndef __cpp_lib_is_pointer_interconvertible
-#  define __cpp_lib_is_pointer_interconvertible 201907L
+#define __cpp_lib_is_pointer_interconvertible 201907L
 #elif __cpp_lib_is_pointer_interconvertible != 201907L
-#  error "Conflicting versions for __cpp_lib_is_pointer_interconvertible"
+#error "Conflicting versions for __cpp_lib_is_pointer_interconvertible"
 #endif
 
 // also in <type_traits>
 #ifndef __cpp_lib_is_swappable
-#  define __cpp_lib_is_swappable 201603L
+#define __cpp_lib_is_swappable 201603L
 #elif __cpp_lib_is_swappable != 201603L
-#  error "Conflicting versions for __cpp_lib_is_swappable"
+#error "Conflicting versions for __cpp_lib_is_swappable"
 #endif
 
 // also in <stop_token>, <thread>
 #ifndef __cpp_lib_jthread
-#  define __cpp_lib_jthread 201911L
+#define __cpp_lib_jthread 201911L
 #elif __cpp_lib_jthread != 201911L
-#  error "Conflicting versions for __cpp_lib_jthread"
+#error "Conflicting versions for __cpp_lib_jthread"
 #endif
 
 // also in <latch>
 #ifndef __cpp_lib_latch
-#  define __cpp_lib_latch 201907L
+#define __cpp_lib_latch 201907L
 #elif __cpp_lib_latch != 201907L
-#  error "Conflicting versions for __cpp_lib_latch"
+#error "Conflicting versions for __cpp_lib_latch"
 #endif
 
 // also in <new>
 #ifndef __cpp_lib_launder
-#  define __cpp_lib_launder 201606L
+#define __cpp_lib_launder 201606L
 #elif __cpp_lib_launder != 201606L
-#  error "Conflicting versions for __cpp_lib_launder"
+#error "Conflicting versions for __cpp_lib_launder"
 #endif
 
 // also in <forward_list>, <list>
 #ifndef __cpp_lib_list_remove_return_type
-#  define __cpp_lib_list_remove_return_type 201806L
+#define __cpp_lib_list_remove_return_type 201806L
 #elif __cpp_lib_list_remove_return_type != 201806L
-#  error "Conflicting versions for __cpp_lib_list_remove_return_type"
+#error "Conflicting versions for __cpp_lib_list_remove_return_type"
 #endif
 
 // also in <type_traits>
 #ifndef __cpp_lib_logical_traits
-#  define __cpp_lib_logical_traits 201510L
+#define __cpp_lib_logical_traits 201510L
 #elif __cpp_lib_logical_traits != 201510L
-#  error "Conflicting versions for __cpp_lib_logical_traits"
+#error "Conflicting versions for __cpp_lib_logical_traits"
 #endif
 
 // also in <tuple>
 #ifndef __cpp_lib_make_from_tuple
-#  define __cpp_lib_make_from_tuple 201606L
+#define __cpp_lib_make_from_tuple 201606L
 #elif __cpp_lib_make_from_tuple != 201606L
-#  error "Conflicting versions for __cpp_lib_make_from_tuple"
+#error "Conflicting versions for __cpp_lib_make_from_tuple"
 #endif
 
 // also in <iterator>
 #ifndef __cpp_lib_make_reverse_iterator
-#  define __cpp_lib_make_reverse_iterator 201402L
+#define __cpp_lib_make_reverse_iterator 201402L
 #elif __cpp_lib_make_reverse_iterator != 201402L
-#  error "Conflicting versions for __cpp_lib_make_reverse_iterator"
+#error "Conflicting versions for __cpp_lib_make_reverse_iterator"
 #endif
 
 // also in <memory>
 #ifndef __cpp_lib_make_unique
-#  define __cpp_lib_make_unique 201304L
+#define __cpp_lib_make_unique 201304L
 #elif __cpp_lib_make_unique != 201304L
-#  error "Conflicting versions for __cpp_lib_make_unique"
+#error "Conflicting versions for __cpp_lib_make_unique"
 #endif
 
 // also in <map>
 #ifndef __cpp_lib_map_try_emplace
-#  define __cpp_lib_map_try_emplace 201411L
+#define __cpp_lib_map_try_emplace 201411L
 #elif __cpp_lib_map_try_emplace != 201411L
-#  error "Conflicting versions for __cpp_lib_map_try_emplace"
+#error "Conflicting versions for __cpp_lib_map_try_emplace"
 #endif
 
 // also in <numbers>
 #ifndef __cpp_lib_math_constants
-#  define __cpp_lib_math_constants 201907L
+#define __cpp_lib_math_constants 201907L
 #elif __cpp_lib_math_constants != 201907L
-#  error "Conflicting versions for __cpp_lib_math_constants"
+#error "Conflicting versions for __cpp_lib_math_constants"
 #endif
 
 // also in <cmath>
 #ifndef __cpp_lib_math_special_functions
-#  define __cpp_lib_math_special_functions 201603L
+#define __cpp_lib_math_special_functions 201603L
 #elif __cpp_lib_math_special_functions != 201603L
-#  error "Conflicting versions for __cpp_lib_math_special_functions"
+#error "Conflicting versions for __cpp_lib_math_special_functions"
 #endif
 
 // also in <memory_resource>
 #ifndef __cpp_lib_memory_resource
-#  define __cpp_lib_memory_resource 201603L
+#define __cpp_lib_memory_resource 201603L
 #elif __cpp_lib_memory_resource != 201603L
-#  error "Conflicting versions for __cpp_lib_memory_resource"
+#error "Conflicting versions for __cpp_lib_memory_resource"
 #endif
 
 // also in <map>, <set>, <unordered_map>, <unordered_set>
 #ifndef __cpp_lib_node_extract
-#  define __cpp_lib_node_extract 201606L
+#define __cpp_lib_node_extract 201606L
 #elif __cpp_lib_node_extract != 201606L
-#  error "Conflicting versions for __cpp_lib_node_extract"
+#error "Conflicting versions for __cpp_lib_node_extract"
 #endif
 
 // also in <array>, <deque>, <forward_list>, <iterator>, <list>, <map>, <regex>, <set>, <string>,
 // <unordered_map>, <unordered_set>, <vector>
 #ifndef __cpp_lib_nonmember_container_access
-#  define __cpp_lib_nonmember_container_access 201411L
+#define __cpp_lib_nonmember_container_access 201411L
 #elif __cpp_lib_nonmember_container_access != 201411L
-#  error "Conflicting versions for __cpp_lib_nonmember_container_access"
+#error "Conflicting versions for __cpp_lib_nonmember_container_access"
 #endif
 
 // also in <functional>
 #ifndef __cpp_lib_not_fn
-#  define __cpp_lib_not_fn 201603L
+#define __cpp_lib_not_fn 201603L
 #elif __cpp_lib_not_fn != 201603L
-#  error "Conflicting versions for __cpp_lib_not_fn"
+#error "Conflicting versions for __cpp_lib_not_fn"
 #endif
 
 // also in <iterator>
 #ifndef __cpp_lib_null_iterators
-#  define __cpp_lib_null_iterators 201304L
+#define __cpp_lib_null_iterators 201304L
 #elif __cpp_lib_null_iterators != 201304L
-#  error "Conflicting versions for __cpp_lib_null_iterators"
+#error "Conflicting versions for __cpp_lib_null_iterators"
 #endif
 
 // also in <optional>
 #ifndef __cpp_lib_optional
-#  define __cpp_lib_optional 201606L
+#define __cpp_lib_optional 201606L
 #elif __cpp_lib_optional != 201606L
-#  error "Conflicting versions for __cpp_lib_optional"
+#error "Conflicting versions for __cpp_lib_optional"
 #endif
 
 // also in <algorithm>, <numeric>
 #ifndef __cpp_lib_parallel_algorithm
-#  define __cpp_lib_parallel_algorithm 201603L
+#define __cpp_lib_parallel_algorithm 201603L
 #elif __cpp_lib_parallel_algorithm != 201603L
-#  error "Conflicting versions for __cpp_lib_parallel_algorithm"
+#error "Conflicting versions for __cpp_lib_parallel_algorithm"
 #endif
 
 // also in <memory>
 #ifndef __cpp_lib_polymorphic_allocator
-#  define __cpp_lib_polymorphic_allocator 201902L
+#define __cpp_lib_polymorphic_allocator 201902L
 #elif __cpp_lib_polymorphic_allocator != 201902L
-#  error "Conflicting versions for __cpp_lib_polymorphic_allocator"
+#error "Conflicting versions for __cpp_lib_polymorphic_allocator"
 #endif
 
 // also in <iomanip>
 #ifndef __cpp_lib_quoted_string_io
-#  define __cpp_lib_quoted_string_io 201304L
+#define __cpp_lib_quoted_string_io 201304L
 #elif __cpp_lib_quoted_string_io != 201304L
-#  error "Conflicting versions for __cpp_lib_quoted_string_io"
+#error "Conflicting versions for __cpp_lib_quoted_string_io"
 #endif
 
 // also in <algorithm>, <functional>, <iterator>, <memory>, <ranges>
 #ifndef __cpp_lib_ranges
-#  define __cpp_lib_ranges 201911L
+#define __cpp_lib_ranges 201911L
 #elif __cpp_lib_ranges != 201911L
-#  error "Conflicting versions for __cpp_lib_ranges"
+#error "Conflicting versions for __cpp_lib_ranges"
 #endif
 
 // also in <memory>
 #ifndef __cpp_lib_raw_memory_algorithms
-#  define __cpp_lib_raw_memory_algorithms 201606L
+#define __cpp_lib_raw_memory_algorithms 201606L
 #elif __cpp_lib_raw_memory_algorithms != 201606L
-#  error "Conflicting versions for __cpp_lib_raw_memory_algorithms"
+#error "Conflicting versions for __cpp_lib_raw_memory_algorithms"
 #endif
 
 // also in <type_traits>
 #ifndef __cpp_lib_remove_cvref
-#  define __cpp_lib_remove_cvref 201711L
+#define __cpp_lib_remove_cvref 201711L
 #elif __cpp_lib_remove_cvref != 201711L
-#  error "Conflicting versions for __cpp_lib_remove_cvref"
+#error "Conflicting versions for __cpp_lib_remove_cvref"
 #endif
 
 // also in <functional>, <type_traits>
 #ifndef __cpp_lib_result_of_sfinae
-#  define __cpp_lib_result_of_sfinae 201210L
+#define __cpp_lib_result_of_sfinae 201210L
 #elif __cpp_lib_result_of_sfinae != 201210L
-#  error "Conflicting versions for __cpp_lib_result_of_sfinae"
+#error "Conflicting versions for __cpp_lib_result_of_sfinae"
 #endif
 
 // also in <algorithm>
 #ifndef __cpp_lib_robust_nonmodifying_seq_ops
-#  define __cpp_lib_robust_nonmodifying_seq_ops 201304L
+#define __cpp_lib_robust_nonmodifying_seq_ops 201304L
 #elif __cpp_lib_robust_nonmodifying_seq_ops != 201304L
-#  error "Conflicting versions for __cpp_lib_robust_nonmodifying_seq_ops"
+#error "Conflicting versions for __cpp_lib_robust_nonmodifying_seq_ops"
 #endif
 
 // also in <algorithm>
 #ifndef __cpp_lib_sample
-#  define __cpp_lib_sample 201603L
+#define __cpp_lib_sample 201603L
 #elif __cpp_lib_sample != 201603L
-#  error "Conflicting versions for __cpp_lib_sample"
+#error "Conflicting versions for __cpp_lib_sample"
 #endif
 
 // also in <mutex>
 #ifndef __cpp_lib_scoped_lock
-#  define __cpp_lib_scoped_lock 201703L
+#define __cpp_lib_scoped_lock 201703L
 #elif __cpp_lib_scoped_lock != 201703L
-#  error "Conflicting versions for __cpp_lib_scoped_lock"
+#error "Conflicting versions for __cpp_lib_scoped_lock"
 #endif
 
 // also in <semaphore>
 #ifndef __cpp_lib_semaphore
-#  define __cpp_lib_semaphore 201907L
+#define __cpp_lib_semaphore 201907L
 #elif __cpp_lib_semaphore != 201907L
-#  error "Conflicting versions for __cpp_lib_semaphore"
+#error "Conflicting versions for __cpp_lib_semaphore"
 #endif
 
 // also in <shared_mutex>
 #ifndef __cpp_lib_shared_mutex
-#  define __cpp_lib_shared_mutex 201505L
+#define __cpp_lib_shared_mutex 201505L
 #elif __cpp_lib_shared_mutex != 201505L
-#  error "Conflicting versions for __cpp_lib_shared_mutex"
+#error "Conflicting versions for __cpp_lib_shared_mutex"
 #endif
 
 // also in <memory>
 #ifndef __cpp_lib_shared_ptr_arrays
-#  define __cpp_lib_shared_ptr_arrays 201707L
+#define __cpp_lib_shared_ptr_arrays 201707L
 #elif __cpp_lib_shared_ptr_arrays != 201707L
-#  error "Conflicting versions for __cpp_lib_shared_ptr_arrays"
+#error "Conflicting versions for __cpp_lib_shared_ptr_arrays"
 #endif
 
 // also in <memory>
 #ifndef __cpp_lib_shared_ptr_weak_type
-#  define __cpp_lib_shared_ptr_weak_type 201606L
+#define __cpp_lib_shared_ptr_weak_type 201606L
 #elif __cpp_lib_shared_ptr_weak_type != 201606L
-#  error "Conflicting versions for __cpp_lib_shared_ptr_weak_type"
+#error "Conflicting versions for __cpp_lib_shared_ptr_weak_type"
 #endif
 
 // also in <shared_mutex>
 #ifndef __cpp_lib_shared_timed_mutex
-#  define __cpp_lib_shared_timed_mutex 201402L
+#define __cpp_lib_shared_timed_mutex 201402L
 #elif __cpp_lib_shared_timed_mutex != 201402L
-#  error "Conflicting versions for __cpp_lib_shared_timed_mutex"
+#error "Conflicting versions for __cpp_lib_shared_timed_mutex"
 #endif
 
 // also in <algorithm>
 #ifndef __cpp_lib_shift
-#  define __cpp_lib_shift 201806L
+#define __cpp_lib_shift 201806L
 #elif __cpp_lib_shift != 201806L
-#  error "Conflicting versions for __cpp_lib_shift"
+#error "Conflicting versions for __cpp_lib_shift"
 #endif
 
 // also in <memory>
 #ifndef __cpp_lib_smart_ptr_for_overwrite
-#  define __cpp_lib_smart_ptr_for_overwrite 202002L
+#define __cpp_lib_smart_ptr_for_overwrite 202002L
 #elif __cpp_lib_smart_ptr_for_overwrite != 202002L
-#  error "Conflicting versions for __cpp_lib_smart_ptr_for_overwrite"
+#error "Conflicting versions for __cpp_lib_smart_ptr_for_overwrite"
 #endif
 
 // also in <source_location>
 #ifndef __cpp_lib_source_location
-#  define __cpp_lib_source_location 201907L
+#define __cpp_lib_source_location 201907L
 #elif __cpp_lib_source_location != 201907L
-#  error "Conflicting versions for __cpp_lib_source_location"
+#error "Conflicting versions for __cpp_lib_source_location"
 #endif
 
 // also in <span>
 #ifndef __cpp_lib_span
-#  define __cpp_lib_span 202002L
+#define __cpp_lib_span 202002L
 #elif __cpp_lib_span != 202002L
-#  error "Conflicting versions for __cpp_lib_span"
+#error "Conflicting versions for __cpp_lib_span"
 #endif
 
 // also in <iterator>
 #ifndef __cpp_lib_ssize
-#  define __cpp_lib_ssize 201902L
+#define __cpp_lib_ssize 201902L
 #elif __cpp_lib_ssize != 201902L
-#  error "Conflicting versions for __cpp_lib_ssize"
+#error "Conflicting versions for __cpp_lib_ssize"
 #endif
 
 // also in <string>, <string_view>
 #ifndef __cpp_lib_starts_ends_with
-#  define __cpp_lib_starts_ends_with 201711L
+#define __cpp_lib_starts_ends_with 201711L
 #elif __cpp_lib_starts_ends_with != 201711L
-#  error "Conflicting versions for __cpp_lib_starts_ends_with"
+#error "Conflicting versions for __cpp_lib_starts_ends_with"
 #endif
 
 // also in <string>
 #ifndef __cpp_lib_string_udls
-#  define __cpp_lib_string_udls 201304L
+#define __cpp_lib_string_udls 201304L
 #elif __cpp_lib_string_udls != 201304L
-#  error "Conflicting versions for __cpp_lib_string_udls"
+#error "Conflicting versions for __cpp_lib_string_udls"
 #endif
 
 // also in <string>, <string_view>
 #ifndef __cpp_lib_string_view
-#  define __cpp_lib_string_view 201803L
+#define __cpp_lib_string_view 201803L
 #elif __cpp_lib_string_view != 201803L
-#  error "Conflicting versions for __cpp_lib_string_view"
+#error "Conflicting versions for __cpp_lib_string_view"
 #endif
 
 // also in <syncstream>
 #ifndef __cpp_lib_syncbuf
-#  define __cpp_lib_syncbuf 201803L
+#define __cpp_lib_syncbuf 201803L
 #elif __cpp_lib_syncbuf != 201803L
-#  error "Conflicting versions for __cpp_lib_syncbuf"
+#error "Conflicting versions for __cpp_lib_syncbuf"
 #endif
 
 // also in <compare>
 #ifndef __cpp_lib_three_way_comparison
-#  define __cpp_lib_three_way_comparison 201907L
+#define __cpp_lib_three_way_comparison 201907L
 #elif __cpp_lib_three_way_comparison != 201907L
-#  error "Conflicting versions for __cpp_lib_three_way_comparison"
+#error "Conflicting versions for __cpp_lib_three_way_comparison"
 #endif
 
 // also in <memory>
 #ifndef __cpp_lib_to_address
-#  define __cpp_lib_to_address 201711L
+#define __cpp_lib_to_address 201711L
 #elif __cpp_lib_to_address != 201711L
-#  error "Conflicting versions for __cpp_lib_to_address"
+#error "Conflicting versions for __cpp_lib_to_address"
 #endif
 
 // also in <array>
 #ifndef __cpp_lib_to_array
-#  define __cpp_lib_to_array 201907L
+#define __cpp_lib_to_array 201907L
 #elif __cpp_lib_to_array != 201907L
-#  error "Conflicting versions for __cpp_lib_to_array"
+#error "Conflicting versions for __cpp_lib_to_array"
 #endif
 
 // also in <charconv>
 #ifndef __cpp_lib_to_chars
-#  define __cpp_lib_to_chars 201611L
+#define __cpp_lib_to_chars 201611L
 #elif __cpp_lib_to_chars != 201611L
-#  error "Conflicting versions for __cpp_lib_to_chars"
+#error "Conflicting versions for __cpp_lib_to_chars"
 #endif
 
 // also in <type_traits>
 #ifndef __cpp_lib_transformation_trait_aliases
-#  define __cpp_lib_transformation_trait_aliases 201304L
+#define __cpp_lib_transformation_trait_aliases 201304L
 #elif __cpp_lib_transformation_trait_aliases != 201304L
-#  error "Conflicting versions for __cpp_lib_transformation_trait_aliases"
+#error "Conflicting versions for __cpp_lib_transformation_trait_aliases"
 #endif
 
 // also in <memory>, <functional>
 #ifndef __cpp_lib_transparent_operators
-#  define __cpp_lib_transparent_operators 201510L
+#define __cpp_lib_transparent_operators 201510L
 #elif __cpp_lib_transparent_operators != 201510L
-#  error "Conflicting versions for __cpp_lib_transparent_operators"
+#error "Conflicting versions for __cpp_lib_transparent_operators"
 #endif
 
 // also in <tuple>
 #ifndef __cpp_lib_tuple_element_t
-#  define __cpp_lib_tuple_element_t 201402L
+#define __cpp_lib_tuple_element_t 201402L
 #elif __cpp_lib_tuple_element_t != 201402L
-#  error "Conflicting versions for __cpp_lib_tuple_element_t"
+#error "Conflicting versions for __cpp_lib_tuple_element_t"
 #endif
 
 // also in <utility>, <tuple>
 #ifndef __cpp_lib_tuples_by_type
-#  define __cpp_lib_tuples_by_type 201304L
+#define __cpp_lib_tuples_by_type 201304L
 #elif __cpp_lib_tuples_by_type != 201304L
-#  error "Conflicting versions for __cpp_lib_tuples_by_type"
+#error "Conflicting versions for __cpp_lib_tuples_by_type"
 #endif
 
 // also in <type_traits>
 #ifndef __cpp_lib_type_identity
-#  define __cpp_lib_type_identity 201806L
+#define __cpp_lib_type_identity 201806L
 #elif __cpp_lib_type_identity != 201806L
-#  error "Conflicting versions for __cpp_lib_type_identity"
+#error "Conflicting versions for __cpp_lib_type_identity"
 #endif
 
 // also in <type_traits>
 #ifndef __cpp_lib_type_trait_variable_templates
-#  define __cpp_lib_type_trait_variable_templates 201510L
+#define __cpp_lib_type_trait_variable_templates 201510L
 #elif __cpp_lib_type_trait_variable_templates != 201510L
-#  error "Conflicting versions for __cpp_lib_type_trait_variable_templates"
+#error "Conflicting versions for __cpp_lib_type_trait_variable_templates"
 #endif
 
 // also in <exception>
 #ifndef __cpp_lib_uncaught_exceptions
-#  define __cpp_lib_uncaught_exceptions 201411L
+#define __cpp_lib_uncaught_exceptions 201411L
 #elif __cpp_lib_uncaught_exceptions != 201411L
-#  error "Conflicting versions for __cpp_lib_uncaught_exceptions"
+#error "Conflicting versions for __cpp_lib_uncaught_exceptions"
 #endif
 
 // also in <unordered_map>
 #ifndef __cpp_lib_unordered_map_try_emplace
-#  define __cpp_lib_unordered_map_try_emplace 201411L
+#define __cpp_lib_unordered_map_try_emplace 201411L
 #elif __cpp_lib_unordered_map_try_emplace != 201411L
-#  error "Conflicting versions for __cpp_lib_unordered_map_try_emplace"
+#error "Conflicting versions for __cpp_lib_unordered_map_try_emplace"
 #endif
 
 // also in <type_traits>
 #ifndef __cpp_lib_unwrap_ref
-#  define __cpp_lib_unwrap_ref 201811L
+#define __cpp_lib_unwrap_ref 201811L
 #elif __cpp_lib_unwrap_ref != 201811L
-#  error "Conflicting versions for __cpp_lib_unwrap_ref"
+#error "Conflicting versions for __cpp_lib_unwrap_ref"
 #endif
 
 // also in <variant>
 #ifndef __cpp_lib_variant
-#  define __cpp_lib_variant 201606L
+#define __cpp_lib_variant 201606L
 #elif __cpp_lib_variant != 201606L
-#  error "Conflicting versions for __cpp_lib_variant"
+#error "Conflicting versions for __cpp_lib_variant"
 #endif
 
 // also in <type_traits>
 #ifndef __cpp_lib_void_t
-#  define __cpp_lib_void_t 201411L
+#define __cpp_lib_void_t 201411L
 #elif __cpp_lib_void_t != 201411L
-#  error "Conflicting versions for __cpp_lib_void_t"
+#error "Conflicting versions for __cpp_lib_void_t"
 #endif
 
 #endif

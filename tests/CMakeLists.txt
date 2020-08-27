@@ -1,5 +1,8 @@
 add_custom_target(build_all_tests echo "Built all tests!"
-        DEPENDS lightcxx_testing process_safe_wrapper)
+        DEPENDS
+        lightcxx_testing
+        lightcxx_testing_interceptors_libc
+        process_safe_wrapper)
 
 add_custom_target(check ${CMAKE_CTEST_COMMAND} --output-on-failure
         DEPENDS build_all_tests WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
@@ -11,6 +14,7 @@ function(add_lightcxx_test filename section name)
     file(STRINGS ${filename} lines)
     set(EXIT "CODE = 0")
     set(STEPS "")
+    set(INTERCEPTORS "")
     set(NO_TEST_LIB OFF)
     foreach (line ${lines})
         if (NOT (line MATCHES "^//[\ ]*([A-Z_]*):([A-Z_]*) (.*)$"))
@@ -36,25 +40,30 @@ function(add_lightcxx_test filename section name)
             set(SKIP_TEST TRUE)
         elseif ("${keyword}" STREQUAL "REQUEST" AND "${argument}" STREQUAL "NO_TEST_LIB")
             set(NO_TEST_LIB ON)
+        elseif ("${keyword}" STREQUAL "REQUEST" AND "${argument}" STREQUAL "INTERCEPTORS")
+            string(LENGTH "${CMAKE_MATCH_3}" INTERCEPTORS_LEN)
+            math(EXPR INTERCEPTORS_LEN "${INTERCEPTORS_LEN} - 2")
+            string(SUBSTRING "${CMAKE_MATCH_3}" 1 ${INTERCEPTORS_LEN} INTERCEPTORS)
         endif ()
     endforeach ()
 
     if (NO_COMPILE)
         foreach (fail_index RANGE ${NO_COMPILE})
-            set(test_name ${section}.${name}_${fail_index})
-            add_executable(${test_name} ${filename})
+            set(test_name ${section}-${name}-${fail_index})
+            set(test_exe_name test.${test_name})
+            add_executable(${test_exe_name} ${filename})
             if (NOT NO_TEST_LIB)
-                target_link_libraries(${test_name} PUBLIC lightcxx_testing)
+                target_link_libraries(${test_exe_name} PUBLIC lightcxx_testing)
             endif ()
-            target_compile_definitions(${test_name} PUBLIC NC_TEST_ID=${fail_index})
-            set_target_properties(${test_name} PROPERTIES
+            target_compile_definitions(${test_exe_name} PUBLIC NC_TEST_ID=${fail_index})
+            set_target_properties(${test_exe_name} PROPERTIES
                     EXCLUDE_FROM_ALL TRUE
                     EXCLUDE_FROM_DEFAULT_BUILD TRUE)
             if (NOT SKIP_TEST)
                 add_test(NAME ${test_name}
                         COMMAND ${CMAKE_COMMAND}
                         --build .
-                        --target ${test_name}
+                        --target ${test_exe_name}
                         --config $<CONFIGURATION>
                         WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
                 set_tests_properties(${test_name} PROPERTIES WILL_FAIL TRUE)
@@ -63,28 +72,33 @@ function(add_lightcxx_test filename section name)
         return()
     endif ()
 
-    set(test_name ${section}.${name})
-    add_executable(${test_name} ${filename})
+    set(test_name ${section}-${name})
+    set(test_exe_name test.${test_name})
+    add_executable(${test_exe_name} ${filename})
     if (NOT NO_TEST_LIB)
-        target_link_libraries(${test_name} PUBLIC lightcxx_testing)
+        target_link_libraries(${test_exe_name} PUBLIC lightcxx_testing)
+        foreach (interceptor ${INTERCEPTORS})
+            target_link_libraries(${test_exe_name} PUBLIC lightcxx_testing_interceptors_${interceptor})
+        endforeach()
     else ()
-        target_link_libraries(${test_name} PUBLIC lightcxx)
+        target_link_libraries(${test_exe_name} PUBLIC lightcxx)
     endif ()
     if (NOT SKIP_TEST)
-        add_test(
-                NAME ${test_name}
-                COMMAND process_safe_wrapper
-                $<TARGET_FILE:${test_name}> ${ARGUMENTS})
-        add_dependencies(build_all_tests ${test_name})
+        add_dependencies(build_all_tests ${test_exe_name})
+        if (NOT (EXIT STREQUAL "CODE = 0") OR STEPS)
+            add_test(NAME ${test_name} COMMAND process_safe_wrapper $<TARGET_FILE:${test_exe_name}> ${ARGUMENTS})
+            set_tests_properties(${test_name} PROPERTIES PASS_REGULAR_EXPRESSION "^${STEPS}\n----\nPROCESS EXIT ${EXIT}")
+        else ()
+            add_test(NAME ${test_name} COMMAND $<TARGET_FILE:${test_exe_name}> ${ARGUMENTS})
+        endif ()
         set_tests_properties(${test_name} PROPERTIES FAIL_REGULAR_EXPRESSION "EXPECTATION FAILED")
-        set_tests_properties(${test_name} PROPERTIES PASS_REGULAR_EXPRESSION "^${STEPS}\n----\nPROCESS EXIT ${EXIT}")
     endif ()
 endfunction()
 
 function(scan_for_lightcxx_tests directory)
     file(GLOB_RECURSE test_files ${directory}/**/*.cpp)
     foreach (test_file ${test_files})
-        if (test_file MATCHES "^.*/([0-9.]*)/(.*).cpp$")
+        if (test_file MATCHES "^.*/[\[]([a-z.]*)[\]]/([^/]*).cpp$")
             add_lightcxx_test(${test_file} ${CMAKE_MATCH_1} ${CMAKE_MATCH_2})
         else ()
             message(WARNING "Test path not recognized: ${test_file}")

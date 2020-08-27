@@ -1,5 +1,5 @@
-#ifndef _LIGHTCXX_GUARD_TESTING_META_H
-#define _LIGHTCXX_GUARD_TESTING_META_H
+#ifndef TESTING_META_H
+#define TESTING_META_H
 
 #include <type_traits>
 

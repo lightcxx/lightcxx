@@ -22,16 +22,13 @@ target_include_directories(lightcxx INTERFACE SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}
 target_compile_options(lightcxx PUBLIC -nostdinc++)
 target_link_options(lightcxx PUBLIC -nostdlib++)
 if (APPLE)
-    target_link_libraries(lightcxx
-            PUBLIC System)
+    target_link_libraries(lightcxx PUBLIC System)
 else ()
-    target_link_libraries(lightcxx
-            PUBLIC c
-            PUBLIC pthread)
+    target_link_libraries(lightcxx PUBLIC c PUBLIC pthread)
 endif ()
 
 if (LIGHTCXX_ENABLE_TESTS)
-    include(CTest)
+    enable_testing()
     add_subdirectory(testing)
     add_subdirectory(tests)
 endif ()

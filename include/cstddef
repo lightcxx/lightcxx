@@ -17,7 +17,7 @@
 #define NULL 0L
 
 #ifdef offsetof
-#undef offsetof // We make our own macros!
+#undef offsetof  // We make our own macros!
 #endif
 #define offsetof(__type, __member) __builtin_offsetof(__type, __member)
 

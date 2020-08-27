@@ -1,5 +1,5 @@
-#ifndef _LIGHTCXX_GUARD_TESTING_INTERCEPTOR_H
-#define _LIGHTCXX_GUARD_TESTING_INTERCEPTOR_H
+#ifndef TESTING_INTERCEPTOR_H
+#define TESTING_INTERCEPTOR_H
 
 #include <stdlib.h>
 
@@ -61,14 +61,6 @@ class CFunctionInterceptor<R(Args...)> {
         }
     }
 };
-
-struct LibCInterceptors {
-    CFunctionInterceptor<void*(::size_t)> malloc;
-    CFunctionInterceptor<void(void*)> free;
-    CFunctionInterceptor<void*(::size_t, ::size_t)> aligned_alloc;
-};
-
-extern LibCInterceptors libc;
 
 }  // namespace Testing
 

@@ -162,8 +162,7 @@ size_t wcstombs(char* s, const wchar_t* pwcs, size_t n) {
     return ::wcstombs(s, pwcs, n);
 }
 
-void* bsearch(
-  const void* key, const void* base, size_t n, size_t size, _Light::_ComparePred* cmp) {
+void* bsearch(const void* key, const void* base, size_t n, size_t size, _Light::_ComparePred* cmp) {
     return ::bsearch(key, base, n, size, cmp);
 }
 
