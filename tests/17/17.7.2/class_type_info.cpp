@@ -7,7 +7,7 @@ struct Type {
     [[maybe_unused]] int x;
 };
 
-void Testing::run() {
+TEST() {
     expectType<const std::type_info&>(typeid(int));
 
     expect(typeid(int) == typeid(int), "equality");

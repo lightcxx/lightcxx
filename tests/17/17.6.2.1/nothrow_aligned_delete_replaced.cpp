@@ -9,7 +9,7 @@ void operator delete(void* ptr, std::align_val_t, const std::nothrow_t&) noexcep
     ::free(ptr);
 }
 
-void Testing::run() {
+TEST() {
     const auto ptr = ::operator new(256, std::align_val_t{128}, std::nothrow);
     ::operator delete(ptr, std::align_val_t{128}, std::nothrow);
 }

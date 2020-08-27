@@ -4,7 +4,7 @@
 
 #include "testing/test.h"
 
-void Testing::run() {
+TEST() {
     std::new_handler g = []() { step("new_handler"); };
     std::new_handler h = []() { throw std::bad_alloc(); };
 

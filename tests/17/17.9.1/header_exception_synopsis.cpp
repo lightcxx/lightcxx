@@ -2,7 +2,7 @@
 
 #include "testing/test.h"
 
-void Testing::run() {
+TEST() {
     [[maybe_unused]] std::exception exc;
     [[maybe_unused]] std::bad_exception b_exc;
     [[maybe_unused]] std::nested_exception n_exc;

@@ -9,7 +9,7 @@ void operator delete[](void* ptr, const std::nothrow_t&) noexcept {
     ::free(ptr);
 }
 
-void Testing::run() {
+TEST() {
     const auto ptr = ::operator new[](256, std::nothrow);
     ::operator delete[](ptr, std::nothrow);
 }

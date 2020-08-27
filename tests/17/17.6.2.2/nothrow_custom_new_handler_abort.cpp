@@ -6,7 +6,7 @@
 #include "testing/test.h"
 #include <stdlib.h>
 
-void Testing::run() {
+TEST() {
     libc.malloc.replace([](std::size_t size) -> void* {
         step("malloc");
         return nullptr;

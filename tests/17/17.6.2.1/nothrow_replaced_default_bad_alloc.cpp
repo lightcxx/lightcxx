@@ -9,7 +9,7 @@ void* operator new(std::size_t) {
     throw std::bad_alloc();
 }
 
-void Testing::run() {
+TEST() {
     std::set_new_handler([]() {
         fail("new_handler");
         ::abort();

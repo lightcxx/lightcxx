@@ -3,7 +3,7 @@
 #include "testing/test.h"
 #include <string.h>
 
-void Testing::run() {
+TEST() {
     // Default constructor
     std::exception default_constructed;
     STATIC_EXPECT(noexcept(std::exception()), "std::exception default constructor is noexcept");

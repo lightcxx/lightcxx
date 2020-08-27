@@ -7,7 +7,7 @@
 int times_malloc_called = 0;
 int times_new_handler_called = 0;
 
-void Testing::run() {
+TEST() {
     libc.malloc.replace([](std::size_t size) -> void* {
         ++times_malloc_called;
         step("malloc %d", times_malloc_called);

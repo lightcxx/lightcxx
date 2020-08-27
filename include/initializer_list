@@ -1,0 +1,48 @@
+#ifndef __LIGHTCXX_GUARD_INITIALIZER_LIST
+#define __LIGHTCXX_GUARD_INITIALIZER_LIST
+
+namespace std {
+
+template<class _T>
+class initializer_list {
+  public:
+    using value_type = _T;
+    using reference = const _T&;
+    using const_reference = const _T&;
+    using size_type = decltype(sizeof(void*));
+
+    using iterator = const _T*;
+    using const_iterator = const _T*;
+
+    constexpr initializer_list() noexcept: __begin(nullptr), __size(0) {}
+
+    constexpr size_type size() const noexcept {
+        return __size;
+    }
+
+    constexpr const _T* begin() const noexcept {
+        return __begin;
+    }
+
+    constexpr const _T* end() const noexcept {
+        return __begin + __size;
+    }
+
+  private:
+    const _T* __begin;
+    size_type __size;
+};
+
+template<class _T>
+constexpr const _T* begin(initializer_list<_T> __il) noexcept {
+    return __il.begin();
+}
+
+template<class _T>
+constexpr const _T* end(initializer_list<_T> __il) noexcept {
+    return __il.end();
+}
+
+}  // namespace std
+
+#endif

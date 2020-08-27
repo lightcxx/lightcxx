@@ -7,7 +7,7 @@ struct Custom {
     [[maybe_unused]] int y;
 };
 
-void Testing::run() {
+TEST() {
     [[maybe_unused]] constexpr ::std::float_round_style fr_style{};
     [[maybe_unused]] constexpr ::std::float_denorm_style fd_style{};
 

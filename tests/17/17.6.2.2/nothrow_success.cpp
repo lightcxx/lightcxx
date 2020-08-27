@@ -2,7 +2,7 @@
 
 #include "testing/test.h"
 
-void Testing::run() {
+TEST() {
     const auto const_ptr = ::operator new[](256, std::nothrow);
     expectType<void* const&>(const_ptr);
     ::operator delete[](const_ptr);

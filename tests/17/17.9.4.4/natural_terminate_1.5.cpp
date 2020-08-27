@@ -25,4 +25,4 @@ struct ThrowGlobal {
 [[maybe_unused]] SetTerminateGlobal set_terminate_;
 [[maybe_unused]] ThrowGlobal throw_;
 
-void Testing::run() {}
+TEST() {}

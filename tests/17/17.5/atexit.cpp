@@ -6,7 +6,7 @@
 
 int at_exit_callback_index = 0;
 
-void Testing::run() {
+TEST() {
     for (int i = 1; i <= 16; i++) {
         ::std::atexit([]() {
             --at_exit_callback_index;

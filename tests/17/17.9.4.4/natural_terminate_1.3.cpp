@@ -19,11 +19,11 @@ void f(int x) noexcept {
     }
 }
 
-void Testing::runWithArgs(int argc, char**) {
+TEST() {
     std::set_terminate([]() {
       step("terminate");
       ::abort();
     });
 
-    f(argc);
+    f(get_argc());
 }

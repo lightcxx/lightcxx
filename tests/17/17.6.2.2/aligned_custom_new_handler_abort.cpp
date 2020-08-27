@@ -6,7 +6,7 @@
 #include "testing/test.h"
 #include <stdlib.h>
 
-void Testing::run() {
+TEST() {
     libc.aligned_alloc.replace([](std::size_t align, std::size_t size) -> void* {
         step("aligned_alloc");
         return nullptr;

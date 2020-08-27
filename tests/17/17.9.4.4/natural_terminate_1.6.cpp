@@ -15,7 +15,7 @@ struct ThrowInDtor {
 
 [[maybe_unused]] ThrowInDtor throw_;
 
-void Testing::run() {
+TEST() {
     std::set_terminate([]() {
         Testing::step("terminate");
         ::abort();

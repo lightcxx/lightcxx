@@ -18,7 +18,7 @@ bool operator==(const lldiv_t& d1, const lldiv_t& d2) {
 
 }  // namespace std
 
-void Testing::run() {
+TEST() {
     constexpr void* n = NULL;
     STATIC_EXPECT(n == nullptr, "NULL");
     [[maybe_unused]] const auto cur_max = MB_CUR_MAX;

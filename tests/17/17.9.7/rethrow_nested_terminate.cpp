@@ -5,7 +5,7 @@
 
 #include "testing/test.h"
 
-void Testing::run() {
+TEST() {
     std::set_terminate([]() {
         step("terminate");
         ::abort();

@@ -2,7 +2,7 @@
 
 #include "testing/test.h"
 
-void Testing::run() {
+TEST() {
     // Note 2
     // TODO: Check Cpp17NullablePointer named requirement.
 

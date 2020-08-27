@@ -2,7 +2,7 @@
 
 #include "testing/test.h"
 
-void Testing::run() {
+TEST() {
     alignas(long double) char space[sizeof(long double)];
 
     const auto placed_ptr_explicit = ::operator new(sizeof(long double), static_cast<void*>(space));

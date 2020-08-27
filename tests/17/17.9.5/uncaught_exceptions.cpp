@@ -24,7 +24,7 @@ struct CheckUncaughtExceptionsInDtor {
     }
 };
 
-void Testing::run() {
+TEST() {
     expect(std::uncaught_exceptions() == 0, "outside any EH clause");
     try {
         expect(std::uncaught_exceptions() == 0, "inside try clause");

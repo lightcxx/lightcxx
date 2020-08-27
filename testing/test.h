@@ -24,25 +24,25 @@ void step(const char* msg, ...) noexcept;
 
 template<class T, class U>
 constexpr void expectType(U&& val) noexcept {
-    static_assert(IsSameType<T, decltype(val)>::value, "Invalid type.");
+    static_assert(std::is_same_v<T, decltype(val)>, "Invalid type.");
 }
 
 template<class T, class U, class V>
 void expectTypeAndValue(U&& val,
                         V&& expected,
                         std::source_location loc = std::source_location::current()) noexcept {
-    static_assert(IsSameType<T, decltype(val)>::value, "Invalid type.");
+    static_assert(std::is_same_v<T, decltype(val)>, "Invalid type.");
     expect(val == expected, loc);
 }
 
 template<class T, class U, class V>
 void expectTypeAndValue(U&& val, V&& expected, const char* msg) noexcept {
-    static_assert(IsSameType<T, decltype(val)>::value, "Invalid type.");
+    static_assert(std::is_same_v<T, decltype(val)>, "Invalid type.");
     expect(val == expected, msg);
 }
 
-void run();
-void runWithArgs(int argc, char** argv);
+int get_argc();
+char** get_argv();
 
 struct Test {
     static Test* head;
@@ -59,9 +59,9 @@ struct Test {
 
 #define TEST(name)                                                                                 \
     namespace Testing {                                                                            \
-    void name();                                                                                   \
-    ::Testing::Test test_##name{name, #name};                                                      \
+    void name##_();                                                                                \
+    ::Testing::Test test_##name{name##_, #name};                                                   \
     }                                                                                              \
-    void Testing::name()
+    void Testing::name##_()
 
 #endif

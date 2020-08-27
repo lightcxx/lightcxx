@@ -2,7 +2,7 @@
 
 #include "testing/test.h"
 
-void Testing::run() {
+TEST() {
     std::terminate_handler g = []() { ::abort(); };
     std::terminate_handler h = []() { _Exit(1); };
     expect(std::set_terminate(g) == nullptr, "first set_terminate returns nullptr");

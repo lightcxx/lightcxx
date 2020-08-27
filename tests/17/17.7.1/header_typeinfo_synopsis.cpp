@@ -2,7 +2,7 @@
 
 #include "testing/test.h"
 
-void Testing::run() {
+TEST() {
     expectType<const std::type_info&>(typeid(int));
 
     [[maybe_unused]] std::bad_cast bad_c;

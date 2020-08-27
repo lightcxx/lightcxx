@@ -2,7 +2,7 @@
 
 #include "testing/test.h"
 
-void Testing::run() {
+TEST() {
 #define TEST_BYTE_OPS_WITH_VALID_INT_TYPE(T)                                                       \
     STATIC_EXPECT(::std::byte{8} == ::std::byte{4} << (T)1, "<< (" #T ")");                        \
     STATIC_EXPECT(                                                                                 \

@@ -21,7 +21,7 @@ struct NonCompliantException : public std::exception {
     NonCompliantException& operator=(NonCompliantException&&) = delete;
 };
 
-void Testing::run() {
+TEST() {
     std::set_terminate([]() {
         step("terminate");
         ::abort();

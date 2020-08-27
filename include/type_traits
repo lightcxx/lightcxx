@@ -216,39 +216,32 @@ using is_final_t = typename is_final<_T>::type;
 template<class _T>
 constexpr bool is_final_v = is_final<_T>::value;
 
-namespace _Light {
-
-template<class _T>
-requires(__is_referenceable<_T>::value) auto __add_lvalue_reference_impl()
-  -> remove_reference_t<_T>&;
-
-template<class _T>
-requires(!__is_referenceable<_T>::value) auto __add_lvalue_reference_impl() -> _T;
-
-}  // namespace _Light
-
 template<class _T>
 struct add_lvalue_reference {
-    using type = decltype(_Light::__add_lvalue_reference_impl<_T>());
+  private:
+    template<class _U>
+    requires(_Light::__is_referenceable<_U>::value) static auto __test() -> remove_reference_t<_U>&;
+
+    template<class _U>
+    requires(!_Light::__is_referenceable<_U>::value) static auto __test() -> _U;
+
+  public:
+    using type = decltype(__test<_T>());
 };
 
 template<class _T>
 using add_lvalue_reference_t = typename add_lvalue_reference<_T>::type;
 
-namespace _Light {
-
-template<class _T>
-requires(__is_referenceable<_T>::value) auto __add_rvalue_reference_impl()
-  -> remove_reference_t<_T>&&;
-
-template<class _T>
-requires(!__is_referenceable<_T>::value) auto __add_rvalue_reference_impl() -> _T;
-
-}  // namespace _Light
-
 template<class _T>
 struct add_rvalue_reference {
-    using type = decltype(_Light::__add_rvalue_reference_impl<_T>());
+    using type = decltype(__test<_T>());
+
+  private:
+    template<class _U>
+    requires(_Light::__is_referenceable<_U>::value) static remove_reference_t<_U>&& __test();
+
+    template<class _U>
+    requires(!_Light::__is_referenceable<_U>::value) static _U __test();
 };
 
 template<class _T>
@@ -291,21 +284,19 @@ using is_convertible_t = typename is_convertible<_From, _To>::type;
 template<class _From, class _To>
 constexpr bool is_convertible_v = is_convertible<_From, _To>::value;
 
-namespace _Light {
-
-template<class _T>
-requires(__is_referenceable<_T>::value
-         || is_same_v<remove_cv_t<_T>, void>) auto __add_pointer_impl() -> remove_reference_t<_T>*;
-
-template<class _T>
-requires(!__is_referenceable<_T>::value
-         && !is_same_v<remove_cv_t<_T>, void>) auto __add_pointer_impl() -> _T;
-
-}  // namespace _Light
-
 template<class _T>
 struct add_pointer {
-    using type = decltype(_Light::__add_pointer_impl<_T>());
+  private:
+    template<class _U>
+    requires(_Light::__is_referenceable<_U>::value
+             || is_same_v<remove_cv_t<_U>, void>) static remove_reference_t<_U>* __test();
+
+    template<class _U>
+    requires(!_Light::__is_referenceable<_U>::value && !is_same_v<remove_cv_t<_U>, void>) static _U
+      __test();
+
+  public:
+    using type = decltype(__test<_T>());
 };
 
 template<class _T>

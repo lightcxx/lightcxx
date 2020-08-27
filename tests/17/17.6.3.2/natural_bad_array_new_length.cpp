@@ -10,7 +10,10 @@ extern "C" void __cxa_throw_bad_array_new_length();
 
 }
 
-void Testing::runWithArgs(int argc, char** argv) {
+TEST() {
+    int argc = get_argc();
+    char** argv = get_argv();
+
     expect(argc >= 3, "Not enough arguments provided.");
 
     // We receive these as runtime arguments so clang cannot optimize them away.

@@ -16,7 +16,7 @@ struct FailPrinter {
 [[maybe_unused]] FailPrinter global{.name = "global"};
 [[maybe_unused]] thread_local FailPrinter t_local{.name = "thread_local"};
 
-void Testing::run() {
+TEST() {
     [[maybe_unused]] static FailPrinter inline_static{.name = "inline_static"};
     [[maybe_unused]] thread_local FailPrinter inline_t_local{.name = "inline_thread_local"};
     [[maybe_unused]] FailPrinter local;

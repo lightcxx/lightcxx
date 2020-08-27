@@ -5,6 +5,8 @@
 
 namespace {
 
+int stored_argc;
+char** stored_argv;
 const char* current_test_name = nullptr;
 int exit_code = 0;
 
@@ -17,10 +19,7 @@ void fail(std::source_location loc) noexcept {
 }
 
 void fail(const char* msg, ...) noexcept {
-    fprintf(stderr, "EXPECTATION FAILED");
-    if (current_test_name != nullptr) {
-        fprintf(stderr, " in test %s", current_test_name);
-    }
+    fprintf(stderr, "EXPECTATION FAILED in test %s", current_test_name);
     if (msg[0] != '\0') {
         fprintf(stderr, ": ");
         va_list args;
@@ -38,10 +37,7 @@ void expect(bool cnd, std::source_location loc) noexcept {
 
 void expect(bool cnd, const char* msg, ...) noexcept {
     if (!cnd) {
-        fprintf(stderr, "EXPECTATION FAILED");
-        if (current_test_name != nullptr) {
-            fprintf(stderr, " in test %s", current_test_name);
-        }
+        fprintf(stderr, "EXPECTATION FAILED in test %s", current_test_name);
         if (msg[0] != '\0') {
             fprintf(stderr, ": ");
             va_list args;
@@ -63,10 +59,12 @@ void step(const char* msg, ...) noexcept {
     fprintf(stderr, "\n");
 }
 
-__attribute__((__weak__)) void run() {}
+int get_argc() {
+    return stored_argc;
+}
 
-__attribute__((__weak__)) void runWithArgs(int argc, char** argv) {
-    run();
+char** get_argv() {
+    return stored_argv;
 }
 
 Test* Test::head = nullptr;
@@ -85,6 +83,8 @@ Test::Test(void (*test)(), const char* name) noexcept: test(test), name(name) {
 }  // namespace Testing
 
 int main(int argc, char** argv) {
+    stored_argc = argc;
+    stored_argv = argv;
     Testing::Test* t = Testing::Test::head;
     while (t != nullptr) {
         current_test_name = t->name;
@@ -92,6 +92,5 @@ int main(int argc, char** argv) {
         t = t->next;
     }
     current_test_name = nullptr;
-    Testing::runWithArgs(argc, argv);
     return exit_code;
 }

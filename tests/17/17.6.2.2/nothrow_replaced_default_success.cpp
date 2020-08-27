@@ -14,7 +14,7 @@ void operator delete[](void* ptr) noexcept {
     return ::free(ptr);
 }
 
-void Testing::run() {
+TEST() {
     std::set_new_handler([]() {
         fail("new_handler");
         ::abort();

@@ -6,7 +6,7 @@ struct S {
     virtual ~S() = default;
 };
 
-void Testing::run() {
+TEST() {
     std::bad_typeid default_constructed;
     S* p = nullptr;
     try {

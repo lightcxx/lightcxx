@@ -4,7 +4,7 @@
 
 #include "testing/test.h"
 
-void Testing::run() {
+TEST() {
     libc.aligned_alloc.replace([](std::size_t align, std::size_t size) -> void* {
         expect(align == 128, "::aligned_alloc align");
         expect(size == 256, "::aligned_alloc size");

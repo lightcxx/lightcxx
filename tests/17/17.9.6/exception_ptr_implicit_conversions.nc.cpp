@@ -24,7 +24,7 @@ void takes_unsigned_char_ptr(unsigned char*) {}
 
 void takes_void_ptr(void*) {}
 
-void Testing::run() {
+TEST() {
     std::exception_ptr exc;
 #if NC_TEST_ID == 0
     takes_bool(exc);

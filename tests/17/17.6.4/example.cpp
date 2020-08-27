@@ -2,7 +2,7 @@
 
 #include "testing/test.h"
 
-void Testing::run() {
+TEST() {
     // This example is taken from the C++ standard, section 17.6.4, paragraph 6.
     struct X {
         int n;

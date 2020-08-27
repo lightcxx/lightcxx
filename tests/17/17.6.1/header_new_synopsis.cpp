@@ -12,7 +12,7 @@ consteval ::std::destroying_delete_t delete_f(::std::destroying_delete_t) {
     return ::std::nothrow_t{};
 }
 
-void Testing::run() {
+TEST() {
     [[maybe_unused]] ::std::bad_alloc b_alloc;
     [[maybe_unused]] ::std::bad_array_new_length b_array_new_length;
 

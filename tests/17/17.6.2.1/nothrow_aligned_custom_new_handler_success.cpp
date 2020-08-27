@@ -7,7 +7,7 @@
 int times_aligned_alloc_called = 0;
 int times_new_handler_called = 0;
 
-void Testing::run() {
+TEST() {
     libc.aligned_alloc.replace([](std::size_t, std::size_t) -> void* {
         ++times_aligned_alloc_called;
         step("alloc %d", times_aligned_alloc_called);

@@ -4,7 +4,7 @@
 
 #include "testing/test.h"
 
-void Testing::run() {
+TEST() {
     libc.malloc.replace([](std::size_t size) -> void* {
         expect(size == 256, "::malloc size");
         step("malloc");

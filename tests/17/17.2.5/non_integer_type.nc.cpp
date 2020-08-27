@@ -8,7 +8,7 @@ struct Aggregate {
     [[maybe_unused]] int x;
 };
 
-void Testing::run() {
+TEST() {
     ::std::byte b{3};
     const char* str;
     Aggregate ag;

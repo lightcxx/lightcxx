@@ -14,7 +14,7 @@ void operator delete[](void* ptr, std::size_t) noexcept {
     ::free(ptr);
 }
 
-void Testing::run() {
+TEST() {
     const auto ptr1 = ::operator new[](256, std::nothrow);
     ::operator delete[](ptr1);
 

@@ -4,7 +4,7 @@
 
 #include "testing/test.h"
 
-void Testing::run() {
+TEST() {
     std::bad_exception default_constructed;
     expect(::strcmp(default_constructed.what(), "bad_exception") == 0,
            "NTBS is implemented to be 'bad_exception'");

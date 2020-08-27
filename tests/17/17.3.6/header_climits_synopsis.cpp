@@ -78,4 +78,4 @@
 #error "ULLONG_MAX is not defined."
 #endif
 
-void Testing::run() {}
+TEST() {}

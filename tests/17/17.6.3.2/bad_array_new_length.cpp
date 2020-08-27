@@ -4,7 +4,7 @@
 
 #include "testing/test.h"
 
-void Testing::run() {
+TEST() {
     std::bad_array_new_length default_constructed;
     expect(::strcmp(default_constructed.what(), "bad_array_new_length") == 0,
            "NTBS is implemented to be 'bad_array_new_length'");

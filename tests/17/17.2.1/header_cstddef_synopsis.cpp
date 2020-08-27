@@ -7,7 +7,7 @@ struct S {
     [[maybe_unused]] int b;
 };
 
-void Testing::run() {
+TEST() {
     constexpr void* n = NULL;
     STATIC_EXPECT(n == nullptr, "NULL");
     STATIC_EXPECT(offsetof(::S, a) == 0, "offsetof");

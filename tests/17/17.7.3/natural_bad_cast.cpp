@@ -9,7 +9,7 @@ struct Bar {
     virtual ~Bar() {}
 };
 
-void Testing::run() {
+TEST() {
     std::bad_cast default_constructed;
 
     Bar b;

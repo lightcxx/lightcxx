@@ -198,7 +198,7 @@
 #error "UINTMAX_C is not defined."
 #endif
 
-void Testing::run() {
+TEST() {
     [[maybe_unused]] constexpr ::std::int8_t i8{};
     static_assert(sizeof(i8) == 1);
     static_assert(Testing::IsSignedIntegerType<::std::int8_t>);

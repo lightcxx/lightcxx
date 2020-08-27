@@ -2,7 +2,7 @@
 
 #include "testing/test.h"
 
-void Testing::run() {
+TEST() {
     constexpr void* null = NULL;
     STATIC_EXPECT(null == nullptr, "NULL");
 

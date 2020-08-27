@@ -4,7 +4,7 @@
 
 #include "testing/test.h"
 
-void Testing::run() {
+TEST() {
     std::set_terminate([]() {
         ::_Exit(3);
     });

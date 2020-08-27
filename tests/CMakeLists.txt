@@ -3,7 +3,7 @@ add_custom_target(build_all_tests echo "Built all tests!"
 
 add_custom_target(check ${CMAKE_CTEST_COMMAND} --output-on-failure
         DEPENDS build_all_tests WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-add_custom_target(check_and_upload ${CMAKE_CTEST_COMMAND} -D Experimental
+add_custom_target(check_xunit ${CMAKE_CTEST_COMMAND} --no-compress-output -T Test
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 
 function(add_lightcxx_test filename section name)
@@ -11,6 +11,7 @@ function(add_lightcxx_test filename section name)
     file(STRINGS ${filename} lines)
     set(EXIT "CODE = 0")
     set(STEPS "")
+    set(NO_TEST_LIB OFF)
     foreach (line ${lines})
         if (NOT (line MATCHES "^//[\ ]*([A-Z_]*):([A-Z_]*) (.*)$"))
             break()
@@ -33,6 +34,8 @@ function(add_lightcxx_test filename section name)
         elseif ("${keyword}" STREQUAL "REQUEST" AND "${argument}" STREQUAL "SKIP")
             message(STATUS "Skipping test ${section}.${name}. Reason: ${CMAKE_MATCH_3}")
             set(SKIP_TEST TRUE)
+        elseif ("${keyword}" STREQUAL "REQUEST" AND "${argument}" STREQUAL "NO_TEST_LIB")
+            set(NO_TEST_LIB ON)
         endif ()
     endforeach ()
 
@@ -40,7 +43,9 @@ function(add_lightcxx_test filename section name)
         foreach (fail_index RANGE ${NO_COMPILE})
             set(test_name ${section}.${name}_${fail_index})
             add_executable(${test_name} ${filename})
-            target_link_libraries(${test_name} PUBLIC lightcxx_testing)
+            if (NOT NO_TEST_LIB)
+                target_link_libraries(${test_name} PUBLIC lightcxx_testing)
+            endif ()
             target_compile_definitions(${test_name} PUBLIC NC_TEST_ID=${fail_index})
             set_target_properties(${test_name} PROPERTIES
                     EXCLUDE_FROM_ALL TRUE
@@ -60,7 +65,11 @@ function(add_lightcxx_test filename section name)
 
     set(test_name ${section}.${name})
     add_executable(${test_name} ${filename})
-    target_link_libraries(${test_name} lightcxx_testing)
+    if (NOT NO_TEST_LIB)
+        target_link_libraries(${test_name} PUBLIC lightcxx_testing)
+    else ()
+        target_link_libraries(${test_name} PUBLIC lightcxx)
+    endif ()
     if (NOT SKIP_TEST)
         add_test(
                 NAME ${test_name}

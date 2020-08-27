@@ -8,7 +8,7 @@ struct StandardLayoutStructure {
     [[maybe_unused]] float c;
 };
 
-void Testing::run() {
+TEST() {
     STATIC_EXPECT(offsetof(StandardLayoutStructure, c) == sizeof(int) + sizeof(int), "offsetof");
     STATIC_EXPECT(noexcept(offsetof(StandardLayoutStructure, c)), "offsetof noexcept");
 

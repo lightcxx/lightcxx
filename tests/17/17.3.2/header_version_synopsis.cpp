@@ -2,7 +2,7 @@
 
 #include "testing/test.h"
 
-void Testing::run() {
+TEST() {
     expectTypeAndValue<long&&>(__cpp_lib_addressof_constexpr, 201603L, "addressof_constexpr");
     expectTypeAndValue<long&&>(
       __cpp_lib_allocator_traits_is_always_equal, 201411L, "allocator_traits_is_always_equal");
