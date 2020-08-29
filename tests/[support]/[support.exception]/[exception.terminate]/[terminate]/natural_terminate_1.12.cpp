@@ -1,4 +1,4 @@
-// REQUEST:SKIP "Enable this after implementing <thread>."
+// REQUEST:SKIP "Requires <thread>."
 // EXPECT:STEPS "after_ctor;terminate"
 // EXPECT:EXIT KILLED BY SIGNAL SIGABRT
 

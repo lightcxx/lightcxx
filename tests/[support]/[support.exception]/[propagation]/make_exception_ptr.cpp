@@ -4,7 +4,7 @@
 
 TEST(int_) {
     auto exc = std::make_exception_ptr(4);
-    expect_type<std::exception_ptr&>(exc);
+    expect_type(std::exception_ptr&, exc);
     expect(exc != nullptr);
 
     try {
@@ -16,7 +16,7 @@ TEST(int_) {
 
 TEST(exception_) {
     auto exc = std::make_exception_ptr(std::exception());
-    expect_type<std::exception_ptr&>(exc);
+    expect_type(std::exception_ptr&, exc);
     expect(exc != nullptr);
 
     try {
@@ -27,7 +27,7 @@ TEST(exception_) {
 
 TEST(catch_by_base_class) {
     auto exc = std::make_exception_ptr(std::bad_exception());
-    expect_type<std::exception_ptr&>(exc);
+    expect_type(std::exception_ptr&, exc);
     expect(exc != nullptr);
 
     try {
@@ -38,7 +38,7 @@ TEST(catch_by_base_class) {
 
 TEST(current_exception_is_equal_to_initial) {
     auto exc = std::make_exception_ptr(4);
-    expect_type<std::exception_ptr&>(exc);
+    expect_type(std::exception_ptr&, exc);
     expect(exc != nullptr);
 
     try {

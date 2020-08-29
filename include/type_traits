@@ -3,6 +3,19 @@
 
 namespace std {
 
+namespace _Light {
+
+template<class _T>
+_T&& __declval_impl(int);
+
+template<class _T>
+_T __declval_impl(long);
+
+}  // namespace _Light
+
+template<class _T>
+decltype(_Light::__declval_impl<_T>(0)) declval() noexcept;
+
 template<class _T, _T _v>
 struct integral_constant {
     static constexpr _T value = _v;

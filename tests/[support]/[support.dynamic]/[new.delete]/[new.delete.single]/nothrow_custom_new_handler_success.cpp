@@ -24,6 +24,6 @@ TEST() {
     });
 
     const auto const_ptr = ::operator new(256, std::nothrow);
-    expect_type<void* const&>(const_ptr);
+    expect_type(void* const&, const_ptr);
     ::operator delete(const_ptr);
 }

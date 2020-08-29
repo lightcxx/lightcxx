@@ -8,13 +8,13 @@ struct Type {
 };
 
 TEST() {
-    expect_type<const std::type_info&>(typeid(int));
+    expect_type(const std::type_info&, typeid(int));
 
     expect(typeid(int) == typeid(int));
     expect(typeid(volatile int) == typeid(const int));
     expect(typeid(Type) == typeid(Type));
     const auto x = Type();
-    expect_type<const Type&>(x);
+    expect_type(const Type&, x);
     expect(typeid(Type) == typeid(x));
 
     expect(!(typeid(int) == typeid(Type)));
@@ -23,7 +23,7 @@ TEST() {
     expect(strcmp(typeid(int).name(), typeid(Type).name()) != 0);
     expect(typeid(int).before(typeid(Type)) || typeid(Type).before(typeid(int)));
 
-    expect_type<size_t&&>(typeid(int).hash_code());
-    expect_type<const char*&&>(typeid(int).name());
-    expect_type<bool&&>(typeid(int).before(typeid(Type)));
+    expect_type(size_t, typeid(int).hash_code());
+    expect_type(const char*, typeid(int).name());
+    expect_type(bool, typeid(int).before(typeid(Type)));
 }

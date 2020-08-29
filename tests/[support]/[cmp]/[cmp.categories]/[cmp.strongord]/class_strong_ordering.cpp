@@ -1,0 +1,290 @@
+#include <compare>
+
+#include "testing.h"
+
+constexpr bool implicit_conversion_to_partial_ordering(std::partial_ordering) noexcept {
+    return true;
+}
+
+constexpr bool implicit_conversion_to_weak_ordering(std::weak_ordering) noexcept {
+    return true;
+}
+
+TEST(less) {
+    expect_type(const std::strong_ordering&, std::strong_ordering::less);
+    expect_ct_and_rt(implicit_conversion_to_partial_ordering(std::strong_ordering::less));
+    expect_ct_and_rt(std::strong_ordering::less == std::partial_ordering::less);
+    expect_ct_and_rt((std::partial_ordering)std::strong_ordering::less
+                     == std::partial_ordering::less);
+    expect_is_noexcept((std::partial_ordering)std::strong_ordering::less);
+    expect_ct_and_rt(implicit_conversion_to_weak_ordering(std::strong_ordering::less));
+    expect_ct_and_rt(std::strong_ordering::less == std::weak_ordering::less);
+    expect_ct_and_rt((std::weak_ordering)std::strong_ordering::less == std::weak_ordering::less);
+    expect_is_noexcept((std::weak_ordering)std::strong_ordering::less);
+    expect_ct_and_rt(std::strong_ordering::less == std::strong_ordering::less);
+    expect_is_noexcept(std::strong_ordering::less == std::strong_ordering::less);
+    expect_ct_and_rt(!(std::strong_ordering::less == std::strong_ordering::equivalent));
+    expect_is_noexcept(std::strong_ordering::less == std::strong_ordering::equivalent);
+    expect_ct_and_rt(!(std::strong_ordering::less == std::strong_ordering::equal));
+    expect_is_noexcept(std::strong_ordering::less == std::strong_ordering::equal);
+    expect_ct_and_rt(!(std::strong_ordering::less == std::strong_ordering::greater));
+    expect_is_noexcept(std::strong_ordering::less == std::strong_ordering::greater);
+    expect_ct_and_rt(!(std::strong_ordering::less != std::strong_ordering::less));
+    expect_is_noexcept(std::strong_ordering::less != std::strong_ordering::less);
+    expect_ct_and_rt(std::strong_ordering::less != std::strong_ordering::equivalent);
+    expect_is_noexcept(std::strong_ordering::less != std::strong_ordering::equivalent);
+    expect_ct_and_rt(std::strong_ordering::less != std::strong_ordering::equal);
+    expect_is_noexcept(std::strong_ordering::less != std::strong_ordering::equal);
+    expect_ct_and_rt(std::strong_ordering::less != std::strong_ordering::greater);
+    expect_is_noexcept(std::strong_ordering::less != std::strong_ordering::greater);
+    expect_ct_and_rt(!(std::strong_ordering::equivalent == std::strong_ordering::less));
+    expect_is_noexcept(std::strong_ordering::equivalent == std::strong_ordering::less);
+    expect_ct_and_rt(!(std::strong_ordering::equal == std::strong_ordering::less));
+    expect_is_noexcept(std::strong_ordering::equal == std::strong_ordering::less);
+    expect_ct_and_rt(!(std::strong_ordering::greater == std::strong_ordering::less));
+    expect_is_noexcept(std::strong_ordering::greater == std::strong_ordering::less);
+    expect_ct_and_rt(std::strong_ordering::equivalent != std::strong_ordering::less);
+    expect_is_noexcept(std::strong_ordering::equivalent != std::strong_ordering::less);
+    expect_ct_and_rt(std::strong_ordering::equal != std::strong_ordering::less);
+    expect_is_noexcept(std::strong_ordering::equal != std::strong_ordering::less);
+    expect_ct_and_rt(std::strong_ordering::greater != std::strong_ordering::less);
+    expect_is_noexcept(std::strong_ordering::greater != std::strong_ordering::less);
+    expect_ct_and_rt(!(std::strong_ordering::less == 0));
+    expect_is_noexcept(std::strong_ordering::less == 0);
+    expect_ct_and_rt(std::strong_ordering::less != 0);
+    expect_is_noexcept(std::strong_ordering::less != 0);
+    expect_ct_and_rt(std::strong_ordering::less < 0);
+    expect_is_noexcept(std::strong_ordering::less < 0);
+    expect_ct_and_rt(!(std::strong_ordering::less > 0));
+    expect_is_noexcept(std::strong_ordering::less > 0);
+    expect_ct_and_rt(std::strong_ordering::less <= 0);
+    expect_is_noexcept(std::strong_ordering::less <= 0);
+    expect_ct_and_rt(!(std::strong_ordering::less >= 0));
+    expect_is_noexcept(std::strong_ordering::less >= 0);
+    expect_ct_and_rt(!(0 == std::strong_ordering::less));
+    expect_is_noexcept(0 == std::strong_ordering::less);
+    expect_ct_and_rt(0 != std::strong_ordering::less);
+    expect_is_noexcept(0 != std::strong_ordering::less);
+    expect_ct_and_rt(!(0 < std::strong_ordering::less));
+    expect_is_noexcept(0 < std::strong_ordering::less);
+    expect_ct_and_rt(0 > std::strong_ordering::less);
+    expect_is_noexcept(0 > std::strong_ordering::less);
+    expect_ct_and_rt(!(0 <= std::strong_ordering::less));
+    expect_is_noexcept(0 <= std::strong_ordering::less);
+    expect_ct_and_rt(0 >= std::strong_ordering::less);
+    expect_is_noexcept(0 >= std::strong_ordering::less);
+    expect_ct_and_rt((std::strong_ordering::less <=> 0) == std::strong_ordering::less);
+    expect_is_noexcept(std::strong_ordering::less <=> 0);
+    expect_ct_and_rt((0 <=> std::strong_ordering::less) == std::strong_ordering::greater);
+    expect_is_noexcept(0 <=> std::strong_ordering::less);
+}
+
+TEST(equal) {
+    expect_type(const std::strong_ordering&, std::strong_ordering::equal);
+    expect_ct_and_rt(implicit_conversion_to_partial_ordering(std::strong_ordering::equal));
+    expect_ct_and_rt(std::strong_ordering::equal == std::partial_ordering::equivalent);
+    expect_ct_and_rt((std::partial_ordering)std::strong_ordering::equal
+                     == std::partial_ordering::equivalent);
+    expect_is_noexcept((std::partial_ordering)std::strong_ordering::equal);
+    expect_ct_and_rt(implicit_conversion_to_weak_ordering(std::strong_ordering::equal));
+    expect_ct_and_rt(std::strong_ordering::equal == std::weak_ordering::equivalent);
+    expect_ct_and_rt((std::weak_ordering)std::strong_ordering::equal
+                     == std::weak_ordering::equivalent);
+    expect_is_noexcept((std::weak_ordering)std::strong_ordering::equal);
+    expect_ct_and_rt(!(std::strong_ordering::equal == std::strong_ordering::less));
+    expect_is_noexcept(std::strong_ordering::equal == std::strong_ordering::less);
+    expect_ct_and_rt(std::strong_ordering::equal == std::strong_ordering::equal);
+    expect_is_noexcept(std::strong_ordering::equal == std::strong_ordering::equal);
+    expect_ct_and_rt(std::strong_ordering::equal == std::strong_ordering::equivalent);
+    expect_is_noexcept(std::strong_ordering::equal == std::strong_ordering::equivalent);
+    expect_ct_and_rt(!(std::strong_ordering::equal == std::strong_ordering::greater));
+    expect_is_noexcept(std::strong_ordering::equal == std::strong_ordering::greater);
+    expect_ct_and_rt(std::strong_ordering::equal != std::strong_ordering::less);
+    expect_is_noexcept(std::strong_ordering::equal != std::strong_ordering::less);
+    expect_ct_and_rt(!(std::strong_ordering::equal != std::strong_ordering::equal));
+    expect_is_noexcept(std::strong_ordering::equal != std::strong_ordering::equal);
+    expect_ct_and_rt(!(std::strong_ordering::equal != std::strong_ordering::equivalent));
+    expect_is_noexcept(std::strong_ordering::equal != std::strong_ordering::equivalent);
+    expect_ct_and_rt(std::strong_ordering::equal != std::strong_ordering::greater);
+    expect_is_noexcept(std::strong_ordering::equal != std::strong_ordering::greater);
+    expect_ct_and_rt(!(std::strong_ordering::less == std::strong_ordering::equal));
+    expect_is_noexcept(std::strong_ordering::less == std::strong_ordering::equal);
+    expect_ct_and_rt(std::strong_ordering::equivalent == std::strong_ordering::equal);
+    expect_is_noexcept(std::strong_ordering::equivalent == std::strong_ordering::equal);
+    expect_ct_and_rt(!(std::strong_ordering::greater == std::strong_ordering::equal));
+    expect_is_noexcept(std::strong_ordering::greater == std::strong_ordering::equal);
+    expect_ct_and_rt(std::strong_ordering::less != std::strong_ordering::equal);
+    expect_is_noexcept(std::strong_ordering::less != std::strong_ordering::equal);
+    expect_ct_and_rt(!(std::strong_ordering::equivalent != std::strong_ordering::equal));
+    expect_is_noexcept(std::strong_ordering::equivalent != std::strong_ordering::equal);
+    expect_ct_and_rt(std::strong_ordering::greater != std::strong_ordering::equal);
+    expect_is_noexcept(std::strong_ordering::greater != std::strong_ordering::equal);
+    expect_ct_and_rt(std::strong_ordering::equal == 0);
+    expect_is_noexcept(std::strong_ordering::equal == 0);
+    expect_ct_and_rt(!(std::strong_ordering::equal != 0));
+    expect_is_noexcept(std::strong_ordering::equal != 0);
+    expect_ct_and_rt(!(std::strong_ordering::equal < 0));
+    expect_is_noexcept(std::strong_ordering::equal < 0);
+    expect_ct_and_rt(!(std::strong_ordering::equal > 0));
+    expect_is_noexcept(std::strong_ordering::equal > 0);
+    expect_ct_and_rt(std::strong_ordering::equal <= 0);
+    expect_is_noexcept(std::strong_ordering::equal <= 0);
+    expect_ct_and_rt(std::strong_ordering::equal >= 0);
+    expect_is_noexcept(std::strong_ordering::equal >= 0);
+    expect_ct_and_rt(0 == std::strong_ordering::equal);
+    expect_is_noexcept(0 == std::strong_ordering::equal);
+    expect_ct_and_rt(!(0 != std::strong_ordering::equal));
+    expect_is_noexcept(0 != std::strong_ordering::equal);
+    expect_ct_and_rt(!(0 < std::strong_ordering::equal));
+    expect_is_noexcept(0 < std::strong_ordering::equal);
+    expect_ct_and_rt(!(0 > std::strong_ordering::equal));
+    expect_is_noexcept(0 > std::strong_ordering::equal);
+    expect_ct_and_rt(0 <= std::strong_ordering::equal);
+    expect_is_noexcept(0 <= std::strong_ordering::equal);
+    expect_ct_and_rt(0 >= std::strong_ordering::equal);
+    expect_is_noexcept(0 >= std::strong_ordering::equal);
+    expect_ct_and_rt((std::strong_ordering::equal <=> 0) == std::strong_ordering::equal);
+    expect_is_noexcept(std::strong_ordering::equal <=> 0);
+    expect_ct_and_rt((0 <=> std::strong_ordering::equal) == std::strong_ordering::equal);
+    expect_is_noexcept(0 <=> std::strong_ordering::equal);
+}
+
+TEST(equivalent) {
+    expect_type(const std::strong_ordering&, std::strong_ordering::equivalent);
+    expect_ct_and_rt(implicit_conversion_to_partial_ordering(std::strong_ordering::equivalent));
+    expect_ct_and_rt(std::strong_ordering::equivalent == std::partial_ordering::equivalent);
+    expect_ct_and_rt((std::partial_ordering)std::strong_ordering::equivalent
+                     == std::partial_ordering::equivalent);
+    expect_is_noexcept((std::partial_ordering)std::strong_ordering::equivalent);
+    expect_ct_and_rt(implicit_conversion_to_weak_ordering(std::strong_ordering::equivalent));
+    expect_ct_and_rt(std::strong_ordering::equivalent == std::weak_ordering::equivalent);
+    expect_ct_and_rt((std::weak_ordering)std::strong_ordering::equivalent
+                     == std::weak_ordering::equivalent);
+    expect_is_noexcept((std::weak_ordering)std::strong_ordering::equivalent);
+    expect_ct_and_rt(!(std::strong_ordering::equivalent == std::strong_ordering::less));
+    expect_is_noexcept(std::strong_ordering::equivalent == std::strong_ordering::less);
+    expect_ct_and_rt(std::strong_ordering::equivalent == std::strong_ordering::equivalent);
+    expect_is_noexcept(std::strong_ordering::equivalent == std::strong_ordering::equivalent);
+    expect_ct_and_rt(std::strong_ordering::equivalent == std::strong_ordering::equal);
+    expect_is_noexcept(std::strong_ordering::equivalent == std::strong_ordering::equal);
+    expect_ct_and_rt(!(std::strong_ordering::equivalent == std::strong_ordering::greater));
+    expect_is_noexcept(std::strong_ordering::equivalent == std::strong_ordering::greater);
+    expect_ct_and_rt(std::strong_ordering::equivalent != std::strong_ordering::less);
+    expect_is_noexcept(std::strong_ordering::equivalent != std::strong_ordering::less);
+    expect_ct_and_rt(!(std::strong_ordering::equivalent != std::strong_ordering::equal));
+    expect_is_noexcept(std::strong_ordering::equivalent != std::strong_ordering::equal);
+    expect_ct_and_rt(!(std::strong_ordering::equivalent != std::strong_ordering::equivalent));
+    expect_is_noexcept(std::strong_ordering::equivalent != std::strong_ordering::equivalent);
+    expect_ct_and_rt(std::strong_ordering::equivalent != std::strong_ordering::greater);
+    expect_is_noexcept(std::strong_ordering::equivalent != std::strong_ordering::greater);
+    expect_ct_and_rt(!(std::strong_ordering::less == std::strong_ordering::equivalent));
+    expect_is_noexcept(std::strong_ordering::less == std::strong_ordering::equivalent);
+    expect_ct_and_rt(std::strong_ordering::equal == std::strong_ordering::equivalent);
+    expect_is_noexcept(std::strong_ordering::equal == std::strong_ordering::equivalent);
+    expect_ct_and_rt(!(std::strong_ordering::greater == std::strong_ordering::equivalent));
+    expect_is_noexcept(std::strong_ordering::greater == std::strong_ordering::equivalent);
+    expect_ct_and_rt(std::strong_ordering::less != std::strong_ordering::equivalent);
+    expect_is_noexcept(std::strong_ordering::less != std::strong_ordering::equivalent);
+    expect_ct_and_rt(!(std::strong_ordering::equal != std::strong_ordering::equivalent));
+    expect_is_noexcept(std::strong_ordering::equal != std::strong_ordering::equivalent);
+    expect_ct_and_rt(std::strong_ordering::greater != std::strong_ordering::equivalent);
+    expect_is_noexcept(std::strong_ordering::greater != std::strong_ordering::equivalent);
+    expect_ct_and_rt(std::strong_ordering::equivalent == 0);
+    expect_is_noexcept(std::strong_ordering::equivalent == 0);
+    expect_ct_and_rt(!(std::strong_ordering::equivalent != 0));
+    expect_is_noexcept(std::strong_ordering::equivalent != 0);
+    expect_ct_and_rt(!(std::strong_ordering::equivalent < 0));
+    expect_is_noexcept(std::strong_ordering::equivalent < 0);
+    expect_ct_and_rt(!(std::strong_ordering::equivalent > 0));
+    expect_is_noexcept(std::strong_ordering::equivalent > 0);
+    expect_ct_and_rt(std::strong_ordering::equivalent <= 0);
+    expect_is_noexcept(std::strong_ordering::equivalent <= 0);
+    expect_ct_and_rt(std::strong_ordering::equivalent >= 0);
+    expect_is_noexcept(std::strong_ordering::equivalent >= 0);
+    expect_ct_and_rt(0 == std::strong_ordering::equivalent);
+    expect_is_noexcept(0 == std::strong_ordering::equivalent);
+    expect_ct_and_rt(!(0 != std::strong_ordering::equivalent));
+    expect_is_noexcept(0 != std::strong_ordering::equivalent);
+    expect_ct_and_rt(!(0 < std::strong_ordering::equivalent));
+    expect_is_noexcept(0 < std::strong_ordering::equivalent);
+    expect_ct_and_rt(!(0 > std::strong_ordering::equivalent));
+    expect_is_noexcept(0 > std::strong_ordering::equivalent);
+    expect_ct_and_rt(0 <= std::strong_ordering::equivalent);
+    expect_is_noexcept(0 <= std::strong_ordering::equivalent);
+    expect_ct_and_rt(0 >= std::strong_ordering::equivalent);
+    expect_is_noexcept(0 >= std::strong_ordering::equivalent);
+    expect_ct_and_rt((std::strong_ordering::equivalent <=> 0) == std::strong_ordering::equivalent);
+    expect_is_noexcept(std::strong_ordering::equivalent <=> 0);
+    expect_ct_and_rt((0 <=> std::strong_ordering::equivalent) == std::strong_ordering::equivalent);
+    expect_is_noexcept(0 <=> std::strong_ordering::equivalent);
+}
+
+TEST(greater) {
+    expect_type(const std::strong_ordering&, std::strong_ordering::greater);
+    expect_ct_and_rt(implicit_conversion_to_partial_ordering(std::strong_ordering::greater));
+    expect_ct_and_rt(std::strong_ordering::greater == std::partial_ordering::greater);
+    expect_ct_and_rt((std::partial_ordering)std::strong_ordering::greater
+                     == std::partial_ordering::greater);
+    expect_is_noexcept((std::partial_ordering)std::strong_ordering::greater);
+    expect_ct_and_rt(implicit_conversion_to_weak_ordering(std::strong_ordering::greater));
+    expect_ct_and_rt(std::strong_ordering::greater == std::weak_ordering::greater);
+    expect_ct_and_rt((std::weak_ordering)std::strong_ordering::greater
+                     == std::weak_ordering::greater);
+    expect_is_noexcept((std::weak_ordering)std::strong_ordering::greater);
+    expect_ct_and_rt(!(std::strong_ordering::greater == std::strong_ordering::less));
+    expect_is_noexcept(std::strong_ordering::greater == std::strong_ordering::less);
+    expect_ct_and_rt(!(std::strong_ordering::greater == std::strong_ordering::equivalent));
+    expect_is_noexcept(std::strong_ordering::greater == std::strong_ordering::equivalent);
+    expect_ct_and_rt(!(std::strong_ordering::greater == std::strong_ordering::equal));
+    expect_is_noexcept(std::strong_ordering::greater == std::strong_ordering::equal);
+    expect_ct_and_rt(std::strong_ordering::greater == std::strong_ordering::greater);
+    expect_is_noexcept(std::strong_ordering::greater == std::strong_ordering::greater);
+    expect_ct_and_rt(std::strong_ordering::greater != std::strong_ordering::less);
+    expect_is_noexcept(std::strong_ordering::greater != std::strong_ordering::less);
+    expect_ct_and_rt(std::strong_ordering::greater != std::strong_ordering::equivalent);
+    expect_is_noexcept(std::strong_ordering::greater != std::strong_ordering::equivalent);
+    expect_ct_and_rt(std::strong_ordering::greater != std::strong_ordering::equal);
+    expect_is_noexcept(std::strong_ordering::greater != std::strong_ordering::equal);
+    expect_ct_and_rt(!(std::strong_ordering::greater != std::strong_ordering::greater));
+    expect_is_noexcept(std::strong_ordering::greater != std::strong_ordering::greater);
+    expect_ct_and_rt(!(std::strong_ordering::less == std::strong_ordering::greater));
+    expect_is_noexcept(std::strong_ordering::less == std::strong_ordering::greater);
+    expect_ct_and_rt(!(std::strong_ordering::equivalent == std::strong_ordering::greater));
+    expect_is_noexcept(std::strong_ordering::equivalent == std::strong_ordering::greater);
+    expect_ct_and_rt(!(std::strong_ordering::equal == std::strong_ordering::greater));
+    expect_is_noexcept(std::strong_ordering::equal == std::strong_ordering::greater);
+    expect_ct_and_rt(std::strong_ordering::less != std::strong_ordering::greater);
+    expect_is_noexcept(std::strong_ordering::less != std::strong_ordering::greater);
+    expect_ct_and_rt(std::strong_ordering::equivalent != std::strong_ordering::greater);
+    expect_is_noexcept(std::strong_ordering::equivalent != std::strong_ordering::greater);
+    expect_ct_and_rt(std::strong_ordering::equal != std::strong_ordering::greater);
+    expect_is_noexcept(std::strong_ordering::equal != std::strong_ordering::greater);
+    expect_ct_and_rt(!(std::strong_ordering::greater == 0));
+    expect_is_noexcept(std::strong_ordering::greater == 0);
+    expect_ct_and_rt(std::strong_ordering::greater != 0);
+    expect_is_noexcept(std::strong_ordering::greater != 0);
+    expect_ct_and_rt(!(std::strong_ordering::greater < 0));
+    expect_is_noexcept(std::strong_ordering::greater < 0);
+    expect_ct_and_rt(std::strong_ordering::greater > 0);
+    expect_is_noexcept(std::strong_ordering::greater > 0);
+    expect_ct_and_rt(!(std::strong_ordering::greater <= 0));
+    expect_is_noexcept(std::strong_ordering::greater <= 0);
+    expect_ct_and_rt(std::strong_ordering::greater >= 0);
+    expect_is_noexcept(std::strong_ordering::greater >= 0);
+    expect_ct_and_rt(!(0 == std::strong_ordering::greater));
+    expect_is_noexcept(0 == std::strong_ordering::greater);
+    expect_ct_and_rt(0 != std::strong_ordering::greater);
+    expect_is_noexcept(0 != std::strong_ordering::greater);
+    expect_ct_and_rt(0 < std::strong_ordering::greater);
+    expect_is_noexcept(0 < std::strong_ordering::greater);
+    expect_ct_and_rt(!(0 > std::strong_ordering::greater));
+    expect_is_noexcept(0 > std::strong_ordering::greater);
+    expect_ct_and_rt(0 <= std::strong_ordering::greater);
+    expect_is_noexcept(0 <= std::strong_ordering::greater);
+    expect_ct_and_rt(!(0 >= std::strong_ordering::greater));
+    expect_is_noexcept(0 >= std::strong_ordering::greater);
+    expect_ct_and_rt((std::strong_ordering::greater <=> 0) == std::strong_ordering::greater);
+    expect_is_noexcept(std::strong_ordering::greater <=> 0);
+    expect_ct_and_rt((0 <=> std::strong_ordering::greater) == std::strong_ordering::less);
+    expect_is_noexcept(0 <=> std::strong_ordering::greater);
+}

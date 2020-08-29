@@ -10,8 +10,8 @@ TEST() {
     expect_type_and_value<::std::nullptr_t&>(n, null);
 
     // The type nullptr_t is a synonym for the type of a nullptr expression
-    expect_type<::std::nullptr_t&&>(nullptr);
+    expect_type(::std::nullptr_t, nullptr);
 
     // [Note: the address of another nullptr_t object that is an lvalue can be taken. — end note]
-    expect_type<::std::nullptr_t*&&>(&n);
+    expect_type(::std::nullptr_t*, &n);
 }

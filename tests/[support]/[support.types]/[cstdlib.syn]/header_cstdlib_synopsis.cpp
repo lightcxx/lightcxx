@@ -45,15 +45,15 @@ TEST() {
     [[maybe_unused]] auto Exit_lambda = []() { ::std::_Exit(10); };
 
     const auto malloc_ptr = ::std::malloc(16);
-    expect_type<void* const&>(malloc_ptr);
+    expect_type(void* const&, malloc_ptr);
     const auto realloc_ptr = ::std::realloc(malloc_ptr, 32);
-    expect_type<void* const&>(realloc_ptr);
+    expect_type(void* const&, realloc_ptr);
     ::std::free(realloc_ptr);
     const auto calloc_ptr = ::std::calloc(16, 32);
-    expect_type<void* const&>(calloc_ptr);
+    expect_type(void* const&, calloc_ptr);
     ::std::free(calloc_ptr);
     const auto aligned_alloc_ptr = ::std::aligned_alloc(4096, 313);
-    expect_type<void* const&>(aligned_alloc_ptr);
+    expect_type(void* const&, aligned_alloc_ptr);
     expect(((unsigned long long)aligned_alloc_ptr) % 4096 == 0);
     ::std::free(aligned_alloc_ptr);
 

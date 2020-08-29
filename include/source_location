@@ -6,7 +6,7 @@
 namespace std {
 
 struct source_location {
-    // TODO: consteval
+    // TODO: This is supposed to be "consteval", change it once compilers fully support it.
     static constexpr source_location current(source_location ret
                                              = source_location(__builtin_LINE(),
                                                                __builtin_COLUMN(),

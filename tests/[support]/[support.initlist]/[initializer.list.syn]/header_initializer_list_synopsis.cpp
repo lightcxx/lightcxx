@@ -6,7 +6,7 @@
 
 TEST(int_) {
     auto i = {1, 2, 3, 4};
-    expect_type<std::initializer_list<int>&>(i);
+    expect_type(std::initializer_list<int>&, i);
     expect_ct_and_rt(std::is_same_v<decltype(i)::value_type, int>);
     expect_ct_and_rt(std::is_same_v<decltype(i)::reference, const int&>);
     expect_ct_and_rt(std::is_same_v<decltype(i)::const_reference, const int&>);
@@ -32,7 +32,7 @@ TEST(int_) {
 
 TEST(const_char_ptr) {
     auto i = {"1", "2", "3", "4", "123"};
-    expect_type<std::initializer_list<const char*>&>(i);
+    expect_type(std::initializer_list<const char*>&, i);
     expect_ct_and_rt(std::is_same_v<decltype(i)::value_type, const char*>);
     expect_ct_and_rt(std::is_same_v<decltype(i)::reference, const char* const&>);
     expect_ct_and_rt(std::is_same_v<decltype(i)::const_reference, const char* const&>);

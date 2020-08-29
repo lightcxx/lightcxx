@@ -10,7 +10,7 @@ struct StandardLayoutStructure {
 
 TEST() {
     expect_ct_and_rt(offsetof(StandardLayoutStructure, c) == sizeof(int) + sizeof(int));
-    expect_ct_and_rt(noexcept(offsetof(StandardLayoutStructure, c)));
+    expect_is_noexcept(offsetof(StandardLayoutStructure, c));
 
     static_assert(Testing::IsSignedIntegerType<::std::ptrdiff_t>);
 

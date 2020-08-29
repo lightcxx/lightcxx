@@ -21,6 +21,6 @@ TEST() {
     });
 
     auto ptr = ::operator new[](256);
-    expect_type<void*&>(ptr);
+    expect_type(void*&, ptr);
     ::operator delete[](ptr);
 }
