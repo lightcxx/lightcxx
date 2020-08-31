@@ -1,0 +1,18 @@
+#ifndef __LIGHTCXX_GUARD_CSETJMP
+#define __LIGHTCXX_GUARD_CSETJMP
+
+// TODO: Don't include C headers in the C++ headers.
+#include <setjmp.h>
+
+namespace std {
+
+using jmp_buf = ::jmp_buf;
+using ::longjmp;
+
+}  // namespace std
+
+#ifndef setjmp
+#define setjmp(__e) ::setjmp(__e)
+#endif
+
+#endif

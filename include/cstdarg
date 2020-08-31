@@ -1,0 +1,15 @@
+#ifndef __LIGHTCXX_GUARD_CSTDARG
+#define __LIGHTCXX_GUARD_CSTDARG
+
+namespace std {
+
+using va_list = __builtin_va_list;
+
+}  // namespace std
+
+#define va_start(__va, __p) __builtin_va_start(__va, __p)
+#define va_arg(__va, _T) __builtin_va_arg(__va, _T)
+#define va_end(__va) __builtin_va_end(__va)
+#define va_copy(__dst_va, __src_va)  __builtin_va_copy(__dst_va, __src_va)
+
+#endif

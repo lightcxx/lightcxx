@@ -51,9 +51,9 @@ struct Test {
 
 #define TEST(name)                                                                                 \
     namespace Testing {                                                                            \
-    static void name##_();                                                                         \
-    static ::Testing::Test test_##name{name##_, #name};                                            \
+    static void test_##name();                                                                     \
+    static ::Testing::Test test_register_##name{test_##name, #name};                               \
     }                                                                                              \
-    static void Testing::name##_()
+    static void Testing::test_##name()
 
 #endif

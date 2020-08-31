@@ -1,0 +1,15 @@
+#ifndef __LIGHTCXX_GUARD_CSIGNAL
+#define __LIGHTCXX_GUARD_CSIGNAL
+
+// TODO: Don't include C headers in the C++ headers.
+#include <signal.h>
+
+namespace std {
+
+using ::sig_atomic_t;
+using ::signal;
+using ::raise;
+
+}  // namespace std
+
+#endif
