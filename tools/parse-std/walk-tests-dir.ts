@@ -21,7 +21,7 @@ for await (const entry of walk(Deno.args[0])) {
         if (lastSlash < 0) {
             continue;
         }
-        const sectionTag = entry.path.substring(lastSlash + 1);
+        const sectionTag = `[${entry.path.substring(lastSlash + 1)}]`;
         if (sections[sectionTag] == null) {
             sections[sectionTag] = new Section(sectionTag);
         }
@@ -31,7 +31,7 @@ for await (const entry of walk(Deno.args[0])) {
             topLevelSections.push(sections[sectionTag]);
             continue;
         }
-        const parentSectionTag = pathWithoutLastDir.substr(beforeLastSlash + 1);
+        const parentSectionTag = `[${pathWithoutLastDir.substr(beforeLastSlash + 1)}]`;
         if (sections[parentSectionTag] == null) {
             sections[parentSectionTag] = new Section(parentSectionTag);
         }
