@@ -1,7 +1,7 @@
 // @ts-ignore
 import jsdom from "https://dev.jspm.io/jsdom";
 
-const topLevelTags = ["support"];
+const topLevelTags = ["support", "utilities"];
 
 class Section {
     tag: string;

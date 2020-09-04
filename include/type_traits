@@ -1,28 +1,22 @@
 #ifndef __LIGHTCXX_GUARD_TYPE_TRAITS
 #define __LIGHTCXX_GUARD_TYPE_TRAITS
 
+#include <__lightcxx/__declval.h>
+
 namespace std {
 
-namespace _Light {
+using size_t = decltype(sizeof(void*));
+using nullptr_t = decltype(nullptr);
 
-template<class _T>
-_T&& __declval_impl(int);
+// region [meta.help]
 
-template<class _T>
-_T __declval_impl(long);
-
-}  // namespace _Light
-
-template<class _T>
-decltype(_Light::__declval_impl<_T>(0)) declval() noexcept;
-
-template<class _T, _T _v>
+template<class _T, _T _V>
 struct integral_constant {
-    static constexpr _T value = _v;
+    static constexpr _T value = _V;
 
     using value_type = _T;
 
-    using type = integral_constant<_T, _v>;
+    using type = integral_constant<_T, _V>;
 
     constexpr operator value_type() const noexcept {
         return value;
@@ -39,6 +33,447 @@ using bool_constant = integral_constant<bool, _B>;
 using true_type = bool_constant<true>;
 
 using false_type = bool_constant<false>;
+
+// endregion
+
+// region implementation-details
+
+namespace _Light {
+
+template<class _T>
+consteval bool __dependent_false() {
+    return false;
+}
+
+}  // namespace _Light
+
+#define __UNARY_TRAIT_TRUE_FOR_ALL_CV(_Trait, _T)                                                  \
+    template<>                                                                                     \
+    struct _Trait<_T> : ::std::true_type {};                                                       \
+    template<>                                                                                     \
+    struct _Trait<_T const> : ::std::true_type {};                                                 \
+    template<>                                                                                     \
+    struct _Trait<_T volatile> : ::std::true_type {};                                              \
+    template<>                                                                                     \
+    struct _Trait<_T const volatile> : ::std::true_type {}
+
+#ifdef _LIGHTCXX_DONT_USE_BUILTINS
+#define __LIGHTCXX_USE_BUILTIN(_B) 0
+#else
+#define __LIGHTCXX_USE_BUILTIN(_B) (defined(_B) || (defined(__has_builtin) && __has_builtin(_B)))
+#endif
+
+// endregion
+
+// region [meta.unary.cat]
+
+#if __LIGHTCXX_USE_BUILTIN(__is_void)
+
+template<class _T>
+struct is_void : bool_constant<__is_void(_T)> {};
+
+template<class _T>
+using is_void_t = bool_constant<__is_void(_T)>;
+
+template<class _T>
+constexpr bool is_void_v = __is_void(_T);
+
+#else
+
+template<class _T>
+struct is_void : false_type {};
+
+__UNARY_TRAIT_TRUE_FOR_ALL_CV(is_void, void);
+
+template<class _T>
+using is_void_t = typename is_void<_T>::type;
+
+template<class _T>
+constexpr bool is_void_v = is_void<_T>::value;
+
+#endif
+
+template<class _T>
+struct is_null_pointer : false_type {};
+
+__UNARY_TRAIT_TRUE_FOR_ALL_CV(is_null_pointer, nullptr_t);
+
+template<class _T>
+using is_null_pointer_t = typename is_null_pointer<_T>::type;
+
+template<class _T>
+constexpr bool is_null_pointer_v = is_null_pointer<_T>::value;
+
+#if __LIGHTCXX_USE_BUILTIN(__is_integral)
+
+template<class _T>
+struct is_integral : bool_constant<__is_integral(_T)> {};
+
+template<class _T>
+using is_integral_t = bool_constant<__is_integral(_T)>;
+
+template<class _T>
+constexpr bool is_integral_v = __is_integral(_T);
+
+#else
+
+template<class _T>
+struct is_integral : false_type {};
+
+__UNARY_TRAIT_TRUE_FOR_ALL_CV(is_integral, bool);
+__UNARY_TRAIT_TRUE_FOR_ALL_CV(is_integral, char);
+__UNARY_TRAIT_TRUE_FOR_ALL_CV(is_integral, wchar_t);
+__UNARY_TRAIT_TRUE_FOR_ALL_CV(is_integral, char8_t);
+__UNARY_TRAIT_TRUE_FOR_ALL_CV(is_integral, char16_t);
+__UNARY_TRAIT_TRUE_FOR_ALL_CV(is_integral, char32_t);
+__UNARY_TRAIT_TRUE_FOR_ALL_CV(is_integral, signed char);
+__UNARY_TRAIT_TRUE_FOR_ALL_CV(is_integral, short);
+__UNARY_TRAIT_TRUE_FOR_ALL_CV(is_integral, int);
+__UNARY_TRAIT_TRUE_FOR_ALL_CV(is_integral, long int);
+__UNARY_TRAIT_TRUE_FOR_ALL_CV(is_integral, long long int);
+__UNARY_TRAIT_TRUE_FOR_ALL_CV(is_integral, unsigned char);
+__UNARY_TRAIT_TRUE_FOR_ALL_CV(is_integral, unsigned short int);
+__UNARY_TRAIT_TRUE_FOR_ALL_CV(is_integral, unsigned int);
+__UNARY_TRAIT_TRUE_FOR_ALL_CV(is_integral, unsigned long int);
+__UNARY_TRAIT_TRUE_FOR_ALL_CV(is_integral, unsigned long long int);
+
+template<class _T>
+using is_integral_t = typename is_integral<_T>::type;
+
+template<class _T>
+constexpr bool is_integral_v = is_integral<_T>::value;
+
+#endif
+
+#if __LIGHTCXX_USE_BUILTIN(__is_floating_point)
+
+template<class _T>
+struct is_floating_point : bool_constant<__is_floating_point(_T)> {};
+
+template<class _T>
+using is_floating_point_t = bool_constant<__is_floating_point(_T)>;
+
+template<class _T>
+constexpr bool is_floating_point_v = __is_floating_point(_T);
+
+#else
+
+template<class _T>
+struct is_floating_point : false_type {};
+
+__UNARY_TRAIT_TRUE_FOR_ALL_CV(is_floating_point, float);
+__UNARY_TRAIT_TRUE_FOR_ALL_CV(is_floating_point, double);
+__UNARY_TRAIT_TRUE_FOR_ALL_CV(is_floating_point, long double);
+
+template<class _T>
+using is_floating_point_t = typename is_floating_point<_T>::type;
+
+template<class _T>
+constexpr bool is_floating_point_v = is_floating_point<_T>::value;
+
+#endif
+
+#if __LIGHTCXX_USE_BUILTIN(__is_array)
+
+template<class _T>
+struct is_array : bool_constant<__is_array(_T)> {};
+
+template<class _T>
+using is_array_t = bool_constant<__is_array(_T)>;
+
+template<class _T>
+constexpr bool is_array_v = __is_array(_T);
+
+#else
+
+template<class _T>
+struct is_array : false_type {};
+
+template<class _T>
+struct is_array<_T[]> : true_type {};
+
+template<class _T, size_t _N>
+struct is_array<_T[_N]> : true_type {};
+
+template<class _T>
+using is_array_t = typename is_array<_T>::type;
+
+template<class _T>
+constexpr bool is_array_v = is_array<_T>::value;
+
+#endif
+
+#if __LIGHTCXX_USE_BUILTIN(__is_pointer)
+
+template<class _T>
+struct is_pointer : bool_constant<__is_pointer(_T)> {};
+
+template<class _T>
+using is_pointer_t = bool_constant<__is_pointer(_T)>;
+
+template<class _T>
+constexpr bool is_pointer_v = __is_pointer(_T);
+
+#else
+
+template<class _T>
+struct is_pointer : false_type {};
+
+template<class _T>
+struct is_pointer<_T*> : true_type {};
+
+template<class _T>
+struct is_pointer<_T* const> : true_type {};
+
+template<class _T>
+struct is_pointer<_T* volatile> : true_type {};
+
+template<class _T>
+struct is_pointer<_T* const volatile> : true_type {};
+
+template<class _T>
+using is_pointer_t = typename is_pointer<_T>::type;
+
+template<class _T>
+constexpr bool is_pointer_v = is_pointer<_T>::value;
+
+#endif
+
+#if __LIGHTCXX_USE_BUILTIN(__is_lvalue_reference)
+
+template<class _T>
+struct is_lvalue_reference : bool_constant<__is_lvalue_reference(_T)> {};
+
+template<class _T>
+using is_lvalue_reference_t = bool_constant<__is_lvalue_reference(_T)>;
+
+template<class _T>
+constexpr bool is_lvalue_reference_v = __is_lvalue_reference(_T);
+
+#else
+
+template<class _T>
+struct is_lvalue_reference : false_type {};
+
+template<class _T>
+struct is_lvalue_reference<_T&> : true_type {};
+
+template<class _T>
+using is_lvalue_reference_t = typename is_lvalue_reference<_T>::type;
+
+template<class _T>
+constexpr bool is_lvalue_reference_v = is_lvalue_reference<_T>::value;
+
+#endif
+
+#if __LIGHTCXX_USE_BUILTIN(__is_rvalue_reference)
+
+template<class _T>
+struct is_rvalue_reference : bool_constant<__is_rvalue_reference(_T)> {};
+
+template<class _T>
+using is_rvalue_reference_t = bool_constant<__is_rvalue_reference(_T)>;
+
+template<class _T>
+constexpr bool is_rvalue_reference_v = __is_rvalue_reference(_T);
+
+#else
+
+template<class _T>
+struct is_rvalue_reference : false_type {};
+
+template<class _T>
+struct is_rvalue_reference<_T&&> : true_type {};
+
+template<class _T>
+using is_rvalue_reference_t = typename is_rvalue_reference<_T>::type;
+
+template<class _T>
+constexpr bool is_rvalue_reference_v = is_rvalue_reference<_T>::value;
+
+#endif
+
+#if __LIGHTCXX_USE_BUILTIN(__is_function)
+
+template<class _T>
+struct is_function : bool_constant<__is_function(_T)> {};
+
+template<class _T>
+using is_function_t = bool_constant<__is_function(_T)>;
+
+template<class _T>
+constexpr bool is_function_v = __is_function(_T);
+
+#else
+
+// Forward declare is_const
+template<class _T>
+struct is_const;
+
+template<class _T>
+constexpr bool is_function_v
+  = !std::is_const<const _T>::value
+    && !std::is_lvalue_reference_v<_T> && !std::is_rvalue_reference_v<_T>;
+
+template<class _T>
+struct is_function : bool_constant<is_function_v<_T>> {};
+
+template<class _T>
+using is_function_t = bool_constant<is_function_v<_T>>;
+
+#endif
+
+#if __LIGHTCXX_USE_BUILTIN(__is_member_object_pointer)
+
+template<class _T>
+struct is_member_object_pointer : bool_constant<__is_member_object_pointer(_T)> {};
+
+template<class _T>
+using is_member_object_pointer_t = bool_constant<__is_member_object_pointer(_T)>;
+
+template<class _T>
+constexpr bool is_member_object_pointer_v = __is_member_object_pointer(_T);
+
+#else
+
+template<class _T>
+struct is_member_object_pointer : false_type {};
+
+template<class _T, class _U>
+struct is_member_object_pointer<_T _U::*> : bool_constant<!is_function_v<_T>> {};
+
+template<class _T, class _U>
+struct is_member_object_pointer<_T _U::*const> : bool_constant<!is_function_v<_T>> {};
+
+template<class _T, class _U>
+struct is_member_object_pointer<_T _U::*volatile> : bool_constant<!is_function_v<_T>> {};
+
+template<class _T, class _U>
+struct is_member_object_pointer<_T _U::*const volatile> : bool_constant<!is_function_v<_T>> {};
+
+template<class _T>
+using is_member_object_pointer_t = typename is_member_object_pointer<_T>::type;
+
+template<class _T>
+constexpr bool is_member_object_pointer_v = is_member_object_pointer<_T>::value;
+
+#endif
+
+#if __LIGHTCXX_USE_BUILTIN(__is_member_function_pointer)
+
+template<class _T>
+struct is_member_function_pointer : bool_constant<__is_member_function_pointer(_T)> {};
+
+template<class _T>
+using is_member_function_pointer_t = bool_constant<__is_member_function_pointer(_T)>;
+
+template<class _T>
+constexpr bool is_member_function_pointer_v = __is_member_function_pointer(_T);
+
+#else
+
+template<class _T>
+struct is_member_function_pointer : false_type {};
+
+template<class _T, class _U>
+struct is_member_function_pointer<_T _U::*> : bool_constant<is_function_v<_T>> {};
+
+template<class _T, class _U>
+struct is_member_function_pointer<_T _U::*const> : bool_constant<is_function_v<_T>> {};
+
+template<class _T, class _U>
+struct is_member_function_pointer<_T _U::*volatile> : bool_constant<is_function_v<_T>> {};
+
+template<class _T, class _U>
+struct is_member_function_pointer<_T _U::*const volatile> : bool_constant<is_function_v<_T>> {};
+
+template<class _T>
+using is_member_function_pointer_t = typename is_member_function_pointer<_T>::type;
+
+template<class _T>
+constexpr bool is_member_function_pointer_v = is_member_function_pointer<_T>::value;
+
+#endif
+
+#if __LIGHTCXX_USE_BUILTIN(__is_enum)
+
+template<class _T>
+struct is_enum : bool_constant<__is_enum(_T)> {};
+
+template<class _T>
+using is_enum_t = bool_constant<__is_enum(_T)>;
+
+template<class _T>
+constexpr bool is_enum_v = __is_enum(_T);
+
+#else
+
+template<class _T>
+struct is_enum {
+    static_assert(_Light::__dependent_false<_T>(), "is_enum is not supported on this compiler.");
+};
+
+template<class _T>
+using is_enum_t = typename is_enum<_T>::type;
+
+template<class _T>
+constexpr bool is_enum_v = is_enum<_T>::value;
+
+#endif
+
+#if __LIGHTCXX_USE_BUILTIN(__is_union)
+
+template<class _T>
+struct is_union : bool_constant<__is_union(_T)> {};
+
+template<class _T>
+using is_union_t = bool_constant<__is_union(_T)>;
+
+template<class _T>
+constexpr bool is_union_v = __is_union(_T);
+
+#else
+
+template<class _T>
+struct is_union {
+    static_assert(_Light::__dependent_false<_T>(), "is_union is not supported on this compiler.");
+};
+
+template<class _T>
+using is_union_t = typename is_union<_T>::type;
+
+template<class _T>
+constexpr bool is_union_v = is_union<_T>::value;
+
+#endif
+
+#if __LIGHTCXX_USE_BUILTIN(__is_class)
+
+template<class _T>
+struct is_class : bool_constant<__is_class(_T)> {};
+
+template<class _T>
+using is_class_t = bool_constant<__is_class(_T)>;
+
+template<class _T>
+constexpr bool is_class_v = __is_class(_T);
+
+#else
+
+template<class _T>
+struct is_class {
+    static_assert(_Light::__dependent_false<_T>(), "is_class is not supported on this compiler.");
+};
+
+template<class _T>
+using is_class_t = typename is_class<_T>::type;
+
+template<class _T>
+constexpr bool is_class_v = is_class<_T>::value;
+
+#endif
+
+// endregion
 
 template<class _T, class _U>
 struct is_same : false_type {};
@@ -69,51 +504,6 @@ struct __is_referenceable
         : integral_constant<bool, !is_same_v<decltype(__is_referenceable_test<_T>(0)), __two>> {};
 
 }  // namespace _Light
-
-template<class _T>
-struct is_integral : bool_constant<__is_integral(_T)> {};
-
-template<class _T>
-using is_integral_t = typename is_integral<_T>::type;
-
-template<class _T>
-constexpr bool is_integral_v = is_integral<_T>::value;
-
-template<class _T>
-struct is_function : bool_constant<__is_function(_T)> {};
-
-template<class _T>
-using is_function_t = typename is_function<_T>::type;
-
-template<class _T>
-constexpr bool is_function_v = is_function<_T>::value;
-
-template<class _T>
-struct is_array : bool_constant<__is_array(_T)> {};
-
-template<class _T>
-using is_array_t = typename is_array<_T>::type;
-
-template<class _T>
-constexpr bool is_array_v = is_array<_T>::value;
-
-template<class _T>
-struct is_class : bool_constant<__is_class(_T)> {};
-
-template<class _T>
-using is_class_t = typename is_class<_T>::type;
-
-template<class _T>
-constexpr bool is_class_v = is_class<_T>::value;
-
-template<class _T>
-struct is_lvalue_reference : bool_constant<__is_lvalue_reference(_T)> {};
-
-template<class _T>
-using is_lvalue_reference_t = typename is_lvalue_reference<_T>::type;
-
-template<class _T>
-constexpr bool is_lvalue_reference_v = is_lvalue_reference<_T>::value;
 
 template<bool _B, class _T, class _F>
 struct conditional {
@@ -203,7 +593,7 @@ struct remove_extent<_T[]> {
     using type = _T;
 };
 
-template<class _T, decltype(sizeof(int)) _N>
+template<class _T, size_t _N>
 struct remove_extent<_T[_N]> {
     using type = _T;
 };
@@ -228,6 +618,18 @@ using is_final_t = typename is_final<_T>::type;
 
 template<class _T>
 constexpr bool is_final_v = is_final<_T>::value;
+
+template<class _T>
+struct is_const : std::false_type {};
+
+template<class _T>
+struct is_const<const _T> : std::true_type {};
+
+template<class _T>
+using is_const_t = typename is_const<_T>::type;
+
+template<class _T>
+constexpr bool is_const_v = is_const<_T>::value;
 
 template<class _T>
 struct add_lvalue_reference {
@@ -330,17 +732,9 @@ struct decay {
 template<class _T>
 using decay_t = typename decay<_T>::type;
 
-template<class _T>
-constexpr _T&& forward(remove_reference_t<_T>& __t) noexcept {
-    return static_cast<_T&&>(__t);
-}
-
-template<class _T>
-constexpr _T&& forward(remove_reference_t<_T>&& __t) noexcept {
-    static_assert(!is_lvalue_reference_v<_T>, "can not forward an rvalue as an lvalue");
-    return static_cast<_T&&>(__t);
-}
-
 }  // namespace std
+
+#undef __UNARY_TRAIT_TRUE_FOR_ALL_CV
+#undef __LIGHTCXX_USE_BUILTIN
 
 #endif

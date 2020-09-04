@@ -18,7 +18,7 @@ add_library(lightcxx STATIC
 target_include_directories(lightcxx
         PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include
         PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/third_party/libcxxabi/include)
-target_include_directories(lightcxx INTERFACE SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_include_directories(lightcxx SYSTEM INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_compile_options(lightcxx PUBLIC -nostdinc++)
 target_link_options(lightcxx PUBLIC -nostdlib++)
 if (APPLE)
