@@ -661,6 +661,10 @@ constexpr bool is_member_pointer_v
 
 // endregion
 
+// region [meta.unary.prop]
+
+// endregion
+
 template<class _T, class _U>
 struct is_same : false_type {};
 
@@ -910,8 +914,7 @@ struct decay {
 
   public:
     using type
-      = conditional_t<is_array_v<_U>,
-                      remove_extent_t<_U>*,
+      = conditional_t<is_array_v<_U>, remove_extent_t<_U>*,
                       conditional_t<is_function_v<_U>, add_pointer_t<_U>, remove_cv_t<_U>>>;
 };
 

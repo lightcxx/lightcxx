@@ -55,10 +55,10 @@ int wctomb(char* __s, wchar_t __wchar);
 size_t mbstowcs(wchar_t* __pwcs, const char* __s, size_t __n);
 size_t wcstombs(char* __s, const wchar_t* __pwcs, size_t __n);
 
-void* bsearch(
-  const void* __key, const void* __base, size_t __n, size_t __size, _Light::_CComparePred* __cmp);
-void* bsearch(
-  const void* __key, const void* __base, size_t __n, size_t __size, _Light::_ComparePred* __cmp);
+void* bsearch(const void* __key, const void* __base, size_t __n, size_t __size,
+              _Light::_CComparePred* __cmp);
+void* bsearch(const void* __key, const void* __base, size_t __n, size_t __size,
+              _Light::_ComparePred* __cmp);
 
 void qsort(void* __base, size_t __n, size_t __size, _Light::_CComparePred* __cmp);
 void qsort(void* __base, size_t __n, size_t __size, _Light::_ComparePred* __cmp);

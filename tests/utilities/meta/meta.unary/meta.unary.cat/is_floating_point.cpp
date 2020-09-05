@@ -4,20 +4,22 @@
 
 #include "meta/test_unary_trait.h"
 
-TEST_UNARY_TRAIT_AGAINST_VOID(false, std::is_floating_point);
-TEST_UNARY_TRAIT_AGAINST_NULLPTR_T(false, std::is_floating_point);
-TEST_UNARY_TRAIT_AGAINST_INTEGRAL(false, std::is_floating_point);
-TEST_UNARY_TRAIT_AGAINST_FLOATING_POINT(true, std::is_floating_point);
-TEST_UNARY_TRAIT_AGAINST_ARRAY(false, std::is_floating_point);
-TEST_UNARY_TRAIT_AGAINST_POINTER(false, std::is_floating_point);
-TEST_UNARY_TRAIT_AGAINST_LVALUE_REFERENCE(false, std::is_floating_point);
-TEST_UNARY_TRAIT_AGAINST_RVALUE_REFERENCE(false, std::is_floating_point);
-TEST_UNARY_TRAIT_AGAINST_MEMBER_OBJECT_POINTER(false, std::is_floating_point);
-TEST_UNARY_TRAIT_AGAINST_MEMBER_FUNCTION_POINTER(false, std::is_floating_point);
-TEST_UNARY_TRAIT_AGAINST_ENUM(false, std::is_floating_point);
-TEST_UNARY_TRAIT_AGAINST_UNION(false, std::is_floating_point);
-TEST_UNARY_TRAIT_AGAINST_CLASS(false, std::is_floating_point);
-TEST_UNARY_TRAIT_AGAINST_FUNCTION(false, std::is_floating_point);
+DECLARE_TRAIT_V_READER(is_floating_point);
+
+TEST_UNARY_TRAIT_AGAINST_VOID(false, is_floating_point, EVERY_CV);
+TEST_UNARY_TRAIT_AGAINST_NULLPTR_T(false, is_floating_point, EVERY_CV);
+TEST_UNARY_TRAIT_AGAINST_INTEGRAL(false, is_floating_point, EVERY_CV);
+TEST_UNARY_TRAIT_AGAINST_FLOATING_POINT(true, is_floating_point, EVERY_CV);
+TEST_UNARY_TRAIT_AGAINST_ARRAY(false, is_floating_point, EVERY_CV);
+TEST_UNARY_TRAIT_AGAINST_POINTER(false, is_floating_point, EVERY_CV);
+TEST_UNARY_TRAIT_AGAINST_LVALUE_REFERENCE(false, is_floating_point);
+TEST_UNARY_TRAIT_AGAINST_RVALUE_REFERENCE(false, is_floating_point);
+TEST_UNARY_TRAIT_AGAINST_MEMBER_OBJECT_POINTER(false, is_floating_point, EVERY_CV);
+TEST_UNARY_TRAIT_AGAINST_MEMBER_FUNCTION_POINTER(false, is_floating_point, EVERY_CV);
+TEST_UNARY_TRAIT_AGAINST_ENUM(false, is_floating_point, EVERY_CV);
+TEST_UNARY_TRAIT_AGAINST_UNION(false, is_floating_point, EVERY_CV);
+TEST_UNARY_TRAIT_AGAINST_CLASS(false, is_floating_point, EVERY_CV);
+TEST_UNARY_TRAIT_AGAINST_FUNCTION(false, is_floating_point);
 
 int main() {
     return 0;

@@ -1,4 +1,4 @@
-//EXPECT:NO_COMPILE 1
+// EXPECT:NO_COMPILE 1
 
 #include <compare>
 

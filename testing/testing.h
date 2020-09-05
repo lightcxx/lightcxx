@@ -26,8 +26,7 @@ void expect(bool cnd, std::source_location loc = std::source_location::current()
     static_assert(::std::is_same_v<expected_type, decltype((expr))>)
 
 template<class T, class U, class V>
-void expect_type_and_value(U&& val,
-                           V&& expected,
+void expect_type_and_value(U&& val, V&& expected,
                            std::source_location loc = std::source_location::current()) noexcept {
     expect_ct_and_rt(std::is_same_v<T, decltype(val)>);
     expect(val == expected, loc);

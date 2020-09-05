@@ -92,7 +92,8 @@ TEST(equivalent) {
     expect_is_noexcept(0 >= std::partial_ordering::equivalent);
     expect_ct_and_rt(!(0 > std::partial_ordering::equivalent));
     expect_is_noexcept(0 > std::partial_ordering::equivalent);
-    expect_ct_and_rt((std::partial_ordering::equivalent <=> 0) == std::partial_ordering::equivalent);
+    expect_ct_and_rt((std::partial_ordering::equivalent <=> 0)
+                     == std::partial_ordering::equivalent);
     expect_is_noexcept(std::partial_ordering::equivalent <=> 0);
     expect_ct_and_rt((0 <=> std::partial_ordering::equivalent)
                      == std::partial_ordering::equivalent);

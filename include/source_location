@@ -8,8 +8,7 @@ namespace std {
 struct source_location {
     // TODO: This is supposed to be "consteval", change it once compilers fully support it.
     static constexpr source_location current(source_location ret
-                                             = source_location(__builtin_LINE(),
-                                                               __builtin_COLUMN(),
+                                             = source_location(__builtin_LINE(), __builtin_COLUMN(),
                                                                __builtin_FILE(),
                                                                __builtin_FUNCTION())) noexcept {
         return ret;
@@ -39,10 +38,8 @@ struct source_location {
     }
 
   private:
-    constexpr source_location(uint_least32_t __line,
-                              uint_least32_t __column,
-                              const char* __file_name,
-                              const char* __function_name)
+    constexpr source_location(uint_least32_t __line, uint_least32_t __column,
+                              const char* __file_name, const char* __function_name)
             : __line(__line), __column(__column), __file_name(__file_name),
               __function_name(__function_name) {}
 

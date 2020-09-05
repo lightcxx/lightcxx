@@ -15,12 +15,8 @@ const char* current_test_name = nullptr;
 namespace Testing {
 
 void fail(std::source_location loc) noexcept {
-    fprintf(stderr,
-            "EXPECTATION FAILED in test %s: in function %s (%s:%d)\n",
-            current_test_name,
-            loc.function_name(),
-            loc.file_name(),
-            loc.line());
+    fprintf(stderr, "EXPECTATION FAILED in test %s: in function %s (%s:%d)\n", current_test_name,
+            loc.function_name(), loc.file_name(), loc.line());
     _Exit(1);
 }
 

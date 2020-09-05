@@ -90,8 +90,8 @@ __attribute__((__weak__)) void* operator new(std::size_t size, const std::nothro
     return ptr;
 }
 
-__attribute__((__weak__)) void*
-  operator new(size_t size, std::align_val_t align, const std::nothrow_t&) noexcept {
+__attribute__((__weak__)) void* operator new(size_t size, std::align_val_t align,
+                                             const std::nothrow_t&) noexcept {
     void* p = nullptr;
     try {
         p = ::operator new(size, align);
@@ -119,8 +119,8 @@ __attribute__((__weak__)) void operator delete(void* ptr, const std::nothrow_t&)
     ::operator delete(ptr);
 }
 
-__attribute__((__weak__)) void
-  operator delete(void* ptr, std::align_val_t align, const std::nothrow_t&) noexcept {
+__attribute__((__weak__)) void operator delete(void* ptr, std::align_val_t align,
+                                               const std::nothrow_t&) noexcept {
     ::operator delete(ptr, align);
 }
 
@@ -142,8 +142,8 @@ __attribute__((__weak__)) void* operator new[](std::size_t size, const std::noth
     return ptr;
 }
 
-__attribute__((__weak__)) void*
-  operator new[](size_t size, std::align_val_t align, const std::nothrow_t&) noexcept {
+__attribute__((__weak__)) void* operator new[](size_t size, std::align_val_t align,
+                                               const std::nothrow_t&) noexcept {
     void* p = nullptr;
     try {
         p = ::operator new[](size, align);
@@ -163,8 +163,8 @@ __attribute__((__weak__)) void operator delete[](void* ptr, std::align_val_t ali
     ::operator delete(ptr, align);
 }
 
-__attribute__((__weak__)) void
-  operator delete[](void* ptr, size_t, std::align_val_t align) noexcept {
+__attribute__((__weak__)) void operator delete[](void* ptr, size_t,
+                                                 std::align_val_t align) noexcept {
     ::operator delete[](ptr, align);
 }
 
@@ -172,8 +172,8 @@ __attribute__((__weak__)) void operator delete[](void* ptr, const std::nothrow_t
     ::operator delete[](ptr);
 }
 
-__attribute__((__weak__)) void
-  operator delete[](void* ptr, std::align_val_t align, const std::nothrow_t&) noexcept {
+__attribute__((__weak__)) void operator delete[](void* ptr, std::align_val_t align,
+                                                 const std::nothrow_t&) noexcept {
     ::operator delete[](ptr, align);
 }
 

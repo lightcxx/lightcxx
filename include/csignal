@@ -6,9 +6,9 @@
 
 namespace std {
 
+using ::raise;
 using ::sig_atomic_t;
 using ::signal;
-using ::raise;
 
 }  // namespace std
 

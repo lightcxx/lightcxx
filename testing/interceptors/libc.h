@@ -13,6 +13,6 @@ struct LibCInterceptors {
 
 extern LibCInterceptors libc;
 
-}
+}  // namespace Testing
 
 #endif

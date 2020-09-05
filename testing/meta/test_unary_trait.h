@@ -3,6 +3,8 @@
 
 #include <type_traits>
 
+using NullptrT = decltype(nullptr);
+
 class Class {
     [[maybe_unused]] int x[2];
     [[maybe_unused]] char y[4];
@@ -25,148 +27,168 @@ enum class [[maybe_unused]] EnumClass{
 
 struct incomplete_type;
 
-#define TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, TP)                                         \
-    static_assert(std::is_base_of_v<std::bool_constant<EXPECTED>, TRAIT<TP>>,                      \
-                  #TRAIT "<" #TP "> must derive from from std::bool_constant<" #EXPECTED ">");     \
-    static_assert(TRAIT<TP>::value == EXPECTED, #TRAIT "<" #TP ">::value must equal " #EXPECTED);  \
-    static_assert(std::is_same_v<TRAIT<TP>::type, std::bool_constant<EXPECTED>>,                   \
-                  #TRAIT "<" #TP ">::type must be same as std::bool_constant<" #EXPECTED ">");     \
-    static_assert(TRAIT##_v<TP> == EXPECTED, #TRAIT "_v<" #TP "> must equal " #EXPECTED);          \
-    static_assert(std::is_same_v<TRAIT##_t<TP>, std::bool_constant<EXPECTED>>,                     \
-                  #TRAIT "_t<" #TP "> must be same as std::bool_constant<" #EXPECTED ">")
+#define DECLARE_TRAIT_V_READER(TRAIT)                                                              \
+    template<class T>                                                                              \
+    struct TRAIT##_v_reader {                                                                      \
+        constexpr auto read() const noexcept {                                                     \
+            return ::std::TRAIT##_v<T>;                                                            \
+        }                                                                                          \
+    }
 
-#define TEST_UNARY_TRAIT_AGAINST_CV_TYPE(EXPECTED, TRAIT, TP)                                      \
-    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, TP);                                            \
-    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, TP const);                                      \
-    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, TP volatile);                                   \
-    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, TP const volatile)
+template<template<class> class Trait, template<class> class Trait_t,
+         template<class> class Trait_v_reader, bool e, class T>
+constexpr bool test_unary_trait_against_type_() {
+    constexpr auto reader = Trait_v_reader<T>{};
+    static_assert(std::is_base_of_v<std::bool_constant<e>, Trait<T>>);
+    static_assert(Trait<T>::value == e);
+    static_assert(std::is_same_v<typename Trait<T>::value_type, bool>);
+    static_assert(Trait<T>{} == e);
+    static_assert((bool)Trait<T>{} == e);
+    static_assert(noexcept((bool)Trait<T>{}));
+    static_assert(Trait<T>{}() == e);
+    static_assert(noexcept(Trait<T>{}()));
+    static_assert(std::is_same_v<bool, decltype(Trait<T>{}())>);
+    static_assert(std::is_same_v<typename Trait<T>::type, std::bool_constant<e>>);
+    static_assert(std::is_same_v<Trait_t<T>, std::bool_constant<e>>);
+    static_assert(std::is_same_v<decltype(reader.read()), bool>);
+    static_assert(reader.read() == e);
+    return true;
+}
 
-#define TEST_UNARY_TRAIT_AGAINST_VOID(EXPECTED, TRAIT)                                             \
-    TEST_UNARY_TRAIT_AGAINST_CV_TYPE(EXPECTED, TRAIT, void)
+template<template<class> class Trait, template<class> class Trait_t,
+         template<class> class Trait_v_reader, bool e, class T1, class T2, class... Ts>
+constexpr bool test_unary_trait_against_type_() {
+    return test_unary_trait_against_type_<Trait, Trait_t, Trait_v_reader, e, T1>()
+           && test_unary_trait_against_type_<Trait, Trait_t, Trait_v_reader, e, T2>()
+           && (test_unary_trait_against_type_<Trait, Trait_t, Trait_v_reader, e, Ts>() && ...);
+}
 
-#define TEST_UNARY_TRAIT_AGAINST_NULLPTR_T(EXPECTED, TRAIT)                                        \
-    TEST_UNARY_TRAIT_AGAINST_CV_TYPE(EXPECTED, TRAIT, decltype(nullptr))
+template<template<class> class Trait, template<class> class Trait_t,
+         template<class> class Trait_v_reader, bool e, class T>
+constexpr bool test_unary_trait_against_type_CONST() {
+    return test_unary_trait_against_type_<Trait, Trait_t, Trait_v_reader, e, T const>();
+}
 
-#define TEST_UNARY_TRAIT_AGAINST_INTEGRAL(EXPECTED, TRAIT)                                         \
-    TEST_UNARY_TRAIT_AGAINST_CV_TYPE(EXPECTED, TRAIT, bool);                                       \
-    TEST_UNARY_TRAIT_AGAINST_CV_TYPE(EXPECTED, TRAIT, char);                                       \
-    TEST_UNARY_TRAIT_AGAINST_CV_TYPE(EXPECTED, TRAIT, char8_t);                                    \
-    TEST_UNARY_TRAIT_AGAINST_CV_TYPE(EXPECTED, TRAIT, char16_t);                                   \
-    TEST_UNARY_TRAIT_AGAINST_CV_TYPE(EXPECTED, TRAIT, char32_t);                                   \
-    TEST_UNARY_TRAIT_AGAINST_CV_TYPE(EXPECTED, TRAIT, wchar_t);                                    \
-    TEST_UNARY_TRAIT_AGAINST_CV_TYPE(EXPECTED, TRAIT, signed char);                                \
-    TEST_UNARY_TRAIT_AGAINST_CV_TYPE(EXPECTED, TRAIT, short int);                                  \
-    TEST_UNARY_TRAIT_AGAINST_CV_TYPE(EXPECTED, TRAIT, int);                                        \
-    TEST_UNARY_TRAIT_AGAINST_CV_TYPE(EXPECTED, TRAIT, long int);                                   \
-    TEST_UNARY_TRAIT_AGAINST_CV_TYPE(EXPECTED, TRAIT, long long int);                              \
-    TEST_UNARY_TRAIT_AGAINST_CV_TYPE(EXPECTED, TRAIT, unsigned char);                              \
-    TEST_UNARY_TRAIT_AGAINST_CV_TYPE(EXPECTED, TRAIT, unsigned short int);                         \
-    TEST_UNARY_TRAIT_AGAINST_CV_TYPE(EXPECTED, TRAIT, unsigned int);                               \
-    TEST_UNARY_TRAIT_AGAINST_CV_TYPE(EXPECTED, TRAIT, unsigned long int);                          \
-    TEST_UNARY_TRAIT_AGAINST_CV_TYPE(EXPECTED, TRAIT, unsigned long long int)
+template<template<class> class Trait, template<class> class Trait_t,
+         template<class> class Trait_v_reader, bool e, class T1, class T2, class... Ts>
+constexpr bool test_unary_trait_against_type_CONST() {
+    return test_unary_trait_against_type_CONST<Trait, Trait_t, Trait_v_reader, e, T1>()
+           && test_unary_trait_against_type_CONST<Trait, Trait_t, Trait_v_reader, e, T2>()
+           && (test_unary_trait_against_type_CONST<Trait, Trait_t, Trait_v_reader, e, Ts>() && ...);
+}
 
-#define TEST_UNARY_TRAIT_AGAINST_FLOATING_POINT(EXPECTED, TRAIT)                                   \
-    TEST_UNARY_TRAIT_AGAINST_CV_TYPE(EXPECTED, TRAIT, float);                                      \
-    TEST_UNARY_TRAIT_AGAINST_CV_TYPE(EXPECTED, TRAIT, double);                                     \
-    TEST_UNARY_TRAIT_AGAINST_CV_TYPE(EXPECTED, TRAIT, long double)
+template<template<class> class Trait, template<class> class Trait_t,
+         template<class> class Trait_v_reader, bool e, class T>
+constexpr bool test_unary_trait_against_type_VOLATILE() {
+    return test_unary_trait_against_type_<Trait, Trait_t, Trait_v_reader, e, T volatile>();
+}
 
-#define TEST_UNARY_TRAIT_AGAINST_ARRAY(EXPECTED, TRAIT)                                            \
-    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, int[10]);                                       \
-    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, const int[10]);                                 \
-    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, volatile int[10]);                              \
-    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, const volatile int[10]);                        \
-    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, int[10][10]);                                   \
-    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, int[]);                                         \
-    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, const int[]);                                   \
-    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, volatile int[]);                                \
-    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, const volatile int[]);                          \
-    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, int[][10]);                                     \
-    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, int[][10][10])
+template<template<class> class Trait, template<class> class Trait_t,
+         template<class> class Trait_v_reader, bool e, class T1, class T2, class... Ts>
+constexpr bool test_unary_trait_against_type_VOLATILE() {
+    return test_unary_trait_against_type_VOLATILE<Trait, Trait_t, Trait_v_reader, e, T1>()
+           && test_unary_trait_against_type_VOLATILE<Trait, Trait_t, Trait_v_reader, e, T2>()
+           && (test_unary_trait_against_type_VOLATILE<Trait, Trait_t, Trait_v_reader, e, Ts>()
+               && ...);
+}
 
-#define TEST_UNARY_TRAIT_AGAINST_POINTER(EXPECTED, TRAIT)                                          \
-    TEST_UNARY_TRAIT_AGAINST_CV_TYPE(EXPECTED, TRAIT, void*);                                      \
-    TEST_UNARY_TRAIT_AGAINST_CV_TYPE(EXPECTED, TRAIT, const void*);                                \
-    TEST_UNARY_TRAIT_AGAINST_CV_TYPE(EXPECTED, TRAIT, volatile void*);                             \
-    TEST_UNARY_TRAIT_AGAINST_CV_TYPE(EXPECTED, TRAIT, const volatile void*);                       \
-    TEST_UNARY_TRAIT_AGAINST_CV_TYPE(EXPECTED, TRAIT, int*);                                       \
-    TEST_UNARY_TRAIT_AGAINST_CV_TYPE(EXPECTED, TRAIT, int**);                                      \
-    TEST_UNARY_TRAIT_AGAINST_CV_TYPE(EXPECTED, TRAIT, int***);                                     \
-    TEST_UNARY_TRAIT_AGAINST_CV_TYPE(EXPECTED, TRAIT, incomplete_type*);                           \
-    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, int (**)(int));                                 \
-    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, int (*volatile* const volatile)(int));          \
-    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, int (*const* const)(int));                      \
-    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, int (*)(int));                                  \
-    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, int (*const)(int));                             \
-    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, int (*volatile)(int));                          \
-    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, int (*const volatile)(int))
+template<template<class> class Trait, template<class> class Trait_t,
+         template<class> class Trait_v_reader, bool e, class T>
+constexpr bool test_unary_trait_against_type_CONST_VOLATILE() {
+    return test_unary_trait_against_type_<Trait, Trait_t, Trait_v_reader, e, T const volatile>();
+}
+
+template<template<class> class Trait, template<class> class Trait_t,
+         template<class> class Trait_v_reader, bool e, class T1, class T2, class... Ts>
+constexpr bool test_unary_trait_against_type_CONST_VOLATILE() {
+    return test_unary_trait_against_type_CONST_VOLATILE<Trait, Trait_t, Trait_v_reader, e, T1>()
+           && test_unary_trait_against_type_CONST_VOLATILE<Trait, Trait_t, Trait_v_reader, e, T2>()
+           && (test_unary_trait_against_type_CONST_VOLATILE<Trait, Trait_t, Trait_v_reader, e, Ts>()
+               && ...);
+}
+
+template<template<class> class Trait, template<class> class Trait_t,
+         template<class> class Trait_v_reader, bool e, class T>
+constexpr bool test_unary_trait_against_type_EVERY_CV() {
+    static_assert(test_unary_trait_against_type_<Trait, Trait_t, Trait_v_reader, e, T>());
+    static_assert(test_unary_trait_against_type_CONST<Trait, Trait_t, Trait_v_reader, e, T>());
+    static_assert(test_unary_trait_against_type_VOLATILE<Trait, Trait_t, Trait_v_reader, e, T>());
+    static_assert(
+      test_unary_trait_against_type_CONST_VOLATILE<Trait, Trait_t, Trait_v_reader, e, T>());
+    return true;
+}
+
+template<template<class> class Trait, template<class> class Trait_t,
+         template<class> class Trait_v_reader, bool e, class T1, class T2, class... Ts>
+constexpr bool test_unary_trait_against_type_EVERY_CV() {
+    return test_unary_trait_against_type_EVERY_CV<Trait, Trait_t, Trait_v_reader, e, T1>()
+           && test_unary_trait_against_type_EVERY_CV<Trait, Trait_t, Trait_v_reader, e, T2>()
+           && (test_unary_trait_against_type_EVERY_CV<Trait, Trait_t, Trait_v_reader, e, Ts>()
+               && ...);
+}
+
+#define TEST_UNARY_TRAIT_AGAINST_TYPES(EXPECTED, TRAIT, SUFFIX, ...)                               \
+    static_assert(                                                                                 \
+      test_unary_trait_against_type_##SUFFIX<std::TRAIT, std::TRAIT##_t, TRAIT##_v_reader,         \
+                                             EXPECTED, __VA_ARGS__>())
+
+#define TEST_UNARY_TRAIT_AGAINST_VOID(EXPECTED, TRAIT, SUFFIX)                                     \
+    TEST_UNARY_TRAIT_AGAINST_TYPES(EXPECTED, TRAIT, SUFFIX, void)
+
+#define TEST_UNARY_TRAIT_AGAINST_NULLPTR_T(EXPECTED, TRAIT, SUFFIX)                                \
+    TEST_UNARY_TRAIT_AGAINST_TYPES(EXPECTED, TRAIT, SUFFIX, NullptrT)
+
+#define TEST_UNARY_TRAIT_AGAINST_INTEGRAL(EXPECTED, TRAIT, SUFFIX)                                 \
+    TEST_UNARY_TRAIT_AGAINST_TYPES(EXPECTED, TRAIT, SUFFIX, bool, char, char8_t, char16_t,         \
+                                   char32_t, wchar_t, signed char, short int, int, long int,       \
+                                   long long int, unsigned char, unsigned short int, unsigned int, \
+                                   unsigned long int, unsigned long long int)
+
+#define TEST_UNARY_TRAIT_AGAINST_FLOATING_POINT(EXPECTED, TRAIT, SUFFIX)                           \
+    TEST_UNARY_TRAIT_AGAINST_TYPES(EXPECTED, TRAIT, SUFFIX, float, double, long double)
+
+#define TEST_UNARY_TRAIT_AGAINST_ARRAY(EXPECTED, TRAIT, SUFFIX)                                    \
+    TEST_UNARY_TRAIT_AGAINST_TYPES(EXPECTED, TRAIT, SUFFIX, int[10], int[10][10], int[],           \
+                                   int[][10], int[][10][10])
+
+#define TEST_UNARY_TRAIT_AGAINST_POINTER(EXPECTED, TRAIT, SUFFIX)                                  \
+    TEST_UNARY_TRAIT_AGAINST_TYPES(EXPECTED, TRAIT, SUFFIX, void*, const void*, volatile void*,    \
+                                   const volatile void*, int*, int**, int***, incomplete_type*,    \
+                                   int (**)(int), int (*)(int))
 
 #define TEST_UNARY_TRAIT_AGAINST_LVALUE_REFERENCE(EXPECTED, TRAIT)                                 \
-    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, int&);                                          \
-    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, const int&);                                    \
-    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, volatile int&);                                 \
-    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, const volatile int&);                           \
-    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, int (&)(int));                                  \
-    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, int*&);                                         \
-    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, int* const&);                                   \
-    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, int* volatile&);                                \
-    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, int* const volatile&);                          \
-    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, incomplete_type&);                              \
-    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, const incomplete_type&);                        \
-    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, volatile incomplete_type&);                     \
-    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, const volatile incomplete_type&)
+    TEST_UNARY_TRAIT_AGAINST_TYPES(                                                                \
+      EXPECTED, TRAIT, , int&, const int&, volatile int&, const volatile int&, int (&)(int),       \
+      int*&, int* const&, int* volatile&, int* const volatile&, incomplete_type&,                  \
+      const incomplete_type&, volatile incomplete_type&, const volatile incomplete_type&)
 
 #define TEST_UNARY_TRAIT_AGAINST_RVALUE_REFERENCE(EXPECTED, TRAIT)                                 \
-    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, int&&);                                         \
-    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, const int&&);                                   \
-    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, volatile int&&);                                \
-    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, const volatile int&&);                          \
-    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, int(&&)(int));                                  \
-    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, int*&&);                                        \
-    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, int* const&&);                                  \
-    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, int* volatile&&);                               \
-    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, int* const volatile&&);                         \
-    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, incomplete_type&&);                             \
-    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, const incomplete_type&&);                       \
-    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, volatile incomplete_type&&);                    \
-    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, const volatile incomplete_type&&)
+    TEST_UNARY_TRAIT_AGAINST_TYPES(                                                                \
+      EXPECTED, TRAIT, , int&&, const int&&, volatile int&&, const volatile int&&, int(&&)(int),   \
+      int*&&, int* const&&, int* volatile&&, int* const volatile&&, incomplete_type&&,             \
+      const incomplete_type&&, volatile incomplete_type&&, const volatile incomplete_type&&)
 
-#define TEST_UNARY_TRAIT_AGAINST_MEMBER_OBJECT_POINTER(EXPECTED, TRAIT)                            \
-    TEST_UNARY_TRAIT_AGAINST_CV_TYPE(EXPECTED, TRAIT, int Class::*);                               \
-    TEST_UNARY_TRAIT_AGAINST_CV_TYPE(EXPECTED, TRAIT, Class Class::*);                             \
-    TEST_UNARY_TRAIT_AGAINST_CV_TYPE(EXPECTED, TRAIT, Class* Class::*)
+#define TEST_UNARY_TRAIT_AGAINST_MEMBER_OBJECT_POINTER(EXPECTED, TRAIT, SUFFIX)                    \
+    TEST_UNARY_TRAIT_AGAINST_TYPES(EXPECTED, TRAIT, SUFFIX, int Class::*, Class Class::*,          \
+                                   Class* Class::*)
 
-#define TEST_UNARY_TRAIT_AGAINST_MEMBER_FUNCTION_POINTER(EXPECTED, TRAIT)                          \
-    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, int (Class::*)(int, int));                      \
-    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, int (Class::*const)(int, int));                 \
-    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, int (Class::*volatile)(int, int));              \
-    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, int (Class::*const volatile)(int, int));        \
-    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, Class (Class::*)(int, Class Class::*));         \
-    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, Class (Class::*const)(int, Class Class::*));    \
-    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, Class (Class::*volatile)(int, Class Class::*)); \
-    TEST_UNARY_TRAIT_AGAINST_TYPE(                                                                 \
-      EXPECTED, TRAIT, Class (Class::*const volatile)(int, Class Class::*));                       \
-    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, Class Class::* (Class::*)(int, int));           \
-    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, Class Class::* (Class::*const)(int, int));      \
-    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, Class Class::* (Class::*volatile)(int, int));   \
-    TEST_UNARY_TRAIT_AGAINST_TYPE(                                                                 \
-      EXPECTED, TRAIT, Class Class::* (Class::*const volatile)(int, int))
+#define TEST_UNARY_TRAIT_AGAINST_MEMBER_FUNCTION_POINTER(EXPECTED, TRAIT, SUFFIX)                  \
+    TEST_UNARY_TRAIT_AGAINST_TYPES(EXPECTED, TRAIT, SUFFIX, int (Class::*)(int, int),              \
+                                   Class (Class::*)(int, Class Class::*),                          \
+                                   Class Class::* (Class::*)(int, int))
 
-#define TEST_UNARY_TRAIT_AGAINST_ENUM(EXPECTED, TRAIT)                                             \
-    TEST_UNARY_TRAIT_AGAINST_CV_TYPE(EXPECTED, TRAIT, Enum);                                       \
-    TEST_UNARY_TRAIT_AGAINST_CV_TYPE(EXPECTED, TRAIT, EnumClass)
+#define TEST_UNARY_TRAIT_AGAINST_ENUM(EXPECTED, TRAIT, SUFFIX)                                     \
+    TEST_UNARY_TRAIT_AGAINST_TYPES(EXPECTED, TRAIT, SUFFIX, Enum);                                 \
+    TEST_UNARY_TRAIT_AGAINST_TYPES(EXPECTED, TRAIT, SUFFIX, EnumClass)
 
-#define TEST_UNARY_TRAIT_AGAINST_UNION(EXPECTED, TRAIT)                                            \
-    TEST_UNARY_TRAIT_AGAINST_CV_TYPE(EXPECTED, TRAIT, Union)
+#define TEST_UNARY_TRAIT_AGAINST_UNION(EXPECTED, TRAIT, SUFFIX)                                    \
+    TEST_UNARY_TRAIT_AGAINST_TYPES(EXPECTED, TRAIT, SUFFIX, Union)
 
-#define TEST_UNARY_TRAIT_AGAINST_CLASS(EXPECTED, TRAIT)                                            \
-    TEST_UNARY_TRAIT_AGAINST_CV_TYPE(EXPECTED, TRAIT, Class)
+#define TEST_UNARY_TRAIT_AGAINST_CLASS(EXPECTED, TRAIT, SUFFIX)                                    \
+    TEST_UNARY_TRAIT_AGAINST_TYPES(EXPECTED, TRAIT, SUFFIX, Class)
 
 #define TEST_UNARY_TRAIT_AGAINST_FUNCTION(EXPECTED, TRAIT)                                         \
-    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, void());                                        \
-    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, int());                                         \
-    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, int(int));                                      \
-    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, int(int, int));                                 \
-    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, int(int()));                                    \
-    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, int(...))
+    TEST_UNARY_TRAIT_AGAINST_TYPES(EXPECTED, TRAIT, , void(), int(), int(int), int(int, int),      \
+                                   int(int()), int(...))
 
 #endif
