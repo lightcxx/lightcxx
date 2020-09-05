@@ -475,6 +475,192 @@ constexpr bool is_class_v = is_class<_T>::value;
 
 // endregion
 
+// region [meta.unary.comp]
+
+#if __LIGHTCXX_USE_BUILTIN(__is_reference)
+
+template<class _T>
+struct is_reference : bool_constant<__is_reference(_T)> {};
+
+template<class _T>
+using is_reference_t = bool_constant<__is_reference(_T)>;
+
+template<class _T>
+constexpr bool is_reference_v = __is_reference(_T);
+
+#else
+
+template<class _T>
+struct is_reference : false_type {};
+
+template<class _T>
+struct is_reference<_T&> : true_type {};
+
+template<class _T>
+struct is_reference<_T&&> : true_type {};
+
+template<class _T>
+using is_reference_t = typename is_reference<_T>::type;
+
+template<class _T>
+constexpr bool is_reference_v = is_reference<_T>::value;
+
+#endif
+
+#if __LIGHTCXX_USE_BUILTIN(__is_arithmetic)
+
+template<class _T>
+struct is_arithmetic : bool_constant<__is_arithmetic(_T)> {};
+
+template<class _T>
+using is_arithmetic_t = bool_constant<__is_arithmetic(_T)>;
+
+template<class _T>
+constexpr bool is_arithmetic_v = __is_arithmetic(_T);
+
+#else
+
+template<class _T>
+constexpr bool is_arithmetic_v = is_integral_v<_T> || is_floating_point_v<_T>;
+
+template<class _T>
+struct is_arithmetic : bool_constant<is_arithmetic_v<_T>> {};
+
+template<class _T>
+using is_arithmetic_t = bool_constant<is_arithmetic_v<_T>>;
+
+#endif
+
+#if __LIGHTCXX_USE_BUILTIN(__is_fundamental)
+
+template<class _T>
+struct is_fundamental : bool_constant<__is_fundamental(_T)> {};
+
+template<class _T>
+using is_fundamental_t = bool_constant<__is_fundamental(_T)>;
+
+template<class _T>
+constexpr bool is_fundamental_v = __is_fundamental(_T);
+
+#else
+
+template<class _T>
+constexpr bool is_fundamental_v
+  = is_void_v<_T> || is_null_pointer_v<_T> || is_integral_v<_T> || is_floating_point_v<_T>;
+
+template<class _T>
+struct is_fundamental : bool_constant<is_fundamental_v<_T>> {};
+
+template<class _T>
+using is_fundamental_t = bool_constant<is_fundamental_v<_T>>;
+
+#endif
+
+#if __LIGHTCXX_USE_BUILTIN(__is_object)
+
+template<class _T>
+struct is_object : bool_constant<__is_object(_T)> {};
+
+template<class _T>
+using is_object_t = bool_constant<__is_object(_T)>;
+
+template<class _T>
+constexpr bool is_object_v = __is_object(_T);
+
+#else
+
+template<class _T>
+constexpr bool is_object_v
+  = is_null_pointer_v<
+      _T> || is_integral_v<_T> || is_floating_point_v<_T> || is_enum_v<_T> || is_pointer_v<_T> || is_member_object_pointer_v<_T> || is_member_function_pointer_v<_T> || is_array_v<_T> || is_union_v<_T> || is_class_v<_T>;
+
+template<class _T>
+struct is_object : bool_constant<is_object_v<_T>> {};
+
+template<class _T>
+using is_object_t = bool_constant<is_object_v<_T>>;
+
+#endif
+
+#if __LIGHTCXX_USE_BUILTIN(__is_scalar)
+
+template<class _T>
+struct is_scalar : bool_constant<__is_scalar(_T)> {};
+
+template<class _T>
+using is_scalar_t = bool_constant<__is_scalar(_T)>;
+
+template<class _T>
+constexpr bool is_scalar_v = __is_scalar(_T);
+
+#else
+
+template<class _T>
+constexpr bool is_scalar_v
+  = is_null_pointer_v<
+      _T> || is_integral_v<_T> || is_floating_point_v<_T> || is_enum_v<_T> || is_pointer_v<_T> || is_member_object_pointer_v<_T> || is_member_function_pointer_v<_T>;
+
+template<class _T>
+struct is_scalar : bool_constant<is_scalar_v<_T>> {};
+
+template<class _T>
+using is_scalar_t = bool_constant<is_scalar_v<_T>>;
+
+#endif
+
+#if __LIGHTCXX_USE_BUILTIN(__is_compound)
+
+template<class _T>
+struct is_compound : bool_constant<__is_compound(_T)> {};
+
+template<class _T>
+using is_compound_t = bool_constant<__is_compound(_T)>;
+
+template<class _T>
+constexpr bool is_compound_v = __is_compound(_T);
+
+#else
+
+template<class _T>
+struct is_compound : bool_constant<!is_fundamental_v<_T>> {};
+
+template<class _T>
+using is_compound_t = bool_constant<!is_fundamental_v<_T>>;
+
+template<class _T>
+constexpr bool is_compound_v = !is_fundamental_v<_T>;
+
+#endif
+
+#if __LIGHTCXX_USE_BUILTIN(__is_member_pointer)
+
+template<class _T>
+struct is_member_pointer : bool_constant<__is_member_pointer(_T)> {};
+
+template<class _T>
+using is_member_pointer_t = bool_constant<__is_member_pointer(_T)>;
+
+template<class _T>
+constexpr bool is_member_pointer_v = __is_member_pointer(_T);
+
+#else
+
+template<class _T>
+struct is_member_pointer
+        : bool_constant<is_member_object_pointer_v<_T> || is_member_function_pointer_v<_T>> {};
+
+template<class _T>
+using is_member_pointer_t
+  = bool_constant<is_member_object_pointer_v<_T> || is_member_function_pointer_v<_T>>;
+
+template<class _T>
+constexpr bool is_member_pointer_v
+  = is_member_object_pointer_v<_T> || is_member_function_pointer_v<_T>;
+
+#endif
+
+// endregion
+
 template<class _T, class _U>
 struct is_same : false_type {};
 

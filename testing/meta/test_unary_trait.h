@@ -3,7 +3,7 @@
 
 #include <type_traits>
 
-class Object {
+class Class {
     [[maybe_unused]] int x[2];
     [[maybe_unused]] char y[4];
 };
@@ -131,28 +131,25 @@ struct incomplete_type;
     TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, const volatile incomplete_type&&)
 
 #define TEST_UNARY_TRAIT_AGAINST_MEMBER_OBJECT_POINTER(EXPECTED, TRAIT)                            \
-    TEST_UNARY_TRAIT_AGAINST_CV_TYPE(EXPECTED, TRAIT, int Object::*);                              \
-    TEST_UNARY_TRAIT_AGAINST_CV_TYPE(EXPECTED, TRAIT, Object Object::*);                           \
-    TEST_UNARY_TRAIT_AGAINST_CV_TYPE(EXPECTED, TRAIT, Object* Object::*)
+    TEST_UNARY_TRAIT_AGAINST_CV_TYPE(EXPECTED, TRAIT, int Class::*);                               \
+    TEST_UNARY_TRAIT_AGAINST_CV_TYPE(EXPECTED, TRAIT, Class Class::*);                             \
+    TEST_UNARY_TRAIT_AGAINST_CV_TYPE(EXPECTED, TRAIT, Class* Class::*)
 
 #define TEST_UNARY_TRAIT_AGAINST_MEMBER_FUNCTION_POINTER(EXPECTED, TRAIT)                          \
-    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, int (Object::*)(int, int));                     \
-    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, int (Object::*const)(int, int));                \
-    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, int (Object::*volatile)(int, int));             \
-    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, int (Object::*const volatile)(int, int));       \
-    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, Object (Object::*)(int, Object Object::*));     \
+    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, int (Class::*)(int, int));                      \
+    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, int (Class::*const)(int, int));                 \
+    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, int (Class::*volatile)(int, int));              \
+    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, int (Class::*const volatile)(int, int));        \
+    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, Class (Class::*)(int, Class Class::*));         \
+    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, Class (Class::*const)(int, Class Class::*));    \
+    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, Class (Class::*volatile)(int, Class Class::*)); \
     TEST_UNARY_TRAIT_AGAINST_TYPE(                                                                 \
-      EXPECTED, TRAIT, Object (Object::*const)(int, Object Object::*));                            \
+      EXPECTED, TRAIT, Class (Class::*const volatile)(int, Class Class::*));                       \
+    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, Class Class::* (Class::*)(int, int));           \
+    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, Class Class::* (Class::*const)(int, int));      \
+    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, Class Class::* (Class::*volatile)(int, int));   \
     TEST_UNARY_TRAIT_AGAINST_TYPE(                                                                 \
-      EXPECTED, TRAIT, Object (Object::*volatile)(int, Object Object::*));                         \
-    TEST_UNARY_TRAIT_AGAINST_TYPE(                                                                 \
-      EXPECTED, TRAIT, Object (Object::*const volatile)(int, Object Object::*));                   \
-    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, Object Object::* (Object::*)(int, int));        \
-    TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, Object Object::* (Object::*const)(int, int));   \
-    TEST_UNARY_TRAIT_AGAINST_TYPE(                                                                 \
-      EXPECTED, TRAIT, Object Object::* (Object::*volatile)(int, int));                            \
-    TEST_UNARY_TRAIT_AGAINST_TYPE(                                                                 \
-      EXPECTED, TRAIT, Object Object::* (Object::*const volatile)(int, int))
+      EXPECTED, TRAIT, Class Class::* (Class::*const volatile)(int, int))
 
 #define TEST_UNARY_TRAIT_AGAINST_ENUM(EXPECTED, TRAIT)                                             \
     TEST_UNARY_TRAIT_AGAINST_CV_TYPE(EXPECTED, TRAIT, Enum);                                       \
@@ -162,7 +159,7 @@ struct incomplete_type;
     TEST_UNARY_TRAIT_AGAINST_CV_TYPE(EXPECTED, TRAIT, Union)
 
 #define TEST_UNARY_TRAIT_AGAINST_CLASS(EXPECTED, TRAIT)                                            \
-    TEST_UNARY_TRAIT_AGAINST_CV_TYPE(EXPECTED, TRAIT, Object)
+    TEST_UNARY_TRAIT_AGAINST_CV_TYPE(EXPECTED, TRAIT, Class)
 
 #define TEST_UNARY_TRAIT_AGAINST_FUNCTION(EXPECTED, TRAIT)                                         \
     TEST_UNARY_TRAIT_AGAINST_TYPE(EXPECTED, TRAIT, void());                                        \
