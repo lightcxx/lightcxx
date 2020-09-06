@@ -35,8 +35,7 @@ struct incomplete_type;
         }                                                                                          \
     }
 
-template<template<class> class Trait, template<class> class Trait_t,
-         template<class> class Trait_v_reader, bool e, class T>
+template<template<class> class Trait, template<class> class Trait_v_reader, bool e, class T>
 constexpr bool test_unary_trait_against_type_() {
     constexpr auto reader = Trait_v_reader<T>{};
     static_assert(std::is_base_of_v<std::bool_constant<e>, Trait<T>>);
@@ -49,88 +48,78 @@ constexpr bool test_unary_trait_against_type_() {
     static_assert(noexcept(Trait<T>{}()));
     static_assert(std::is_same_v<bool, decltype(Trait<T>{}())>);
     static_assert(std::is_same_v<typename Trait<T>::type, std::bool_constant<e>>);
-    static_assert(std::is_same_v<Trait_t<T>, std::bool_constant<e>>);
     static_assert(std::is_same_v<decltype(reader.read()), bool>);
     static_assert(reader.read() == e);
     return true;
 }
 
-template<template<class> class Trait, template<class> class Trait_t,
-         template<class> class Trait_v_reader, bool e, class T1, class T2, class... Ts>
+template<template<class> class Trait, template<class> class Trait_v_reader, bool e, class T1,
+         class T2, class... Ts>
 constexpr bool test_unary_trait_against_type_() {
-    return test_unary_trait_against_type_<Trait, Trait_t, Trait_v_reader, e, T1>()
-           && test_unary_trait_against_type_<Trait, Trait_t, Trait_v_reader, e, T2>()
-           && (test_unary_trait_against_type_<Trait, Trait_t, Trait_v_reader, e, Ts>() && ...);
+    return test_unary_trait_against_type_<Trait, Trait_v_reader, e, T1>()
+           && test_unary_trait_against_type_<Trait, Trait_v_reader, e, T2>()
+           && (test_unary_trait_against_type_<Trait, Trait_v_reader, e, Ts>() && ...);
 }
 
-template<template<class> class Trait, template<class> class Trait_t,
-         template<class> class Trait_v_reader, bool e, class T>
+template<template<class> class Trait, template<class> class Trait_v_reader, bool e, class T>
 constexpr bool test_unary_trait_against_type_CONST() {
-    return test_unary_trait_against_type_<Trait, Trait_t, Trait_v_reader, e, T const>();
+    return test_unary_trait_against_type_<Trait, Trait_v_reader, e, T const>();
 }
 
-template<template<class> class Trait, template<class> class Trait_t,
-         template<class> class Trait_v_reader, bool e, class T1, class T2, class... Ts>
+template<template<class> class Trait, template<class> class Trait_v_reader, bool e, class T1,
+         class T2, class... Ts>
 constexpr bool test_unary_trait_against_type_CONST() {
-    return test_unary_trait_against_type_CONST<Trait, Trait_t, Trait_v_reader, e, T1>()
-           && test_unary_trait_against_type_CONST<Trait, Trait_t, Trait_v_reader, e, T2>()
-           && (test_unary_trait_against_type_CONST<Trait, Trait_t, Trait_v_reader, e, Ts>() && ...);
+    return test_unary_trait_against_type_CONST<Trait, Trait_v_reader, e, T1>()
+           && test_unary_trait_against_type_CONST<Trait, Trait_v_reader, e, T2>()
+           && (test_unary_trait_against_type_CONST<Trait, Trait_v_reader, e, Ts>() && ...);
 }
 
-template<template<class> class Trait, template<class> class Trait_t,
-         template<class> class Trait_v_reader, bool e, class T>
+template<template<class> class Trait, template<class> class Trait_v_reader, bool e, class T>
 constexpr bool test_unary_trait_against_type_VOLATILE() {
-    return test_unary_trait_against_type_<Trait, Trait_t, Trait_v_reader, e, T volatile>();
+    return test_unary_trait_against_type_<Trait, Trait_v_reader, e, T volatile>();
 }
 
-template<template<class> class Trait, template<class> class Trait_t,
-         template<class> class Trait_v_reader, bool e, class T1, class T2, class... Ts>
+template<template<class> class Trait, template<class> class Trait_v_reader, bool e, class T1,
+         class T2, class... Ts>
 constexpr bool test_unary_trait_against_type_VOLATILE() {
-    return test_unary_trait_against_type_VOLATILE<Trait, Trait_t, Trait_v_reader, e, T1>()
-           && test_unary_trait_against_type_VOLATILE<Trait, Trait_t, Trait_v_reader, e, T2>()
-           && (test_unary_trait_against_type_VOLATILE<Trait, Trait_t, Trait_v_reader, e, Ts>()
-               && ...);
+    return test_unary_trait_against_type_VOLATILE<Trait, Trait_v_reader, e, T1>()
+           && test_unary_trait_against_type_VOLATILE<Trait, Trait_v_reader, e, T2>()
+           && (test_unary_trait_against_type_VOLATILE<Trait, Trait_v_reader, e, Ts>() && ...);
 }
 
-template<template<class> class Trait, template<class> class Trait_t,
-         template<class> class Trait_v_reader, bool e, class T>
+template<template<class> class Trait, template<class> class Trait_v_reader, bool e, class T>
 constexpr bool test_unary_trait_against_type_CONST_VOLATILE() {
-    return test_unary_trait_against_type_<Trait, Trait_t, Trait_v_reader, e, T const volatile>();
+    return test_unary_trait_against_type_<Trait, Trait_v_reader, e, T const volatile>();
 }
 
-template<template<class> class Trait, template<class> class Trait_t,
-         template<class> class Trait_v_reader, bool e, class T1, class T2, class... Ts>
+template<template<class> class Trait, template<class> class Trait_v_reader, bool e, class T1,
+         class T2, class... Ts>
 constexpr bool test_unary_trait_against_type_CONST_VOLATILE() {
-    return test_unary_trait_against_type_CONST_VOLATILE<Trait, Trait_t, Trait_v_reader, e, T1>()
-           && test_unary_trait_against_type_CONST_VOLATILE<Trait, Trait_t, Trait_v_reader, e, T2>()
-           && (test_unary_trait_against_type_CONST_VOLATILE<Trait, Trait_t, Trait_v_reader, e, Ts>()
-               && ...);
+    return test_unary_trait_against_type_CONST_VOLATILE<Trait, Trait_v_reader, e, T1>()
+           && test_unary_trait_against_type_CONST_VOLATILE<Trait, Trait_v_reader, e, T2>()
+           && (test_unary_trait_against_type_CONST_VOLATILE<Trait, Trait_v_reader, e, Ts>() && ...);
 }
 
-template<template<class> class Trait, template<class> class Trait_t,
-         template<class> class Trait_v_reader, bool e, class T>
+template<template<class> class Trait, template<class> class Trait_v_reader, bool e, class T>
 constexpr bool test_unary_trait_against_type_EVERY_CV() {
-    static_assert(test_unary_trait_against_type_<Trait, Trait_t, Trait_v_reader, e, T>());
-    static_assert(test_unary_trait_against_type_CONST<Trait, Trait_t, Trait_v_reader, e, T>());
-    static_assert(test_unary_trait_against_type_VOLATILE<Trait, Trait_t, Trait_v_reader, e, T>());
-    static_assert(
-      test_unary_trait_against_type_CONST_VOLATILE<Trait, Trait_t, Trait_v_reader, e, T>());
+    static_assert(test_unary_trait_against_type_<Trait, Trait_v_reader, e, T>());
+    static_assert(test_unary_trait_against_type_CONST<Trait, Trait_v_reader, e, T>());
+    static_assert(test_unary_trait_against_type_VOLATILE<Trait, Trait_v_reader, e, T>());
+    static_assert(test_unary_trait_against_type_CONST_VOLATILE<Trait, Trait_v_reader, e, T>());
     return true;
 }
 
-template<template<class> class Trait, template<class> class Trait_t,
-         template<class> class Trait_v_reader, bool e, class T1, class T2, class... Ts>
+template<template<class> class Trait, template<class> class Trait_v_reader, bool e, class T1,
+         class T2, class... Ts>
 constexpr bool test_unary_trait_against_type_EVERY_CV() {
-    return test_unary_trait_against_type_EVERY_CV<Trait, Trait_t, Trait_v_reader, e, T1>()
-           && test_unary_trait_against_type_EVERY_CV<Trait, Trait_t, Trait_v_reader, e, T2>()
-           && (test_unary_trait_against_type_EVERY_CV<Trait, Trait_t, Trait_v_reader, e, Ts>()
-               && ...);
+    return test_unary_trait_against_type_EVERY_CV<Trait, Trait_v_reader, e, T1>()
+           && test_unary_trait_against_type_EVERY_CV<Trait, Trait_v_reader, e, T2>()
+           && (test_unary_trait_against_type_EVERY_CV<Trait, Trait_v_reader, e, Ts>() && ...);
 }
 
 #define TEST_UNARY_TRAIT_AGAINST_TYPES(EXPECTED, TRAIT, SUFFIX, ...)                               \
-    static_assert(                                                                                 \
-      test_unary_trait_against_type_##SUFFIX<std::TRAIT, std::TRAIT##_t, TRAIT##_v_reader,         \
-                                             EXPECTED, __VA_ARGS__>())
+    static_assert(test_unary_trait_against_type_##SUFFIX<std::TRAIT, TRAIT##_v_reader, EXPECTED,   \
+                                                         __VA_ARGS__>())
 
 #define TEST_UNARY_TRAIT_AGAINST_VOID(EXPECTED, TRAIT, SUFFIX)                                     \
     TEST_UNARY_TRAIT_AGAINST_TYPES(EXPECTED, TRAIT, SUFFIX, void)

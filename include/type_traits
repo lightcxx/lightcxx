@@ -40,6 +40,8 @@ using false_type = bool_constant<false>;
 
 namespace _Light {
 
+struct _No_t {};
+
 template<class _T>
 consteval bool __dependent_false() {
     return false;
@@ -67,13 +69,11 @@ consteval bool __dependent_false() {
 
 // region [meta.unary.cat]
 
+// region is_void
 #if __LIGHTCXX_USE_BUILTIN(__is_void)
 
 template<class _T>
 struct is_void : bool_constant<__is_void(_T)> {};
-
-template<class _T>
-using is_void_t = bool_constant<__is_void(_T)>;
 
 template<class _T>
 constexpr bool is_void_v = __is_void(_T);
@@ -86,31 +86,25 @@ struct is_void : false_type {};
 __UNARY_TRAIT_TRUE_FOR_ALL_CV(is_void, void);
 
 template<class _T>
-using is_void_t = typename is_void<_T>::type;
-
-template<class _T>
 constexpr bool is_void_v = is_void<_T>::value;
 
-#endif
+#endif  // endregion
 
+// region is_null_pointer
 template<class _T>
 struct is_null_pointer : false_type {};
 
 __UNARY_TRAIT_TRUE_FOR_ALL_CV(is_null_pointer, nullptr_t);
 
 template<class _T>
-using is_null_pointer_t = typename is_null_pointer<_T>::type;
-
-template<class _T>
 constexpr bool is_null_pointer_v = is_null_pointer<_T>::value;
+// endregion
 
+// region is_integral
 #if __LIGHTCXX_USE_BUILTIN(__is_integral)
 
 template<class _T>
 struct is_integral : bool_constant<__is_integral(_T)> {};
-
-template<class _T>
-using is_integral_t = bool_constant<__is_integral(_T)>;
 
 template<class _T>
 constexpr bool is_integral_v = __is_integral(_T);
@@ -138,20 +132,15 @@ __UNARY_TRAIT_TRUE_FOR_ALL_CV(is_integral, unsigned long int);
 __UNARY_TRAIT_TRUE_FOR_ALL_CV(is_integral, unsigned long long int);
 
 template<class _T>
-using is_integral_t = typename is_integral<_T>::type;
-
-template<class _T>
 constexpr bool is_integral_v = is_integral<_T>::value;
 
-#endif
+#endif  // endregion
 
+// region is_floating_point
 #if __LIGHTCXX_USE_BUILTIN(__is_floating_point)
 
 template<class _T>
 struct is_floating_point : bool_constant<__is_floating_point(_T)> {};
-
-template<class _T>
-using is_floating_point_t = bool_constant<__is_floating_point(_T)>;
 
 template<class _T>
 constexpr bool is_floating_point_v = __is_floating_point(_T);
@@ -166,20 +155,15 @@ __UNARY_TRAIT_TRUE_FOR_ALL_CV(is_floating_point, double);
 __UNARY_TRAIT_TRUE_FOR_ALL_CV(is_floating_point, long double);
 
 template<class _T>
-using is_floating_point_t = typename is_floating_point<_T>::type;
-
-template<class _T>
 constexpr bool is_floating_point_v = is_floating_point<_T>::value;
 
-#endif
+#endif  // endregion
 
+// region is_array
 #if __LIGHTCXX_USE_BUILTIN(__is_array)
 
 template<class _T>
 struct is_array : bool_constant<__is_array(_T)> {};
-
-template<class _T>
-using is_array_t = bool_constant<__is_array(_T)>;
 
 template<class _T>
 constexpr bool is_array_v = __is_array(_T);
@@ -196,20 +180,15 @@ template<class _T, size_t _N>
 struct is_array<_T[_N]> : true_type {};
 
 template<class _T>
-using is_array_t = typename is_array<_T>::type;
-
-template<class _T>
 constexpr bool is_array_v = is_array<_T>::value;
 
-#endif
+#endif  // endregion
 
+// region is_pointer
 #if __LIGHTCXX_USE_BUILTIN(__is_pointer)
 
 template<class _T>
 struct is_pointer : bool_constant<__is_pointer(_T)> {};
-
-template<class _T>
-using is_pointer_t = bool_constant<__is_pointer(_T)>;
 
 template<class _T>
 constexpr bool is_pointer_v = __is_pointer(_T);
@@ -232,20 +211,15 @@ template<class _T>
 struct is_pointer<_T* const volatile> : true_type {};
 
 template<class _T>
-using is_pointer_t = typename is_pointer<_T>::type;
-
-template<class _T>
 constexpr bool is_pointer_v = is_pointer<_T>::value;
 
-#endif
+#endif  // endregion
 
+// region is_lvalue_reference
 #if __LIGHTCXX_USE_BUILTIN(__is_lvalue_reference)
 
 template<class _T>
 struct is_lvalue_reference : bool_constant<__is_lvalue_reference(_T)> {};
-
-template<class _T>
-using is_lvalue_reference_t = bool_constant<__is_lvalue_reference(_T)>;
 
 template<class _T>
 constexpr bool is_lvalue_reference_v = __is_lvalue_reference(_T);
@@ -259,20 +233,15 @@ template<class _T>
 struct is_lvalue_reference<_T&> : true_type {};
 
 template<class _T>
-using is_lvalue_reference_t = typename is_lvalue_reference<_T>::type;
-
-template<class _T>
 constexpr bool is_lvalue_reference_v = is_lvalue_reference<_T>::value;
 
-#endif
+#endif  // endregion
 
+// region is_rvalue_reference
 #if __LIGHTCXX_USE_BUILTIN(__is_rvalue_reference)
 
 template<class _T>
 struct is_rvalue_reference : bool_constant<__is_rvalue_reference(_T)> {};
-
-template<class _T>
-using is_rvalue_reference_t = bool_constant<__is_rvalue_reference(_T)>;
 
 template<class _T>
 constexpr bool is_rvalue_reference_v = __is_rvalue_reference(_T);
@@ -286,20 +255,15 @@ template<class _T>
 struct is_rvalue_reference<_T&&> : true_type {};
 
 template<class _T>
-using is_rvalue_reference_t = typename is_rvalue_reference<_T>::type;
-
-template<class _T>
 constexpr bool is_rvalue_reference_v = is_rvalue_reference<_T>::value;
 
-#endif
+#endif  // endregion
 
+// region is_function
 #if __LIGHTCXX_USE_BUILTIN(__is_function)
 
 template<class _T>
 struct is_function : bool_constant<__is_function(_T)> {};
-
-template<class _T>
-using is_function_t = bool_constant<__is_function(_T)>;
 
 template<class _T>
 constexpr bool is_function_v = __is_function(_T);
@@ -312,24 +276,18 @@ struct is_const;
 
 template<class _T>
 constexpr bool is_function_v
-  = !std::is_const<const _T>::value
-    && !std::is_lvalue_reference_v<_T> && !std::is_rvalue_reference_v<_T>;
+  = !is_const<const _T>::value && !is_lvalue_reference_v<_T> && !is_rvalue_reference_v<_T>;
 
 template<class _T>
 struct is_function : bool_constant<is_function_v<_T>> {};
 
-template<class _T>
-using is_function_t = bool_constant<is_function_v<_T>>;
+#endif  // endregion
 
-#endif
-
+// region is_member_object_pointer
 #if __LIGHTCXX_USE_BUILTIN(__is_member_object_pointer)
 
 template<class _T>
 struct is_member_object_pointer : bool_constant<__is_member_object_pointer(_T)> {};
-
-template<class _T>
-using is_member_object_pointer_t = bool_constant<__is_member_object_pointer(_T)>;
 
 template<class _T>
 constexpr bool is_member_object_pointer_v = __is_member_object_pointer(_T);
@@ -352,20 +310,15 @@ template<class _T, class _U>
 struct is_member_object_pointer<_T _U::*const volatile> : bool_constant<!is_function_v<_T>> {};
 
 template<class _T>
-using is_member_object_pointer_t = typename is_member_object_pointer<_T>::type;
-
-template<class _T>
 constexpr bool is_member_object_pointer_v = is_member_object_pointer<_T>::value;
 
-#endif
+#endif  // endregion
 
+// region is_member_function_pointer
 #if __LIGHTCXX_USE_BUILTIN(__is_member_function_pointer)
 
 template<class _T>
 struct is_member_function_pointer : bool_constant<__is_member_function_pointer(_T)> {};
-
-template<class _T>
-using is_member_function_pointer_t = bool_constant<__is_member_function_pointer(_T)>;
 
 template<class _T>
 constexpr bool is_member_function_pointer_v = __is_member_function_pointer(_T);
@@ -388,20 +341,15 @@ template<class _T, class _U>
 struct is_member_function_pointer<_T _U::*const volatile> : bool_constant<is_function_v<_T>> {};
 
 template<class _T>
-using is_member_function_pointer_t = typename is_member_function_pointer<_T>::type;
-
-template<class _T>
 constexpr bool is_member_function_pointer_v = is_member_function_pointer<_T>::value;
 
-#endif
+#endif  // endregion
 
+// region is_enum
 #if __LIGHTCXX_USE_BUILTIN(__is_enum)
 
 template<class _T>
 struct is_enum : bool_constant<__is_enum(_T)> {};
-
-template<class _T>
-using is_enum_t = bool_constant<__is_enum(_T)>;
 
 template<class _T>
 constexpr bool is_enum_v = __is_enum(_T);
@@ -414,20 +362,15 @@ struct is_enum {
 };
 
 template<class _T>
-using is_enum_t = typename is_enum<_T>::type;
-
-template<class _T>
 constexpr bool is_enum_v = is_enum<_T>::value;
 
-#endif
+#endif  // endregion
 
+// region is_union
 #if __LIGHTCXX_USE_BUILTIN(__is_union)
 
 template<class _T>
 struct is_union : bool_constant<__is_union(_T)> {};
-
-template<class _T>
-using is_union_t = bool_constant<__is_union(_T)>;
 
 template<class _T>
 constexpr bool is_union_v = __is_union(_T);
@@ -440,20 +383,15 @@ struct is_union {
 };
 
 template<class _T>
-using is_union_t = typename is_union<_T>::type;
-
-template<class _T>
 constexpr bool is_union_v = is_union<_T>::value;
 
-#endif
+#endif  // endregion
 
+// region is_class
 #if __LIGHTCXX_USE_BUILTIN(__is_class)
 
 template<class _T>
 struct is_class : bool_constant<__is_class(_T)> {};
-
-template<class _T>
-using is_class_t = bool_constant<__is_class(_T)>;
 
 template<class _T>
 constexpr bool is_class_v = __is_class(_T);
@@ -466,24 +404,19 @@ struct is_class {
 };
 
 template<class _T>
-using is_class_t = typename is_class<_T>::type;
-
-template<class _T>
 constexpr bool is_class_v = is_class<_T>::value;
 
-#endif
+#endif  // endregion
 
 // endregion
 
 // region [meta.unary.comp]
 
+// region is_reference
 #if __LIGHTCXX_USE_BUILTIN(__is_reference)
 
 template<class _T>
 struct is_reference : bool_constant<__is_reference(_T)> {};
-
-template<class _T>
-using is_reference_t = bool_constant<__is_reference(_T)>;
 
 template<class _T>
 constexpr bool is_reference_v = __is_reference(_T);
@@ -500,20 +433,15 @@ template<class _T>
 struct is_reference<_T&&> : true_type {};
 
 template<class _T>
-using is_reference_t = typename is_reference<_T>::type;
-
-template<class _T>
 constexpr bool is_reference_v = is_reference<_T>::value;
 
-#endif
+#endif  // endregion
 
+// region is_arithmetic
 #if __LIGHTCXX_USE_BUILTIN(__is_arithmetic)
 
 template<class _T>
 struct is_arithmetic : bool_constant<__is_arithmetic(_T)> {};
-
-template<class _T>
-using is_arithmetic_t = bool_constant<__is_arithmetic(_T)>;
 
 template<class _T>
 constexpr bool is_arithmetic_v = __is_arithmetic(_T);
@@ -526,18 +454,13 @@ constexpr bool is_arithmetic_v = is_integral_v<_T> || is_floating_point_v<_T>;
 template<class _T>
 struct is_arithmetic : bool_constant<is_arithmetic_v<_T>> {};
 
-template<class _T>
-using is_arithmetic_t = bool_constant<is_arithmetic_v<_T>>;
+#endif  // endregion
 
-#endif
-
+// region is_fundamental
 #if __LIGHTCXX_USE_BUILTIN(__is_fundamental)
 
 template<class _T>
 struct is_fundamental : bool_constant<__is_fundamental(_T)> {};
-
-template<class _T>
-using is_fundamental_t = bool_constant<__is_fundamental(_T)>;
 
 template<class _T>
 constexpr bool is_fundamental_v = __is_fundamental(_T);
@@ -551,18 +474,13 @@ constexpr bool is_fundamental_v
 template<class _T>
 struct is_fundamental : bool_constant<is_fundamental_v<_T>> {};
 
-template<class _T>
-using is_fundamental_t = bool_constant<is_fundamental_v<_T>>;
+#endif  // endregion
 
-#endif
-
+// region is_object
 #if __LIGHTCXX_USE_BUILTIN(__is_object)
 
 template<class _T>
 struct is_object : bool_constant<__is_object(_T)> {};
-
-template<class _T>
-using is_object_t = bool_constant<__is_object(_T)>;
 
 template<class _T>
 constexpr bool is_object_v = __is_object(_T);
@@ -577,18 +495,13 @@ constexpr bool is_object_v
 template<class _T>
 struct is_object : bool_constant<is_object_v<_T>> {};
 
-template<class _T>
-using is_object_t = bool_constant<is_object_v<_T>>;
+#endif  // endregion
 
-#endif
-
+// region is_scalar
 #if __LIGHTCXX_USE_BUILTIN(__is_scalar)
 
 template<class _T>
 struct is_scalar : bool_constant<__is_scalar(_T)> {};
-
-template<class _T>
-using is_scalar_t = bool_constant<__is_scalar(_T)>;
 
 template<class _T>
 constexpr bool is_scalar_v = __is_scalar(_T);
@@ -603,18 +516,13 @@ constexpr bool is_scalar_v
 template<class _T>
 struct is_scalar : bool_constant<is_scalar_v<_T>> {};
 
-template<class _T>
-using is_scalar_t = bool_constant<is_scalar_v<_T>>;
+#endif  // endregion
 
-#endif
-
+// region is_compound
 #if __LIGHTCXX_USE_BUILTIN(__is_compound)
 
 template<class _T>
 struct is_compound : bool_constant<__is_compound(_T)> {};
-
-template<class _T>
-using is_compound_t = bool_constant<__is_compound(_T)>;
 
 template<class _T>
 constexpr bool is_compound_v = __is_compound(_T);
@@ -625,20 +533,15 @@ template<class _T>
 struct is_compound : bool_constant<!is_fundamental_v<_T>> {};
 
 template<class _T>
-using is_compound_t = bool_constant<!is_fundamental_v<_T>>;
-
-template<class _T>
 constexpr bool is_compound_v = !is_fundamental_v<_T>;
 
-#endif
+#endif  // endregion
 
+// region is_member_pointer
 #if __LIGHTCXX_USE_BUILTIN(__is_member_pointer)
 
 template<class _T>
 struct is_member_pointer : bool_constant<__is_member_pointer(_T)> {};
-
-template<class _T>
-using is_member_pointer_t = bool_constant<__is_member_pointer(_T)>;
 
 template<class _T>
 constexpr bool is_member_pointer_v = __is_member_pointer(_T);
@@ -657,41 +560,141 @@ template<class _T>
 constexpr bool is_member_pointer_v
   = is_member_object_pointer_v<_T> || is_member_function_pointer_v<_T>;
 
-#endif
+#endif  // endregion
 
 // endregion
 
 // region [meta.unary.prop]
 
+// region is_const
+#if __LIGHTCXX_USE_BUILTIN(__is_const)
+
+template<class _T>
+struct is_const : bool_constant<__is_const(_T)> {};
+
+template<class _T>
+constexpr bool is_const_v = __is_const(_T);
+
+#else
+
+template<class _T>
+struct is_const : false_type {};
+
+template<class _T>
+struct is_const<_T const> : true_type {};
+
+template<class _T>
+constexpr bool is_const_v = is_const<_T>::value;
+
+#endif  // endregion
+
+// region is_volatile
+#if __LIGHTCXX_USE_BUILTIN(__is_volatile)
+
+template<class _T>
+struct is_volatile : bool_constant<__is_volatile(_T)> {};
+
+template<class _T>
+constexpr bool is_volatile_v = __is_volatile(_T);
+
+#else
+
+template<class _T>
+struct is_volatile : false_type {};
+
+template<class _T>
+struct is_volatile<_T volatile> : true_type {};
+
+template<class _T>
+constexpr bool is_volatile_v = is_volatile<_T>::value;
+
+#endif  // endregion
+
+// region is_constructible
+#if __LIGHTCXX_USE_BUILTIN(__is_constructible)
+
+template<class _T, class... _Args>
+struct is_constructible : bool_constant<__is_constructible(_T, _Args...)> {};
+
+template<class _T, class... _Args>
+constexpr bool is_constructible_v = __is_constructible(_T, _Args...);
+
+#else
+
+template<class _T, class _U>
+struct is_same;
+
+template<class _T>
+struct remove_cv;
+
+template<class _T>
+struct add_pointer;
+
+namespace _Light {
+
+template<class _T, class... _Args>
+auto _IsConstructibleTest(int) -> decltype(new _T(declval<_Args>()...));
+
+template<class, class...>
+auto _IsConstructibleTest(...) -> _No_t;
+
+template<class _X, class _Y>
+auto _IsConstructibleReferenceTest(int) -> decltype(static_cast<_X>(declval<_Y>()));
+
+template<class, class>
+auto _IsConstructibleReferenceTest(...) -> _No_t;
+
+template<class _T, class... _Args>
+constexpr bool _IsConstructibleImpl
+  = is_same<decltype(_IsConstructibleTest<_T, _Args...>(0)), typename add_pointer<_T>::type>::value;
+
+template<class _T, class _From>
+constexpr bool _IsConstructibleImpl<_T&, _From> = !is_same<
+  decltype(_IsConstructibleReferenceTest<_T&, _From>(0)), _No_t>::value;
+
+template<class _T, class _From>
+constexpr bool _IsConstructibleImpl<_T&&, _From> = !is_same<
+  decltype(_IsConstructibleReferenceTest<_T&&, _From>(0)), _No_t>::value;
+
+template<class _T, class _From>
+constexpr bool _IsConstructibleImpl<_T&&, _From&> = is_same<
+  typename remove_cv<_T>::type, typename remove_cv<_From>::type>::value&& is_function_v<_T>;
+
+template<class _T, size_t _N>
+constexpr bool _IsConstructibleImpl<_T[_N]> = _IsConstructibleImpl<_T>;
+
+}  // namespace _Light
+
+template<class _T, class... _Args>
+struct is_constructible : bool_constant<_Light::_IsConstructibleImpl<_T, _Args...>> {};
+
+template<class _T, class... _Args>
+constexpr bool is_constructible_v = _Light::_IsConstructibleImpl<_T, _Args...>;
+
+#endif // endregion
+
 // endregion
 
 template<class _T, class _U>
-struct is_same : false_type {};
+struct [[maybe_unused]] is_same : false_type {};
 
 template<class _T>
-struct is_same<_T, _T> : true_type {};
-
-template<class _T, class _U>
-using is_same_t = typename is_same<_T, _U>::type;
+struct [[maybe_unused]] is_same<_T, _T> : true_type {};
 
 template<class _T, class _U>
 constexpr bool is_same_v = is_same<_T, _U>::value;
 
 namespace _Light {
 
-struct __two {
-    [[maybe_unused]] char __lx[2];
-};
-
 template<class _T>
 auto __is_referenceable_test(int) -> _T&;
 
 template<class>
-auto __is_referenceable_test(...) -> __two;
+auto __is_referenceable_test(...) -> _No_t;
 
 template<class _T>
 struct __is_referenceable
-        : integral_constant<bool, !is_same_v<decltype(__is_referenceable_test<_T>(0)), __two>> {};
+        : integral_constant<bool, !is_same_v<decltype(__is_referenceable_test<_T>(0)), _No_t>> {};
 
 }  // namespace _Light
 
@@ -792,10 +795,25 @@ template<class _T>
 using remove_extent_t = typename remove_extent<_T>::type;
 
 template<class _T>
-struct is_polymorphic : bool_constant<__is_polymorphic(_T)> {};
+struct remove_all_extents {
+    using type = _T;
+};
 
 template<class _T>
-using is_polymorphic_t = typename is_polymorphic<_T>::type;
+struct remove_all_extents<_T[]> {
+    using type = typename remove_all_extents<_T>::type;
+};
+
+template<class _T, size_t _N>
+struct remove_all_extents<_T[_N]> {
+    using type = typename remove_all_extents<_T>::type;
+};
+
+template<class _T>
+using remove_all_extents_t = typename remove_all_extents<_T>::type;
+
+template<class _T>
+struct is_polymorphic : bool_constant<__is_polymorphic(_T)> {};
 
 template<class _T>
 constexpr bool is_polymorphic_v = is_polymorphic<_T>::value;
@@ -804,22 +822,7 @@ template<class _T>
 struct is_final : bool_constant<__is_final(_T)> {};
 
 template<class _T>
-using is_final_t = typename is_final<_T>::type;
-
-template<class _T>
 constexpr bool is_final_v = is_final<_T>::value;
-
-template<class _T>
-struct is_const : std::false_type {};
-
-template<class _T>
-struct is_const<const _T> : std::true_type {};
-
-template<class _T>
-using is_const_t = typename is_const<_T>::type;
-
-template<class _T>
-constexpr bool is_const_v = is_const<_T>::value;
 
 template<class _T>
 struct add_lvalue_reference {
@@ -852,21 +855,9 @@ struct add_rvalue_reference {
 template<class _T>
 using add_rvalue_reference_t = typename add_rvalue_reference<_T>::type;
 
-template<class _T, class... _Args>
-struct is_constructible : bool_constant<__is_constructible(_T, _Args...)> {};
-
-template<class _T, class... _Args>
-using is_constructible_t = typename is_constructible<_T, _Args...>::type;
-
-template<class _T, class... _Args>
-constexpr bool is_constructible_v = is_constructible<_T, _Args...>::value;
-
 template<class _T>
 struct is_copy_constructible
         : bool_constant<is_constructible_v<_T, add_lvalue_reference_t<add_const_t<_T>>>> {};
-
-template<class _T>
-using is_copy_constructible_t = typename is_copy_constructible<_T>::type;
 
 template<class _T>
 constexpr bool is_copy_constructible_v = is_copy_constructible<_T>::value;
@@ -875,16 +866,10 @@ template<class _Base, class _Derived>
 struct is_base_of : bool_constant<__is_base_of(_Base, _Derived)> {};
 
 template<class _Base, class _Derived>
-using is_base_of_t = typename is_base_of<_Base, _Derived>::type;
-
-template<class _Base, class _Derived>
 constexpr bool is_base_of_v = is_base_of<_Base, _Derived>::value;
 
 template<class _From, class _To>
 struct is_convertible : bool_constant<__is_convertible(_From, _To)> {};
-
-template<class _From, class _To>
-using is_convertible_t = typename is_convertible<_From, _To>::type;
 
 template<class _From, class _To>
 constexpr bool is_convertible_v = is_convertible<_From, _To>::value;
