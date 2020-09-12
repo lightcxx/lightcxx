@@ -36,7 +36,7 @@ struct incomplete_type;
     }
 
 template<template<class> class Trait, template<class> class Trait_v_reader, bool e, class T>
-constexpr bool test_unary_trait_against_type_() {
+constexpr bool test_unary_trait_against_type_NO_CV() {
     constexpr auto reader = Trait_v_reader<T>{};
     static_assert(std::is_base_of_v<std::bool_constant<e>, Trait<T>>);
     static_assert(Trait<T>::value == e);
@@ -55,15 +55,15 @@ constexpr bool test_unary_trait_against_type_() {
 
 template<template<class> class Trait, template<class> class Trait_v_reader, bool e, class T1,
          class T2, class... Ts>
-constexpr bool test_unary_trait_against_type_() {
-    return test_unary_trait_against_type_<Trait, Trait_v_reader, e, T1>()
-           && test_unary_trait_against_type_<Trait, Trait_v_reader, e, T2>()
-           && (test_unary_trait_against_type_<Trait, Trait_v_reader, e, Ts>() && ...);
+constexpr bool test_unary_trait_against_type_NO_CV() {
+    return test_unary_trait_against_type_NO_CV<Trait, Trait_v_reader, e, T1>()
+           && test_unary_trait_against_type_NO_CV<Trait, Trait_v_reader, e, T2>()
+           && (test_unary_trait_against_type_NO_CV<Trait, Trait_v_reader, e, Ts>() && ...);
 }
 
 template<template<class> class Trait, template<class> class Trait_v_reader, bool e, class T>
 constexpr bool test_unary_trait_against_type_CONST() {
-    return test_unary_trait_against_type_<Trait, Trait_v_reader, e, T const>();
+    return test_unary_trait_against_type_NO_CV<Trait, Trait_v_reader, e, T const>();
 }
 
 template<template<class> class Trait, template<class> class Trait_v_reader, bool e, class T1,
@@ -76,7 +76,7 @@ constexpr bool test_unary_trait_against_type_CONST() {
 
 template<template<class> class Trait, template<class> class Trait_v_reader, bool e, class T>
 constexpr bool test_unary_trait_against_type_VOLATILE() {
-    return test_unary_trait_against_type_<Trait, Trait_v_reader, e, T volatile>();
+    return test_unary_trait_against_type_NO_CV<Trait, Trait_v_reader, e, T volatile>();
 }
 
 template<template<class> class Trait, template<class> class Trait_v_reader, bool e, class T1,
@@ -89,7 +89,7 @@ constexpr bool test_unary_trait_against_type_VOLATILE() {
 
 template<template<class> class Trait, template<class> class Trait_v_reader, bool e, class T>
 constexpr bool test_unary_trait_against_type_CONST_VOLATILE() {
-    return test_unary_trait_against_type_<Trait, Trait_v_reader, e, T const volatile>();
+    return test_unary_trait_against_type_NO_CV<Trait, Trait_v_reader, e, T const volatile>();
 }
 
 template<template<class> class Trait, template<class> class Trait_v_reader, bool e, class T1,
@@ -102,7 +102,7 @@ constexpr bool test_unary_trait_against_type_CONST_VOLATILE() {
 
 template<template<class> class Trait, template<class> class Trait_v_reader, bool e, class T>
 constexpr bool test_unary_trait_against_type_EVERY_CV() {
-    static_assert(test_unary_trait_against_type_<Trait, Trait_v_reader, e, T>());
+    static_assert(test_unary_trait_against_type_NO_CV<Trait, Trait_v_reader, e, T>());
     static_assert(test_unary_trait_against_type_CONST<Trait, Trait_v_reader, e, T>());
     static_assert(test_unary_trait_against_type_VOLATILE<Trait, Trait_v_reader, e, T>());
     static_assert(test_unary_trait_against_type_CONST_VOLATILE<Trait, Trait_v_reader, e, T>());
@@ -147,13 +147,13 @@ constexpr bool test_unary_trait_against_type_EVERY_CV() {
 
 #define TEST_UNARY_TRAIT_AGAINST_LVALUE_REFERENCE(EXPECTED, TRAIT)                                 \
     TEST_UNARY_TRAIT_AGAINST_TYPES(                                                                \
-      EXPECTED, TRAIT, , int&, const int&, volatile int&, const volatile int&, int (&)(int),       \
+      EXPECTED, TRAIT, NO_CV, int&, const int&, volatile int&, const volatile int&, int (&)(int),       \
       int*&, int* const&, int* volatile&, int* const volatile&, incomplete_type&,                  \
       const incomplete_type&, volatile incomplete_type&, const volatile incomplete_type&)
 
 #define TEST_UNARY_TRAIT_AGAINST_RVALUE_REFERENCE(EXPECTED, TRAIT)                                 \
     TEST_UNARY_TRAIT_AGAINST_TYPES(                                                                \
-      EXPECTED, TRAIT, , int&&, const int&&, volatile int&&, const volatile int&&, int(&&)(int),   \
+      EXPECTED, TRAIT, NO_CV, int&&, const int&&, volatile int&&, const volatile int&&, int(&&)(int),   \
       int*&&, int* const&&, int* volatile&&, int* const volatile&&, incomplete_type&&,             \
       const incomplete_type&&, volatile incomplete_type&&, const volatile incomplete_type&&)
 
@@ -177,7 +177,7 @@ constexpr bool test_unary_trait_against_type_EVERY_CV() {
     TEST_UNARY_TRAIT_AGAINST_TYPES(EXPECTED, TRAIT, SUFFIX, Class)
 
 #define TEST_UNARY_TRAIT_AGAINST_FUNCTION(EXPECTED, TRAIT)                                         \
-    TEST_UNARY_TRAIT_AGAINST_TYPES(EXPECTED, TRAIT, , void(), int(), int(int), int(int, int),      \
+    TEST_UNARY_TRAIT_AGAINST_TYPES(EXPECTED, TRAIT, NO_CV, void(), int(), int(int), int(int, int),      \
                                    int(int()), int(...))
 
 #endif

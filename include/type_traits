@@ -671,7 +671,51 @@ struct is_constructible : bool_constant<_Light::_IsConstructibleImpl<_T, _Args..
 template<class _T, class... _Args>
 constexpr bool is_constructible_v = _Light::_IsConstructibleImpl<_T, _Args...>;
 
-#endif // endregion
+#endif  // endregion
+
+// region is_default_constructible
+
+template<class _T>
+struct is_default_constructible : bool_constant<is_constructible_v<_T>> {};
+
+template<class _T>
+constexpr bool is_default_constructible_v = is_constructible_v<_T>;
+
+// endregion
+
+// region is_copy_constructible
+
+template<class _T>
+struct add_lvalue_reference;
+
+template<class _T>
+struct add_const;
+
+template<class _T>
+struct is_copy_constructible
+        : bool_constant<is_constructible_v<
+            _T, typename add_lvalue_reference<typename add_const<_T>::type>::type>> {};
+
+template<class _T>
+constexpr bool is_copy_constructible_v
+  = is_constructible_v<_T, typename add_lvalue_reference<typename add_const<_T>::type>::type>;
+
+// endregion
+
+// region is_move_constructible
+
+template<class _T>
+struct add_rvalue_reference;
+
+template<class _T>
+struct is_move_constructible
+        : bool_constant<is_constructible_v<_T, typename add_rvalue_reference<_T>::type>> {};
+
+template<class _T>
+constexpr bool is_move_constructible_v
+  = is_constructible_v<_T, typename add_rvalue_reference<_T>::type>;
+
+// endregion
 
 // endregion
 
@@ -842,25 +886,19 @@ using add_lvalue_reference_t = typename add_lvalue_reference<_T>::type;
 
 template<class _T>
 struct add_rvalue_reference {
-    using type = decltype(__test<_T>());
-
   private:
     template<class _U>
     requires(_Light::__is_referenceable<_U>::value) static remove_reference_t<_U>&& __test();
 
     template<class _U>
     requires(!_Light::__is_referenceable<_U>::value) static _U __test();
+
+  public:
+    using type = decltype(__test<_T>());
 };
 
 template<class _T>
 using add_rvalue_reference_t = typename add_rvalue_reference<_T>::type;
-
-template<class _T>
-struct is_copy_constructible
-        : bool_constant<is_constructible_v<_T, add_lvalue_reference_t<add_const_t<_T>>>> {};
-
-template<class _T>
-constexpr bool is_copy_constructible_v = is_copy_constructible<_T>::value;
 
 template<class _Base, class _Derived>
 struct is_base_of : bool_constant<__is_base_of(_Base, _Derived)> {};
