@@ -29,9 +29,9 @@ struct incomplete_type;
 
 #define DECLARE_TRAIT_V_READER(TRAIT)                                                              \
     template<class T>                                                                              \
-    struct TRAIT##_v_reader {                                                                      \
+    struct TRAIT##_reader {                                                                        \
         constexpr auto read() const noexcept {                                                     \
-            return ::std::TRAIT##_v<T>;                                                            \
+            return ::std::TRAIT<T>;                                                                \
         }                                                                                          \
     }
 
@@ -147,15 +147,16 @@ constexpr bool test_unary_trait_against_type_EVERY_CV() {
 
 #define TEST_UNARY_TRAIT_AGAINST_LVALUE_REFERENCE(EXPECTED, TRAIT)                                 \
     TEST_UNARY_TRAIT_AGAINST_TYPES(                                                                \
-      EXPECTED, TRAIT, NO_CV, int&, const int&, volatile int&, const volatile int&, int (&)(int),       \
+      EXPECTED, TRAIT, NO_CV, int&, const int&, volatile int&, const volatile int&, int (&)(int),  \
       int*&, int* const&, int* volatile&, int* const volatile&, incomplete_type&,                  \
       const incomplete_type&, volatile incomplete_type&, const volatile incomplete_type&)
 
 #define TEST_UNARY_TRAIT_AGAINST_RVALUE_REFERENCE(EXPECTED, TRAIT)                                 \
-    TEST_UNARY_TRAIT_AGAINST_TYPES(                                                                \
-      EXPECTED, TRAIT, NO_CV, int&&, const int&&, volatile int&&, const volatile int&&, int(&&)(int),   \
-      int*&&, int* const&&, int* volatile&&, int* const volatile&&, incomplete_type&&,             \
-      const incomplete_type&&, volatile incomplete_type&&, const volatile incomplete_type&&)
+    TEST_UNARY_TRAIT_AGAINST_TYPES(EXPECTED, TRAIT, NO_CV, int&&, const int&&, volatile int&&,     \
+                                   const volatile int&&, int(&&)(int), int*&&, int* const&&,       \
+                                   int* volatile&&, int* const volatile&&, incomplete_type&&,      \
+                                   const incomplete_type&&, volatile incomplete_type&&,            \
+                                   const volatile incomplete_type&&)
 
 #define TEST_UNARY_TRAIT_AGAINST_MEMBER_OBJECT_POINTER(EXPECTED, TRAIT, SUFFIX)                    \
     TEST_UNARY_TRAIT_AGAINST_TYPES(EXPECTED, TRAIT, SUFFIX, int Class::*, Class Class::*,          \
@@ -177,7 +178,7 @@ constexpr bool test_unary_trait_against_type_EVERY_CV() {
     TEST_UNARY_TRAIT_AGAINST_TYPES(EXPECTED, TRAIT, SUFFIX, Class)
 
 #define TEST_UNARY_TRAIT_AGAINST_FUNCTION(EXPECTED, TRAIT)                                         \
-    TEST_UNARY_TRAIT_AGAINST_TYPES(EXPECTED, TRAIT, NO_CV, void(), int(), int(int), int(int, int),      \
+    TEST_UNARY_TRAIT_AGAINST_TYPES(EXPECTED, TRAIT, NO_CV, void(), int(), int(int), int(int, int), \
                                    int(int()), int(...))
 
 #endif

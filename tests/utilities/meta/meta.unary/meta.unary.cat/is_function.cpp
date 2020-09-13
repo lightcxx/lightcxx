@@ -4,7 +4,7 @@
 
 #include "meta/test_unary_trait.h"
 
-DECLARE_TRAIT_V_READER(is_function);
+DECLARE_TRAIT_V_READER(is_function_v);
 
 TEST_UNARY_TRAIT_AGAINST_VOID(false, is_function, EVERY_CV);
 TEST_UNARY_TRAIT_AGAINST_NULLPTR_T(false, is_function, EVERY_CV);

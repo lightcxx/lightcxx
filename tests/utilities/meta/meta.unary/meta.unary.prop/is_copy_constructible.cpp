@@ -4,7 +4,7 @@
 
 #include "meta/test_unary_trait.h"
 
-DECLARE_TRAIT_V_READER(is_copy_constructible);
+DECLARE_TRAIT_V_READER(is_copy_constructible_v);
 
 TEST_UNARY_TRAIT_AGAINST_VOID(false, is_copy_constructible, EVERY_CV);
 TEST_UNARY_TRAIT_AGAINST_NULLPTR_T(true, is_copy_constructible, EVERY_CV);

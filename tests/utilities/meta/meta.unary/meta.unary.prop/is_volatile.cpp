@@ -4,7 +4,7 @@
 
 #include "meta/test_unary_trait.h"
 
-DECLARE_TRAIT_V_READER(is_volatile);
+DECLARE_TRAIT_V_READER(is_volatile_v);
 
 TEST_UNARY_TRAIT_AGAINST_VOID(false, is_volatile, NO_CV);
 TEST_UNARY_TRAIT_AGAINST_VOID(false, is_volatile, CONST);

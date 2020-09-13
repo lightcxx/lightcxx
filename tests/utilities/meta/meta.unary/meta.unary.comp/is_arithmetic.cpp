@@ -4,7 +4,7 @@
 
 #include "meta/test_unary_trait.h"
 
-DECLARE_TRAIT_V_READER(is_arithmetic);
+DECLARE_TRAIT_V_READER(is_arithmetic_v);
 
 TEST_UNARY_TRAIT_AGAINST_VOID(false, is_arithmetic, EVERY_CV);
 TEST_UNARY_TRAIT_AGAINST_NULLPTR_T(false, is_arithmetic, EVERY_CV);

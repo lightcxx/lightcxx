@@ -4,7 +4,7 @@
 
 #include "meta/test_unary_trait.h"
 
-DECLARE_TRAIT_V_READER(is_scalar);
+DECLARE_TRAIT_V_READER(is_scalar_v);
 
 TEST_UNARY_TRAIT_AGAINST_VOID(false, is_scalar, EVERY_CV);
 TEST_UNARY_TRAIT_AGAINST_NULLPTR_T(true, is_scalar, EVERY_CV);
