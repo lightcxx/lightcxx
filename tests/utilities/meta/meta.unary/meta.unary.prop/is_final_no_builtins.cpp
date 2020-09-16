@@ -1,11 +1,13 @@
 // REQUEST:NO_TEST_LIB "The testing library depends on <type_traits>."
-// EXPECT:NO_COMPILE "std::is_(class|enum|union) is not supported on this compiler."
+// EXPECT:NO_COMPILE "std::is_final is not supported on this compiler."
 
 #define _LIGHTCXX_DONT_USE_BUILTINS
 
 #include <type_traits>
 
+#include "meta/test_unary_trait.h"
+
 int main() {
-    static_assert(std::is_object<int>::value);
+    static_assert(std::is_final<Class>::value);
     return 0;
 }
