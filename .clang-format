@@ -3,7 +3,6 @@ Standard: c++20
 
 AlignAfterOpenBracket: Align
 AlignEscapedNewlines: Right
-AlignOperands: Align
 AlignTrailingComments: true
 AllowAllParametersOfDeclarationOnNextLine: true
 AllowShortLambdasOnASingleLine: All
