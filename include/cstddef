@@ -33,25 +33,27 @@ using nullptr_t = decltype(nullptr);
 
 enum class byte : unsigned char {};
 
-template<class _T>
-requires(is_integral_v<_T>) constexpr byte operator<<(byte __b, _T __shift) noexcept {
+// clang-format off
+template<class _T> requires is_integral_v<_T>
+constexpr byte operator<<(byte __b, _T __shift) noexcept {
     return static_cast<byte>(static_cast<unsigned int>(__b) << __shift);
 }
 
-template<class _T>
-requires(is_integral_v<_T>) constexpr byte& operator<<=(byte& __b, _T __shift) noexcept {
+template<class _T> requires is_integral_v<_T>
+constexpr byte& operator<<=(byte& __b, _T __shift) noexcept {
     return __b = __b << __shift;
 }
 
-template<class _T>
-requires(is_integral_v<_T>) constexpr byte operator>>(byte __b, _T __shift) noexcept {
+template<class _T> requires is_integral_v<_T>
+constexpr byte operator>>(byte __b, _T __shift) noexcept {
     return static_cast<byte>(static_cast<unsigned int>(__b) >> __shift);
 }
 
-template<class _T>
-requires(is_integral_v<_T>) constexpr byte& operator>>=(byte& __b, _T __shift) noexcept {
+template<class _T> requires is_integral_v<_T>
+constexpr byte& operator>>=(byte& __b, _T __shift) noexcept {
     return __b = __b >> __shift;
 }
+// clang-format on
 
 constexpr byte operator|(byte __l, byte __r) noexcept {
     return static_cast<byte>(static_cast<unsigned int>(__l) | static_cast<unsigned int>(__r));
@@ -81,10 +83,12 @@ constexpr byte operator~(byte __b) noexcept {
     return static_cast<byte>(~static_cast<unsigned int>(__b));
 }
 
-template<class _T>
-requires(is_integral_v<_T>) constexpr _T to_integer(byte __b) noexcept {
+// clang-format off
+template<class _T> requires is_integral_v<_T>
+constexpr _T to_integer(byte __b) noexcept {
     return static_cast<_T>(__b);
 }
+// clang-format on
 
 }  // namespace std
 
