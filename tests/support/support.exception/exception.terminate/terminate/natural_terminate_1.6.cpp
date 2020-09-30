@@ -6,6 +6,7 @@
 #include <exception>
 
 #include "testing.h"
+#include <stdlib.h>
 
 struct ThrowInDtor {
     ~ThrowInDtor() noexcept(false) {
@@ -17,7 +18,7 @@ struct ThrowInDtor {
 
 TEST() {
     std::set_terminate([]() {
-        Testing::step("terminate");
+        step("terminate");
         ::abort();
     });
 }

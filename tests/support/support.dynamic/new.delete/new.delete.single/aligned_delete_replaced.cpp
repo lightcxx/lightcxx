@@ -3,14 +3,15 @@
 #include <new>
 
 #include "testing.h"
+#include <stdlib.h>
 
 void operator delete(void* ptr, std::align_val_t) noexcept {
-    Testing::step("delete");
+    step("delete");
     ::free(ptr);
 }
 
 void operator delete(void* ptr, std::size_t, std::align_val_t) noexcept {
-    Testing::step("delete_size");
+    step("delete_size");
     ::free(ptr);
 }
 

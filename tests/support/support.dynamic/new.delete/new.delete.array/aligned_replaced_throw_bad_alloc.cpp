@@ -5,14 +5,13 @@
 #include "testing.h"
 
 void* operator new[](std::size_t, std::align_val_t) {
-    Testing::step("new");
+    step("new");
     throw std::bad_alloc();
 }
 
 TEST() {
     std::set_new_handler([]() {
         fail();
-        ::abort();
     });
 
     try {

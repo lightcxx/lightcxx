@@ -6,11 +6,12 @@
 #include <exception>
 
 #include "testing.h"
+#include <stdlib.h>
 
 struct SetTerminateGlobal {
     SetTerminateGlobal() {
         std::set_terminate([]() {
-            Testing::step("terminate");
+            step("terminate");
             ::abort();
         });
     }

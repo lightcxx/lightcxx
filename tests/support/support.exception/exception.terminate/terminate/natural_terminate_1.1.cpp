@@ -6,11 +6,12 @@
 #include <exception>
 
 #include "testing.h"
+#include <stdlib.h>
 
 struct NonCompliantException : public std::exception {
     NonCompliantException() = default;
     NonCompliantException(const NonCompliantException& other) {
-        Testing::step("copy_ctor");
+        step("copy_ctor");
         throw 5;
     }
     NonCompliantException& operator=(const NonCompliantException&) {

@@ -9,8 +9,7 @@
 
 TEST() {
     std::set_terminate([]() {
-        Testing::step("terminate");
-        ::abort();
+        step("terminate");
     });
 
     step("before_ctor");

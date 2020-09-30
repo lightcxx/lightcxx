@@ -3,6 +3,8 @@
 
 #include "interceptor.h"
 
+#include <stdlib.h>
+
 namespace Testing {
 
 struct LibCInterceptors {

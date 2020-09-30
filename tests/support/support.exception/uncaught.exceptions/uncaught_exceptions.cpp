@@ -7,14 +7,14 @@ struct CheckUncaughtExceptionsInDtor {
 
     ~CheckUncaughtExceptionsInDtor() {
         int u = std::uncaught_exceptions();
-        Testing::expect(u == expected);
+        expect(u == expected);
         if (expected < 10) {
             try {
-                Testing::expect(u == expected);
+                expect(u == expected);
                 CheckUncaughtExceptionsInDtor c{expected + 1};
                 throw 5;
-            } catch (int) { Testing::expect(u == expected); }
-            Testing::expect(u == expected);
+            } catch (int) { expect(u == expected); }
+            expect(u == expected);
         }
     }
 };

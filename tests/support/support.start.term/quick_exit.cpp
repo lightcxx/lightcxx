@@ -7,7 +7,7 @@
 
 struct FailPrinter {
     ~FailPrinter() {
-        Testing::fail();
+        fail();
     }
 };
 

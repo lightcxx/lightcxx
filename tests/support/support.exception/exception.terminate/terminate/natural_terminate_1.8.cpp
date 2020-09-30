@@ -7,9 +7,11 @@
 
 #include "testing.h"
 
+#include <stdlib.h>
+
 TEST() {
     std::set_terminate([]() {
-        Testing::step("terminate");
+        step("terminate");
         ::abort();
     });
 

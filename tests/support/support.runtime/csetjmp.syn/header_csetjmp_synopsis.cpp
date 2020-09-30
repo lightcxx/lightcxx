@@ -9,7 +9,7 @@
 TEST() {
     std::jmp_buf jb;
     auto&& ret = setjmp(jb);
-    expect_type_and_value<int&>(ret, 0);
+    expect_type_and_value(ret, int&, 0);
     expect_type(void, std::longjmp(jb, 0));
 }
 

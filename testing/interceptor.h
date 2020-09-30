@@ -1,11 +1,9 @@
 #ifndef TESTING_INTERCEPTOR_H
 #define TESTING_INTERCEPTOR_H
 
-#include <stdlib.h>
+extern "C" void* testing_find_next_symbol(const char* name);
 
 namespace Testing {
-
-void* find_next_symbol(const char* name);
 
 template<class F>
 class CFunctionInterceptor;
@@ -55,7 +53,7 @@ class CFunctionInterceptor<R(Args...)> {
             return replacement(raw_replacement, raw_replacement_state, args...);
         } else {
             if (!original) {
-                original = reinterpret_cast<F*>(find_next_symbol(symbol));
+                original = reinterpret_cast<F*>(testing_find_next_symbol(symbol));
             }
             return original(args...);
         }

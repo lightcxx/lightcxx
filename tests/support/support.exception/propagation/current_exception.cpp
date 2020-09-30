@@ -41,7 +41,7 @@ TEST(rethrowing_CountedException_helper) {
 }
 
 TEST(before_eh_clauses) {
-    expect_type_and_value<std::exception_ptr&&>(std::current_exception(), nullptr);
+    expect_type_and_value(std::current_exception(), std::exception_ptr, nullptr);
 
     std::exception_ptr exc;
     expect(exc == nullptr);
@@ -51,7 +51,7 @@ TEST(before_eh_clauses) {
 
 TEST(inside_try_clause) {
     try {
-        expect_type_and_value<std::exception_ptr&&>(std::current_exception(), nullptr);
+        expect_type_and_value(std::current_exception(), std::exception_ptr, nullptr);
         std::exception_ptr exc;
         expect(exc == nullptr);
         exc = std::current_exception();

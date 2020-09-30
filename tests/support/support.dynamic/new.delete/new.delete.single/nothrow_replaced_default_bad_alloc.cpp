@@ -5,7 +5,7 @@
 #include "testing.h"
 
 void* operator new(std::size_t) {
-    Testing::step("new");
+    step("new");
     throw std::bad_alloc();
 }
 

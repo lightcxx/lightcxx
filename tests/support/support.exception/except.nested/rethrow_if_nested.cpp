@@ -51,8 +51,7 @@ class WithOverrideForAddressOfOperator : public std::exception {
     ~WithOverrideForAddressOfOperator() override = default;
 
     WithOverrideForAddressOfOperator* operator&() {
-        Testing::fail();
-        return this;
+        fail();
     }
 };
 TEST(polymorphic_class_with_override_for_address_of_operator) {

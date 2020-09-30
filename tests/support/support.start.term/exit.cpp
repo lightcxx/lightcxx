@@ -9,7 +9,7 @@ struct FailPrinter {
     const char* name;
 
     ~FailPrinter() {
-        Testing::fail();
+        fail();
     }
 };
 
@@ -17,7 +17,7 @@ struct SuccessPrinter {
     const char* name = "local";
 
     ~SuccessPrinter() {
-        Testing::step("~%s", name);
+        step("~%s", name);
     }
 };
 

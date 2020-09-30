@@ -3,6 +3,7 @@
 #include <new>
 
 #include "testing.h"
+#include <stdlib.h>
 
 namespace __cxxabiv1 {
 
@@ -11,8 +12,8 @@ extern "C" void __cxa_throw_bad_array_new_length();
 }
 
 TEST() {
-    int argc = get_argc();
-    char** argv = get_argv();
+    int argc = testing_get_argc();
+    char** argv = testing_get_argv();
 
     expect(argc >= 3);
 

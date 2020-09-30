@@ -6,6 +6,7 @@
 #include <exception>
 
 #include "testing.h"
+#include <stdlib.h>
 
 struct ThrowingDestructor {
     ~ThrowingDestructor() noexcept(false) {

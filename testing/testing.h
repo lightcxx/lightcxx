@@ -1,57 +1,59 @@
 #ifndef TESTING_TESTING_H
 #define TESTING_TESTING_H
 
-#include "meta.h"
-#include <stdlib.h>
+extern "C" void testing_step_impl(const char* msg, ...);
 
-#include <source_location>
+[[noreturn]] extern "C" void testing_fail_impl(const char* func, const char* file, int line);
+
+extern "C" void testing_expect_impl(int cnd, const char* func, const char* file, int line);
+
+extern "C" int testing_get_argc();
+
+extern "C" char** testing_get_argv();
+
+extern "C" void testing_register_test(void (*test)(), const char* name);
 
 namespace Testing {
 
-void step(const char* msg, ...) noexcept;
+struct TestRegisterer {
+    explicit TestRegisterer(void (*test)(), const char* name) noexcept {
+        testing_register_test(test, name);
+    }
+};
 
-[[noreturn]] void fail(std::source_location loc = std::source_location::current()) noexcept;
+template<class, class>
+inline constexpr bool same_type = false;
 
-void expect(bool cnd, std::source_location loc = std::source_location::current()) noexcept;
+template<class T>
+inline constexpr bool same_type<T, T> = true;
+
+}  // namespace Testing
+
+#define fail() testing_fail_impl(__func__, __FILE__, __LINE__)
+
+#define step(...) testing_step_impl(__VA_ARGS__)
+
+#define expect(cnd) testing_expect_impl(cnd, __func__, __FILE__, __LINE__)
 
 #define expect_ct_and_rt(...)                                                                      \
-    ::Testing::expect(__VA_ARGS__);                                                                \
+    testing_expect_impl(__VA_ARGS__, __func__, __FILE__, __LINE__);                                \
     static_assert(__VA_ARGS__)
 
 #define expect_is_noexcept(...) static_assert(noexcept(__VA_ARGS__))
 
-#define expect_same_type(...) static_assert(::std::is_same_v<__VA_ARGS__>)
+#define expect_same_type(...) static_assert(::Testing::same_type<__VA_ARGS__>)
 
 #define expect_type(expected_type, expr)                                                           \
-    static_assert(::std::is_same_v<expected_type, decltype((expr))>)
+    static_assert(::Testing::same_type<expected_type, decltype((expr))>)
 
-template<class T, class U, class V>
-void expect_type_and_value(U&& val, V&& expected,
-                           std::source_location loc = std::source_location::current()) noexcept {
-    expect_ct_and_rt(std::is_same_v<T, decltype(val)>);
-    expect(val == expected, loc);
-}
-
-int get_argc();
-char** get_argv();
-
-struct Test {
-    static Test* head;
-    static Test* tail;
-
-    void (*test)();
-    const char* name;
-    Test* next;
-
-    explicit Test(void (*test)(), const char* name) noexcept;
-};
-
-}  // namespace Testing
+#define expect_type_and_value(expr, type, value)                                                   \
+    expect_ct_and_rt(::Testing::same_type<type, decltype((expr))>);                                \
+    expect((expr) == value)
 
 #define TEST(name)                                                                                 \
     namespace Testing {                                                                            \
     static void test_##name();                                                                     \
-    static ::Testing::Test test_register_##name{test_##name, #name};                               \
+    static ::Testing::TestRegisterer test_register_##name{test_##name, #name};                     \
     }                                                                                              \
     static void Testing::test_##name()
 

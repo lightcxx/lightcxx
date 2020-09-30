@@ -7,6 +7,8 @@
 
 #include "testing.h"
 
+#include <stdlib.h>
+
 void g(int x) {
     if (x != 2) {
         throw x;
@@ -25,5 +27,5 @@ TEST() {
         ::abort();
     });
 
-    f(get_argc());
+    f(testing_get_argc());
 }

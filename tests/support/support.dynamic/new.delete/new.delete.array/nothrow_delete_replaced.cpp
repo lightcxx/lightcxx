@@ -3,9 +3,10 @@
 #include <new>
 
 #include "testing.h"
+#include <stdlib.h>
 
 void operator delete[](void* ptr, const std::nothrow_t&) noexcept {
-    Testing::step("delete");
+    step("delete");
     ::free(ptr);
 }
 

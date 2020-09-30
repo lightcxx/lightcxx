@@ -1,6 +1,7 @@
 #include <exception>
 
 #include "testing.h"
+#include <stdlib.h>
 
 TEST() {
     std::terminate_handler g = []() { ::abort(); };

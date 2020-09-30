@@ -37,7 +37,7 @@ static void sum_and_product(long long* sum, long long* product, const char* form
                 break;
             }
             default: {
-                Testing::fail();
+                fail();
             }
         }
     }
