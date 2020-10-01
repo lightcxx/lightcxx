@@ -1,5 +1,3 @@
-// REQUEST:NO_TEST_LIB "The testing library depends on <type_traits>."
-
 #include <type_traits>
 
 #include "meta/test_unary_trait.h"
@@ -84,7 +82,3 @@ class PolymorphicBase : public VirtualMethod {};
 TEST_UNARY_TRAIT_AGAINST_TYPES(false, is_empty, EVERY_CV, NonEmpty, Bits, VirtualDtor,
                                VirtualMethod, PureVirtualMethod, VirtualBase,
                                VirtualPolymorphicBase, PolymorphicBase);
-
-int main() {
-    return 0;
-}

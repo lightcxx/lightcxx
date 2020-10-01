@@ -1,5 +1,3 @@
-// REQUEST:NO_TEST_LIB "The testing library depends on <type_traits>."
-
 #include <type_traits>
 
 #include "meta/test_unary_trait.h"
@@ -65,7 +63,3 @@ class VirtualAbstractBase : virtual PureVirtualMethod {};
 TEST_UNARY_TRAIT_AGAINST_TYPES(true, is_abstract, EVERY_CV, PureVirtualDtor, PureVirtualMethod,
                                PublicAbstractBase, ProtectedAbstractBase, PrivateAbstractBase,
                                VirtualAbstractBase);
-
-int main() {
-    return 0;
-}

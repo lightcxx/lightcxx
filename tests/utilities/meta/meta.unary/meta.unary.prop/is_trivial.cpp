@@ -1,5 +1,3 @@
-// REQUEST:NO_TEST_LIB "The testing library depends on <type_traits>."
-
 #include <type_traits>
 
 #include "meta/test_unary_trait.h"
@@ -817,7 +815,3 @@ TEST_IS_TRIVIAL(false, C_EmptyDfltCtor_EmptyCpCtor_EmptyMvCtor_EmptyCpAssign_Emp
 TEST_IS_TRIVIAL(false, C_EmptyDfltCtor_EmptyCpCtor_EmptyMvCtor_EmptyCpAssign_EmptyMvAssign_DeleteDtor);
 TEST_IS_TRIVIAL(false, C_EmptyDfltCtor_EmptyCpCtor_EmptyMvCtor_EmptyCpAssign_EmptyMvAssign_EmptyDtor);
 // clang-format on
-
-int main() {
-    return 0;
-}

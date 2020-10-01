@@ -1,4 +1,3 @@
-// REQUEST:NO_TEST_LIB "The testing library depends on <type_traits>."
 // EXPECT:NO_COMPILE "std::is_trivially_copyable is not supported on this compiler."
 
 #define _LIGHTCXX_DONT_USE_BUILTINS
@@ -7,7 +6,4 @@
 
 #include "meta/test_unary_trait.h"
 
-int main() {
-    static_assert(std::is_trivially_copyable<Class>::value);
-    return 0;
-}
+static_assert(std::is_trivially_copyable<Class>::value);

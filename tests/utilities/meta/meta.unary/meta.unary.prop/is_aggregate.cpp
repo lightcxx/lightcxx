@@ -1,5 +1,3 @@
-// REQUEST:NO_TEST_LIB "The testing library depends on <type_traits>."
-
 #include <type_traits>
 
 #include "meta/test_unary_trait.h"
@@ -317,7 +315,3 @@ union NonAggregateArrayVariant {
 TEST_UNARY_TRAIT_AGAINST_TYPES(true, is_aggregate, EVERY_CV, OneIntVariant, AggregateVariant,
                                AggregateArrayVariant, NonAggregateVariant,
                                NonAggregateAndArrayVariant, NonAggregateArrayVariant);
-
-int main() {
-    return 0;
-}

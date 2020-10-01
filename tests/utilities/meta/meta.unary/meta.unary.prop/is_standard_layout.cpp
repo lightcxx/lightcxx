@@ -1,5 +1,3 @@
-// REQUEST:NO_TEST_LIB "The testing library depends on <type_traits>."
-
 #include <type_traits>
 
 #include "meta/test_unary_trait.h"
@@ -240,7 +238,3 @@ union NonStdLayoutArrayVariant {
 
 TEST_UNARY_TRAIT_AGAINST_TYPES(false, is_standard_layout, EVERY_CV, NonStdLayoutVariant,
                                NonStdLayoutAndArrayVariant, NonStdLayoutArrayVariant);
-
-int main() {
-    return 0;
-}

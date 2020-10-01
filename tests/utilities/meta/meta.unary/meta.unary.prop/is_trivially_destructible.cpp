@@ -1,5 +1,3 @@
-// REQUEST:NO_TEST_LIB "The testing library depends on <type_traits>."
-
 #include <type_traits>
 
 #include "meta/test_unary_trait.h"
@@ -117,7 +115,3 @@ union UnionWithDefaultedDtor {
 
 TEST_UNARY_TRAIT_AGAINST_TYPES(true, is_trivially_destructible, EVERY_CV, ClassWithDefaultedDtor,
                                UnionWithDefaultedDtor);
-
-int main() {
-    return 0;
-}

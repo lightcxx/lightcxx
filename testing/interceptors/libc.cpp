@@ -1,7 +1,5 @@
 #include "libc.h"
 
-#include <stdlib.h>
-
 namespace Testing {
 
 LibCInterceptors libc{

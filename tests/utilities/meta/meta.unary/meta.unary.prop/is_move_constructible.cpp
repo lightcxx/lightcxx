@@ -1,5 +1,3 @@
-// REQUEST:NO_TEST_LIB "The testing library depends on <type_traits>."
-
 #include <type_traits>
 
 #include "meta/test_unary_trait.h"
@@ -61,7 +59,3 @@ TEST_UNARY_TRAIT_AGAINST_TYPES(false, is_move_constructible, CONST_VOLATILE, NoC
 TEST_UNARY_TRAIT_AGAINST_TYPES(false, is_move_constructible, EVERY_CV, NoCopyNoMoveCtor);
 
 TEST_UNARY_TRAIT_AGAINST_FUNCTION(false, is_move_constructible);
-
-int main() {
-    return 0;
-}

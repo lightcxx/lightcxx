@@ -1,5 +1,3 @@
-// REQUEST:NO_TEST_LIB "The testing library depends on <type_traits>."
-
 #include <type_traits>
 
 #include "meta/test_unary_trait.h"
@@ -489,7 +487,3 @@ static_assert(test_is_nothrow_constructible<false, int(), int(int, int)>());
 static_assert(test_is_nothrow_constructible<false, int(), int (&)(int, int)>());
 static_assert(test_is_nothrow_constructible<false, int(), int(&&)(int, int)>());
 // endregion
-
-int main() {
-    return 0;
-}

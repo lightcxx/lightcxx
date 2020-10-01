@@ -1,8 +1,8 @@
-// REQUEST:NO_TEST_LIB "The testing library depends on <type_traits>."
+#include "testing.h"
 
 #include <type_traits>
 
-int main() {
+TEST() {
     static_assert(std::integral_constant<int, 3>::value == 3);
     static_assert(std::integral_constant<bool, true>::value == true);
     static_assert(std::bool_constant<true>::value == true);
@@ -33,6 +33,4 @@ int main() {
 
     static_assert(std::is_rvalue_reference<int&&>::value == true);
     static_assert(std::is_rvalue_reference_v<int&&> == true);
-
-    return 0;
 }

@@ -1,5 +1,3 @@
-// REQUEST:NO_TEST_LIB "The testing library depends on <type_traits>."
-
 #include <type_traits>
 
 #include "meta/test_unary_trait.h"
@@ -20,7 +18,3 @@ TEST_UNARY_TRAIT_AGAINST_ENUM(true, is_enum, EVERY_CV);
 TEST_UNARY_TRAIT_AGAINST_UNION(false, is_enum, EVERY_CV);
 TEST_UNARY_TRAIT_AGAINST_CLASS(false, is_enum, EVERY_CV);
 TEST_UNARY_TRAIT_AGAINST_FUNCTION(false, is_enum);
-
-int main() {
-    return 0;
-}

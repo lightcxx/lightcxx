@@ -1,5 +1,3 @@
-// REQUEST:NO_TEST_LIB "The testing library depends on <type_traits>."
-
 #include <type_traits>
 
 #include "meta/test_unary_trait.h"
@@ -66,7 +64,3 @@ TEST_UNARY_TRAIT_AGAINST_CLASS(true, is_volatile, VOLATILE);
 TEST_UNARY_TRAIT_AGAINST_CLASS(true, is_volatile, CONST_VOLATILE);
 
 TEST_UNARY_TRAIT_AGAINST_FUNCTION(false, is_volatile);
-
-int main() {
-    return 0;
-}

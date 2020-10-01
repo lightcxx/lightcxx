@@ -1,4 +1,4 @@
-// REQUEST:NO_TEST_LIB "The testing library depends on <type_traits>."
+#include "testing.h"
 
 #include <type_traits>
 
@@ -29,7 +29,7 @@ constexpr void test_bool_constant() {
     static_assert(std::is_same_v<bool, decltype(T{}())>);
 }
 
-int main() {
+TEST() {
     test_integral_constant<bool, true>();
     test_integral_constant<bool, false>();
     test_integral_constant<char, 0>();
