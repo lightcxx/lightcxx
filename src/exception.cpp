@@ -1,14 +1,11 @@
 #include "exception"
 
-#include "cxxabi.h"
-
 #include "cstdlib"
-
 #include "handler.h"
 
-namespace std {
+#include "cxxabi.h"
 
-[[noreturn]] void __terminate(terminate_handler) noexcept;
+namespace std {
 
 exception::exception() noexcept = default;
 
@@ -47,7 +44,13 @@ terminate_handler get_terminate() noexcept {
 }
 
 [[noreturn]] void terminate() noexcept {
-    __terminate(get_terminate());
+    const auto handler = get_terminate();
+    if (handler) {
+        try {
+            handler();
+        } catch (...) {}
+    }
+    abort();
 }
 
 int uncaught_exceptions() noexcept {
@@ -113,7 +116,7 @@ exception_ptr nested_exception::nested_ptr() const noexcept {
 // Stubs for libc++abi
 namespace std {
 
-void __terminate(terminate_handler handler) noexcept {
+[[noreturn, maybe_unused]] void __terminate(terminate_handler handler) noexcept {
     if (handler) {
         try {
             handler();

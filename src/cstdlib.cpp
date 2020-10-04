@@ -1,5 +1,8 @@
 #include "cstdlib"
 
+#include "exception"
+#include "handler.h"
+
 // Un-define this so we can get it from the LibC implementation.
 #undef MB_CUR_MAX
 
@@ -7,10 +10,6 @@
 // TODO: Remove dependency on C's <stdatomic.h> once <atomic> is implemented.
 #include <stdatomic.h>
 #include <stdlib.h>
-
-#include <exception>
-
-#include "handler.h"
 
 namespace std {
 
