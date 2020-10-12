@@ -5,11 +5,7 @@
 #include "testing.h"
 #include <stdlib.h>
 
-namespace __cxxabiv1 {
-
 extern "C" void __cxa_throw_bad_array_new_length();
-
-}
 
 TEST() {
     int argc = testing_get_argc();
@@ -29,7 +25,7 @@ TEST() {
     try {
         // TODO: Remove this when clang fixes its codegen to actually call this function when it
         //  should.
-        __cxxabiv1::__cxa_throw_bad_array_new_length();
+        __cxa_throw_bad_array_new_length();
         new int[minus_one];     // negative size: bad_array_new_length
         new int[one]{1, 2, 3};  // too many initializers: bad_array_new_length
         fail();

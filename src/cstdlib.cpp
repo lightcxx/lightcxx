@@ -15,12 +15,10 @@ namespace std {
 
 namespace _Light {
 
-using AtExitHandlerPtr = _AtExitHandler*;
-
 namespace {
 
 atomic_size_t num_quick_exit_handlers = 0;
-Handler<AtExitHandlerPtr> quick_exit_handlers[32]{};
+Handler<_AtExitHandler*> quick_exit_handlers[32]{};
 
 }  // namespace
 
@@ -34,11 +32,11 @@ int _MBCurMax() {
     ::abort();
 }
 
-int atexit(_Light::AtExitHandlerPtr func) noexcept {
+int atexit(_Light::_AtExitHandler* func) noexcept {
     return ::atexit(func);
 }
 
-int at_quick_exit(_Light::AtExitHandlerPtr func) noexcept {
+int at_quick_exit(_Light::_AtExitHandler* func) noexcept {
     const auto index = atomic_fetch_add(&_Light::num_quick_exit_handlers, 1);
     if (index >= 32) {
         return 1;

@@ -3,7 +3,15 @@
 #include "cstdlib"
 #include "handler.h"
 
-#include "cxxabi.h"
+extern "C" {
+
+unsigned int __cxa_uncaught_exceptions() throw();
+void* __cxa_current_primary_exception() throw();
+void __cxa_rethrow_primary_exception(void*);
+void __cxa_increment_exception_refcount(void*) throw();
+void __cxa_decrement_exception_refcount(void*) throw();
+
+}
 
 namespace std {
 
@@ -54,18 +62,18 @@ terminate_handler get_terminate() noexcept {
 }
 
 int uncaught_exceptions() noexcept {
-    return __cxxabiv1::__cxa_uncaught_exceptions();
+    return __cxa_uncaught_exceptions();
 }
 
 exception_ptr current_exception() noexcept {
-    return exception_ptr(__cxxabiv1::__cxa_current_primary_exception());
+    return exception_ptr(__cxa_current_primary_exception());
 }
 
 [[noreturn]] void rethrow_exception(exception_ptr p) {
     if (p == nullptr) {
         terminate();
     }
-    __cxxabiv1::__cxa_rethrow_primary_exception(p.__ptr);
+    __cxa_rethrow_primary_exception(p.__ptr);
     terminate();
 }
 
@@ -74,20 +82,20 @@ exception_ptr::exception_ptr() noexcept = default;
 exception_ptr::exception_ptr(nullptr_t) noexcept: exception_ptr() {}
 
 exception_ptr::exception_ptr(const exception_ptr& __other) noexcept: __ptr(__other.__ptr) {
-    __cxxabiv1::__cxa_increment_exception_refcount(__ptr);
+    __cxa_increment_exception_refcount(__ptr);
 }
 
 exception_ptr& exception_ptr::operator=(const exception_ptr& __other) noexcept {
     if (__ptr != __other.__ptr) {
-        __cxxabiv1::__cxa_increment_exception_refcount(__other.__ptr);
-        __cxxabiv1::__cxa_decrement_exception_refcount(__ptr);
+        __cxa_increment_exception_refcount(__other.__ptr);
+        __cxa_decrement_exception_refcount(__ptr);
         __ptr = __other.__ptr;
     }
     return *this;
 }
 
 exception_ptr::~exception_ptr() noexcept {
-    __cxxabiv1::__cxa_decrement_exception_refcount(__ptr);
+    __cxa_decrement_exception_refcount(__ptr);
 }
 
 exception_ptr::exception_ptr(void* __ptr): __ptr(__ptr) {}
