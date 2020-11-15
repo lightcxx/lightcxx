@@ -1,8 +1,6 @@
 #ifndef __LIGHTCXX_GUARD_EXCEPTION
 #define __LIGHTCXX_GUARD_EXCEPTION
 
-#include <__lightcxx/__named_requirements.h>
-#include <__lightcxx/__utility_core.h>
 #include <memory>
 #include <type_traits>
 
@@ -110,7 +108,9 @@ struct _WithNested : public _T, public nested_exception {
 template<class _T>
 [[noreturn]] void throw_with_nested(_T&& __t) {
     using _U = decay_t<_T>;
-    _Light::_Cpp17CopyConstructible::__assert<_U>();
+    static_assert(
+      is_copy_constructible_v<_U>,
+      "Decayed type of argument for std::throw_with_nested must be copy constructible.");
     if constexpr (is_class_v<_U> && !is_final_v<_U> && !is_base_of_v<nested_exception, _U>) {
         throw _Light::_WithNested<_U>(forward<_T>(__t));
     } else {

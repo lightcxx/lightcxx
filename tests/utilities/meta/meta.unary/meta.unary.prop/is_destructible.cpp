@@ -8,7 +8,7 @@ TEST_UNARY_TRAIT_AGAINST_VOID(false, is_destructible, EVERY_CV);
 TEST_UNARY_TRAIT_AGAINST_NULLPTR_T(true, is_destructible, EVERY_CV);
 TEST_UNARY_TRAIT_AGAINST_INTEGRAL(true, is_destructible, EVERY_CV);
 TEST_UNARY_TRAIT_AGAINST_FLOATING_POINT(true, is_destructible, EVERY_CV);
-TEST_UNARY_TRAIT_AGAINST_ARRAY(true, is_destructible, EVERY_CV);
+// TEST_UNARY_TRAIT_AGAINST_ARRAY(true, is_destructible, EVERY_CV); // Special tests
 TEST_UNARY_TRAIT_AGAINST_POINTER(true, is_destructible, EVERY_CV);
 TEST_UNARY_TRAIT_AGAINST_LVALUE_REFERENCE(true, is_destructible);
 TEST_UNARY_TRAIT_AGAINST_RVALUE_REFERENCE(true, is_destructible);
@@ -66,10 +66,19 @@ union UnionWithPrivateDtor {
     ~UnionWithPrivateDtor() {}
 };
 
-TEST_UNARY_TRAIT_AGAINST_TYPES(false, is_destructible, EVERY_CV, ClassWithDeletedDtor,
-                               ClassWithDeletedDtorMember, ClassWithProtectedDtor,
-                               ClassWithPrivateDtor, ClassWithPrivateDtorBase, IncompleteClass,
-                               UnionWithDeletedDtor, UnionWithProtectedDtor, UnionWithPrivateDtor);
+TEST_UNARY_TRAIT_AGAINST_TYPES(
+  false, is_destructible, EVERY_CV, ClassWithDeletedDtor, ClassWithDeletedDtorMember,
+  ClassWithProtectedDtor, ClassWithPrivateDtor, ClassWithPrivateDtorBase, IncompleteClass,
+  UnionWithDeletedDtor, UnionWithProtectedDtor, UnionWithPrivateDtor, ClassWithDeletedDtor[],
+  ClassWithDeletedDtorMember[], ClassWithProtectedDtor[], ClassWithPrivateDtor[],
+  ClassWithPrivateDtorBase[], IncompleteClass[], UnionWithDeletedDtor[], UnionWithProtectedDtor[],
+  UnionWithPrivateDtor[], ClassWithDeletedDtor[10], ClassWithDeletedDtorMember[10],
+  ClassWithProtectedDtor[10], ClassWithPrivateDtor[10], ClassWithPrivateDtorBase[10],
+  IncompleteClass[10], UnionWithDeletedDtor[10], UnionWithProtectedDtor[10],
+  UnionWithPrivateDtor[10], ClassWithDeletedDtor[][10], ClassWithDeletedDtorMember[][10],
+  ClassWithProtectedDtor[][10], ClassWithPrivateDtor[][10], ClassWithPrivateDtorBase[][10],
+  IncompleteClass[][10], UnionWithDeletedDtor[][10], UnionWithProtectedDtor[][10],
+  UnionWithPrivateDtor[][10]);
 
 class ClassWithDefinedDtor {
   public:
@@ -108,7 +117,13 @@ class ClassWithProtectedDtorBaseAndDefinedDtor : public ClassWithProtectedDtor {
     ~ClassWithProtectedDtorBaseAndDefinedDtor() {}
 };
 
-TEST_UNARY_TRAIT_AGAINST_TYPES(true, is_destructible, EVERY_CV, ClassWithDefinedDtor,
-                               ClassWithDefaultedDtor, UnionWithDefinedDtor, UnionWithDefaultedDtor,
-                               ClassWithProtectedDtorBase,
-                               ClassWithProtectedDtorBaseAndDefinedDtor);
+TEST_UNARY_TRAIT_AGAINST_TYPES(
+  true, is_destructible, EVERY_CV, ClassWithDefinedDtor, ClassWithDefaultedDtor,
+  UnionWithDefinedDtor, UnionWithDefaultedDtor, ClassWithProtectedDtorBase,
+  ClassWithProtectedDtorBaseAndDefinedDtor, ClassWithDefinedDtor[], ClassWithDefaultedDtor[],
+  UnionWithDefinedDtor[], UnionWithDefaultedDtor[], ClassWithProtectedDtorBase[],
+  ClassWithProtectedDtorBaseAndDefinedDtor[], ClassWithDefinedDtor[10], ClassWithDefaultedDtor[10],
+  UnionWithDefinedDtor[10], UnionWithDefaultedDtor[10], ClassWithProtectedDtorBase[10],
+  ClassWithProtectedDtorBaseAndDefinedDtor[10], ClassWithDefinedDtor[][10],
+  ClassWithDefaultedDtor[][10], UnionWithDefinedDtor[][10], UnionWithDefaultedDtor[][10],
+  ClassWithProtectedDtorBase[][10], ClassWithProtectedDtorBaseAndDefinedDtor[][10]);
