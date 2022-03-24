@@ -38,8 +38,8 @@ struct incomplete_type;
 template<template<class> class Trait, template<class> class Trait_v_reader, bool e, class T>
 constexpr bool test_unary_trait_against_type_NO_CV() {
     constexpr auto reader = Trait_v_reader<T>{};
-    static_assert(std::is_base_of_v<std::bool_constant<e>, Trait<T>>);
     static_assert(Trait<T>::value == e);
+    static_assert(std::is_base_of_v<std::bool_constant<e>, Trait<T>>);
     static_assert(std::is_same_v<typename Trait<T>::value_type, bool>);
     static_assert(Trait<T>{} == e);
     static_assert((bool)Trait<T>{} == e);
