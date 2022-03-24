@@ -168,8 +168,7 @@ constexpr bool test_unary_trait_against_type_EVERY_CV() {
                                    Class Class::* (Class::*)(int, int))
 
 #define TEST_UNARY_TRAIT_AGAINST_ENUM(EXPECTED, TRAIT, SUFFIX)                                     \
-    TEST_UNARY_TRAIT_AGAINST_TYPES(EXPECTED, TRAIT, SUFFIX, Enum);                                 \
-    TEST_UNARY_TRAIT_AGAINST_TYPES(EXPECTED, TRAIT, SUFFIX, EnumClass)
+    TEST_UNARY_TRAIT_AGAINST_TYPES(EXPECTED, TRAIT, SUFFIX, Enum, EnumClass)
 
 #define TEST_UNARY_TRAIT_AGAINST_UNION(EXPECTED, TRAIT, SUFFIX)                                    \
     TEST_UNARY_TRAIT_AGAINST_TYPES(EXPECTED, TRAIT, SUFFIX, Union)

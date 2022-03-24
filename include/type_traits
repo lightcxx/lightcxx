@@ -57,22 +57,22 @@ concept same_as = is_same_v<_T, _U>;
 
 namespace _Light {
 
-template<class _T>
-inline constexpr bool _False = false;
+    template<class _T>
+    inline constexpr bool _False = false;
 
-template<class _T>
-using _NonSfinaeAddReference = _T&;
+    template<class _T>
+    using _NonSfinaeAddReference = _T&;
 
-template<class _T>
-concept _Referenceable = requires {
-    typename _NonSfinaeAddReference<_T>;
-};
+    template<class _T>
+    concept _Referenceable = requires {
+        typename _NonSfinaeAddReference<_T>;
+    };
 
-template<class _T>
-_T&& __declval_impl(int);
+    template<class _T>
+    _T&& __declval_impl(int);
 
-template<class _T>
-_T __declval_impl(long);
+    template<class _T>
+    _T __declval_impl(long);
 
 }  // namespace _Light
 
@@ -1504,6 +1504,54 @@ template<class _T>
 struct is_nothrow_swappable : bool_constant<is_nothrow_swappable_v<_T>> {};
 
 // clang-format on
+// endregion
+
+// region has_virtual_destructor
+#if __LIGHTCXX_USE_BUILTIN(__has_virtual_destructor)
+
+template<class _T>
+struct has_virtual_destructor : bool_constant<__has_virtual_destructor(_T)> {};
+
+template<class _T>
+inline constexpr bool has_virtual_destructor_v = __has_virtual_destructor(_T);
+
+#else
+
+template<class _T>
+struct has_virtual_destructor : false_type {
+    static_assert(_Light::_False<_T>,
+                  "std::has_virtual_destructor is not supported on this compiler.");
+};
+
+template<class _T>
+inline constexpr bool has_virtual_destructor_v = has_virtual_destructor<_T>::value;
+
+#endif  // endregion
+
+// region has_unique_object_representations
+#if __LIGHTCXX_USE_BUILTIN(__has_unique_object_representations)
+
+template<class _T>
+struct has_unique_object_representations : bool_constant<__has_unique_object_representations(_T)> {
+};
+
+template<class _T>
+inline constexpr bool has_unique_object_representations_v = __has_unique_object_representations(_T);
+
+#else
+
+template<class _T>
+struct has_unique_object_representations : false_type {
+    static_assert(_Light::_False<_T>,
+                  "std::has_unique_object_representations is not supported on this compiler.");
+};
+
+template<class _T>
+inline constexpr bool has_unique_object_representations_v
+  = has_unique_object_representations<_T>::value;
+
+#endif  // endregion
+
 // endregion
 
 // endregion
