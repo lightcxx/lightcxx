@@ -280,7 +280,7 @@ TEST_UNARY_TRAIT_AGAINST_TYPES(
   // TODO: Double-check if these should be aggregates or not. All tested implementations (at the
   //  time of writing), when compiling in any C++ standard mode say that
   //  std::is_aggregate_v<X> == true for all three.
-//   , InheritedPublicCtor, InheritedProtectedCtor, InheritedPrivateCtor
+  //   , InheritedPublicCtor, InheritedProtectedCtor, InheritedPrivateCtor
 );
 
 union OneIntVariant {

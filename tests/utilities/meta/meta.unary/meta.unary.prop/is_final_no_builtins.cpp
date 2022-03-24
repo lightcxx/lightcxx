@@ -4,8 +4,6 @@
 
 #include <type_traits>
 
-struct Final final {
-
-};
+struct Final final {};
 
 static_assert(std::is_final<Final>::value);

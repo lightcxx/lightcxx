@@ -56,7 +56,7 @@ void testing_register_test(void (*test)(), const char* name) {
 int main(int argc, char** argv) {
     testing_stored_argc = argc;
     testing_stored_argv = argv;
-    for (int i = 0; i < num_tests;i++) {
+    for (int i = 0; i < num_tests; i++) {
         testing_current_test_name = tests[i].name;
         tests[i].test();
     }

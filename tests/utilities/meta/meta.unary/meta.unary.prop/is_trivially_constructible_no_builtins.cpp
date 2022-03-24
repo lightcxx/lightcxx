@@ -6,5 +6,4 @@
 
 struct Trivial {};
 
-static_assert(
-  std::is_trivially_constructible<Trivial, const Trivial&>::value);
+static_assert(std::is_trivially_constructible<Trivial, const Trivial&>::value);

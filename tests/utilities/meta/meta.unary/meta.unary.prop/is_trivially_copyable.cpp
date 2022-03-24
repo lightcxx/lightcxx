@@ -75,7 +75,7 @@ TEST_UNARY_TRAIT_AGAINST_UNION(false, is_trivially_copyable, EVERY_CV);
 TEST_UNARY_TRAIT_AGAINST_FUNCTION(false, is_trivially_copyable);
 
 // Classes and array of classes.
-#define TEST_IS_TRIVIALLY_COPYABLE(EXPECTED, CLASS)                                  \
+#define TEST_IS_TRIVIALLY_COPYABLE(EXPECTED, CLASS)                                                \
     TEST_UNARY_TRAIT_AGAINST_TYPES(EXPECTED, is_trivially_copyable, EVERY_CV, CLASS, CLASS[10],    \
                                    CLASS[10][10], CLASS[], CLASS[][10])
 

@@ -10,9 +10,7 @@ void* operator new(std::size_t) {
 }
 
 TEST() {
-    std::set_new_handler([]() {
-        fail();
-    });
+    std::set_new_handler([]() { fail(); });
 
     try {
         [[maybe_unused]] const auto const_ptr = ::operator new(256);

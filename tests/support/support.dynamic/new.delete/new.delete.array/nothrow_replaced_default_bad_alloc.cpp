@@ -10,9 +10,7 @@ void* operator new[](std::size_t) {
 }
 
 TEST() {
-    std::set_new_handler([]() {
-        fail();
-    });
+    std::set_new_handler([]() { fail(); });
 
     const auto const_ptr = ::operator new[](256, std::nothrow);
     expect(const_ptr == nullptr);

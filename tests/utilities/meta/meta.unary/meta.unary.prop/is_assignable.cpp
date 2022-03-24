@@ -13,8 +13,7 @@ constexpr bool test_is_assignable() {
     bool b7 = std::is_assignable<T, U>{}() == e;
     bool b8 = noexcept(std::is_assignable<T, U>{}());
     bool b9 = std::is_same_v<bool, decltype(std::is_assignable<T, U>{}())>;
-    bool b10
-      = std::is_same_v<typename std::is_assignable<T, U>::type, std::bool_constant<e>>;
+    bool b10 = std::is_same_v<typename std::is_assignable<T, U>::type, std::bool_constant<e>>;
     bool b11 = std::is_same_v<decltype(std::is_assignable_v<T, U>), const bool>;
     bool b12 = std::is_assignable_v<T, U> == e;
     return b1 && b2 && b3 && b4 && b5 && b6 && b7 && b8 && b9 && b10 && b11 && b12;
@@ -67,10 +66,10 @@ constexpr bool test_scalar_or_union() {
 
     static_assert(test_is_assignable<false, T, volatile U>());
     static_assert(test_is_assignable<false, T, volatile U&>());
-    static_assert(test_is_assignable<false, T, volatile U &&>());
+    static_assert(test_is_assignable<false, T, volatile U&&>());
     static_assert(test_is_assignable<false, T, const volatile U>());
     static_assert(test_is_assignable<false, T, const volatile U&>());
-    static_assert(test_is_assignable<false, T, const volatile U &&>());
+    static_assert(test_is_assignable<false, T, const volatile U&&>());
     // With an implicit conversion
     static_assert(test_is_assignable<is_union, T, ConvertsTo<U>>());
     static_assert(test_is_assignable<is_union, T, ConvertsTo<U>&>());
@@ -86,10 +85,10 @@ constexpr bool test_scalar_or_union() {
     static_assert(test_is_assignable<false, const T, const U&&>());
     static_assert(test_is_assignable<false, const T, volatile U>());
     static_assert(test_is_assignable<false, const T, volatile U&>());
-    static_assert(test_is_assignable<false, const T, volatile U &&>());
+    static_assert(test_is_assignable<false, const T, volatile U&&>());
     static_assert(test_is_assignable<false, const T, const volatile U>());
     static_assert(test_is_assignable<false, const T, const volatile U&>());
-    static_assert(test_is_assignable<false, const T, const volatile U &&>());
+    static_assert(test_is_assignable<false, const T, const volatile U&&>());
     static_assert(test_is_assignable<false, const T, ConvertsTo<U>>());
     static_assert(test_is_assignable<false, const T, ConvertsTo<U>&>());
     static_assert(test_is_assignable<false, const T, ConvertsTo<U>&&>());
@@ -103,10 +102,10 @@ constexpr bool test_scalar_or_union() {
     static_assert(test_is_assignable<false, volatile T, const U&&>());
     static_assert(test_is_assignable<false, volatile T, volatile U>());
     static_assert(test_is_assignable<false, volatile T, volatile U&>());
-    static_assert(test_is_assignable<false, volatile T, volatile U &&>());
+    static_assert(test_is_assignable<false, volatile T, volatile U&&>());
     static_assert(test_is_assignable<false, volatile T, const volatile U>());
     static_assert(test_is_assignable<false, volatile T, const volatile U&>());
-    static_assert(test_is_assignable<false, volatile T, const volatile U &&>());
+    static_assert(test_is_assignable<false, volatile T, const volatile U&&>());
     // With an implicit conversion
     static_assert(test_is_assignable<false, volatile T, ConvertsTo<U>>());
     static_assert(test_is_assignable<false, volatile T, ConvertsTo<U>&>());
@@ -122,10 +121,10 @@ constexpr bool test_scalar_or_union() {
     static_assert(test_is_assignable<false, const volatile T, const U&&>());
     static_assert(test_is_assignable<false, const volatile T, volatile U>());
     static_assert(test_is_assignable<false, const volatile T, volatile U&>());
-    static_assert(test_is_assignable<false, const volatile T, volatile U &&>());
+    static_assert(test_is_assignable<false, const volatile T, volatile U&&>());
     static_assert(test_is_assignable<false, const volatile T, const volatile U>());
     static_assert(test_is_assignable<false, const volatile T, const volatile U&>());
-    static_assert(test_is_assignable<false, const volatile T, const volatile U &&>());
+    static_assert(test_is_assignable<false, const volatile T, const volatile U&&>());
     static_assert(test_is_assignable<false, const volatile T, ConvertsTo<U>>());
     static_assert(test_is_assignable<false, const volatile T, ConvertsTo<U>&>());
     static_assert(test_is_assignable<false, const volatile T, ConvertsTo<U>&&>());

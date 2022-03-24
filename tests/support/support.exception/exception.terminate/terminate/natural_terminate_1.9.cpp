@@ -8,9 +8,7 @@
 #include "testing.h"
 
 TEST() {
-    std::set_terminate([]() {
-        step("terminate");
-    });
+    std::set_terminate([]() { step("terminate"); });
 
     step("before_ctor");
     std::nested_exception exc;

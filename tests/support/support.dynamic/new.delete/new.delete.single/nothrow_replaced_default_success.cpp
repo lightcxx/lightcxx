@@ -16,9 +16,7 @@ void operator delete(void* ptr) noexcept {
 }
 
 TEST() {
-    std::set_new_handler([]() {
-        fail();
-    });
+    std::set_new_handler([]() { fail(); });
 
     auto ptr = ::operator new(256, std::nothrow);
     expect_type(void*&, ptr);

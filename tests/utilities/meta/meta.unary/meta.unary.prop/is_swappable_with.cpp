@@ -71,7 +71,7 @@ inline void swap(ByADL&, ByADL&) {}
 inline void swap(ByADL&, int) {}
 inline void swap(int, ByADL&) {}
 
-}
+}  // namespace ns
 static_assert(test_is_swappable_with<true, ns::ByADL&>());
 static_assert(test_is_swappable_with<true, ns::ByADL&, int>());
 static_assert(test_is_swappable_with<true, ns::ByADL&, int&>());

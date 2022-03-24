@@ -80,6 +80,6 @@ class VirtualPolymorphicBase : virtual PureVirtualMethod {};
 
 class PolymorphicBase : public VirtualMethod {};
 
-TEST_UNARY_TRAIT_AGAINST_TYPES(false, is_empty, EVERY_CV, NonEmpty, VirtualDtor,
-                               VirtualMethod, PureVirtualMethod, VirtualBase,
-                               VirtualPolymorphicBase, PolymorphicBase);
+TEST_UNARY_TRAIT_AGAINST_TYPES(false, is_empty, EVERY_CV, NonEmpty, VirtualDtor, VirtualMethod,
+                               PureVirtualMethod, VirtualBase, VirtualPolymorphicBase,
+                               PolymorphicBase);

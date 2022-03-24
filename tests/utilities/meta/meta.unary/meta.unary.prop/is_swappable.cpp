@@ -89,7 +89,7 @@ struct GlobalSwap {
     GlobalSwap& operator=(GlobalSwap&&) = delete;
 };
 
-}
+}  // namespace ns2
 
 void swap(ns2::GlobalSwap&, ns2::GlobalSwap&) {}
 
@@ -112,7 +112,7 @@ struct ADLSwap {
 
 void swap(ADLSwap&, ADLSwap&) {}
 
-}
+}  // namespace ns
 
 TEST_UNARY_TRAIT_AGAINST_TYPES(true, is_swappable, NO_CV, HiddenFriendSwap, ns::ADLSwap);
 TEST_UNARY_TRAIT_AGAINST_TYPES(false, is_swappable, VOLATILE, HiddenFriendSwap, ns::ADLSwap);

@@ -4,13 +4,11 @@
 #include "handler.h"
 
 extern "C" {
-
 unsigned int __cxa_uncaught_exceptions() throw();
 void* __cxa_current_primary_exception() throw();
 void __cxa_rethrow_primary_exception(void*);
 void __cxa_increment_exception_refcount(void*) throw();
 void __cxa_decrement_exception_refcount(void*) throw();
-
 }
 
 namespace std {

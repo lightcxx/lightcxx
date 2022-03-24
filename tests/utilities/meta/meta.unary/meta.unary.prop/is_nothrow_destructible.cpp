@@ -8,7 +8,7 @@ TEST_UNARY_TRAIT_AGAINST_VOID(false, is_nothrow_destructible, EVERY_CV);
 TEST_UNARY_TRAIT_AGAINST_NULLPTR_T(true, is_nothrow_destructible, EVERY_CV);
 TEST_UNARY_TRAIT_AGAINST_INTEGRAL(true, is_nothrow_destructible, EVERY_CV);
 TEST_UNARY_TRAIT_AGAINST_FLOATING_POINT(true, is_nothrow_destructible, EVERY_CV);
-//TEST_UNARY_TRAIT_AGAINST_ARRAY(true, is_nothrow_destructible, EVERY_CV);
+// TEST_UNARY_TRAIT_AGAINST_ARRAY(true, is_nothrow_destructible, EVERY_CV);
 TEST_UNARY_TRAIT_AGAINST_POINTER(true, is_nothrow_destructible, EVERY_CV);
 TEST_UNARY_TRAIT_AGAINST_LVALUE_REFERENCE(true, is_nothrow_destructible);
 TEST_UNARY_TRAIT_AGAINST_RVALUE_REFERENCE(true, is_nothrow_destructible);

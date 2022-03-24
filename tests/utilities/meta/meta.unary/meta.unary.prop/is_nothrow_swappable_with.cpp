@@ -85,7 +85,6 @@ static_assert(test_is_nothrow_swappable_with<false, const int&, ns::ByADL&>());
 static_assert(test_is_nothrow_swappable_with<false, int&&, ns::ByADL&>());
 static_assert(test_is_nothrow_swappable_with<false, const int&&, ns::ByADL&>());
 
-
 struct HiddenFriendNothrowSwap {
     int x;
 

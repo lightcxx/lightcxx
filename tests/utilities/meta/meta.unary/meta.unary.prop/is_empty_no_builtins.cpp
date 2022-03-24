@@ -4,8 +4,6 @@
 
 #include <type_traits>
 
-struct Empty {
-
-};
+struct Empty {};
 
 static_assert(std::is_empty<Empty>::value);
