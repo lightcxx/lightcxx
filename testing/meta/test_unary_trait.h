@@ -117,6 +117,24 @@ constexpr bool test_unary_trait_against_type_EVERY_CV() {
            && (test_unary_trait_against_type_EVERY_CV<Trait, Trait_v_reader, e, Ts>() && ...);
 }
 
+template<template<class> class Trait, template<class> class Trait_v_reader, class T, std::size_t e>
+constexpr bool test_unary_prop_query() {
+    static_assert(Trait<T>::value == e);
+    static_assert(std::is_base_of_v<std::integral_constant<std::size_t, e>, Trait<T>>);
+    static_assert(std::is_same_v<typename Trait<T>::value_type, std::size_t>);
+    static_assert(Trait<T>{} == e);
+    static_assert((std::size_t)Trait<T>{} == e);
+    static_assert(noexcept((std::size_t)Trait<T>{}));
+    static_assert(Trait<T>{}() == e);
+    static_assert(noexcept(Trait<T>{}()));
+    static_assert(std::is_same_v<std::size_t, decltype(Trait<T>{}())>);
+    static_assert(std::is_same_v<typename Trait<T>::type, std::integral_constant<std::size_t, e>>);
+    constexpr auto reader = Trait_v_reader<T>{};
+    static_assert(std::is_same_v<decltype(reader.read()), std::size_t>);
+    static_assert(reader.read() == e);
+    return true;
+}
+
 #define TEST_UNARY_TRAIT_AGAINST_TYPES(EXPECTED, TRAIT, SUFFIX, ...)                               \
     static_assert(test_unary_trait_against_type_##SUFFIX<std::TRAIT, TRAIT##_v_reader, EXPECTED,   \
                                                          __VA_ARGS__>())

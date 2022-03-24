@@ -10,7 +10,7 @@ using nullptr_t = decltype(nullptr);
 
 template<class _T, _T _V>
 struct integral_constant {
-    static constexpr _T value = _V;
+    static inline constexpr _T value = _V;
 
     using value_type = _T;
 
@@ -74,7 +74,7 @@ namespace _Light {
     template<class _T>
     _T __declval_impl(long);
 
-}  // namespace _Light
+};  // namespace _Light
 
 #define __UNARY_TRAIT_TRUE_FOR_ALL_CV(_Trait, _T)                                                  \
     template<>                                                                                     \
@@ -1551,6 +1551,52 @@ inline constexpr bool has_unique_object_representations_v
   = has_unique_object_representations<_T>::value;
 
 #endif  // endregion
+
+// endregion
+
+// region meta.unary.prop.query
+
+// region alignment_of
+template<class _T>
+struct alignment_of : integral_constant<size_t, alignof(_T)> {};
+
+template<class _T>
+inline constexpr size_t alignment_of_v = alignof(_T);
+// endregion
+
+// region rank
+template<class _T>
+struct rank : integral_constant<size_t, 0> {};
+
+template<class _T>
+struct rank<_T[]> : integral_constant<size_t, rank<_T>::value + 1> {};
+
+template<class _T, size_t _N>
+struct rank<_T[_N]> : integral_constant<size_t, rank<_T>::value + 1> {};
+
+template<class _T>
+inline constexpr auto rank_v = rank<_T>::value;
+// endregion
+
+// region extent
+template<class _T, unsigned _I = 0>
+struct extent : integral_constant<size_t, 0> {};
+
+template<class _T>
+struct extent<_T[], 0> : integral_constant<size_t, 0> {};
+
+template<class _T, std::size_t _N>
+struct extent<_T[_N], 0> : integral_constant<size_t, _N> {};
+
+template<class _T, unsigned _I>
+struct extent<_T[], _I> : extent<_T, _I - 1> {};
+
+template<class _T, std::size_t _N, unsigned _I>
+struct extent<_T[_N], _I> : extent<_T, _I - 1> {};
+
+template<class _T, unsigned _I = 0>
+inline constexpr auto extent_v = extent<_T, _I>::value;
+// endregion
 
 // endregion
 
