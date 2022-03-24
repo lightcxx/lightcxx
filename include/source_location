@@ -7,11 +7,11 @@ namespace std {
 
 struct source_location {
     // TODO: This is supposed to be "consteval", change it once compilers fully support it.
-    static constexpr source_location current(source_location ret
+    static constexpr source_location current(source_location __ret
                                              = source_location(__builtin_LINE(), __builtin_COLUMN(),
                                                                __builtin_FILE(),
                                                                __builtin_FUNCTION())) noexcept {
-        return ret;
+        return __ret;
     }
 
     constexpr source_location(): source_location(0, 0, "", "") {}
