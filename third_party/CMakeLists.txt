@@ -17,6 +17,8 @@ endif()
 
 add_library(third_party_libcxxabi_object OBJECT ${third_party_libcxxabi_object_src})
 target_include_directories(third_party_libcxxabi_object PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/
+        ${CMAKE_CURRENT_SOURCE_DIR}/libcxx/src
         ${CMAKE_CURRENT_SOURCE_DIR}/libcxxabi/include
         ${CMAKE_CURRENT_SOURCE_DIR}/libcxx/include)
 target_compile_options(third_party_libcxxabi_object PRIVATE -nostdinc++)
