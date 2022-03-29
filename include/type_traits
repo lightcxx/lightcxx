@@ -2338,6 +2338,11 @@ template<class _T>
 using type_identity_t = _T;
 // endregion
 
+// region void_t
+template<class...>
+using void_t = void;
+// endregion
+
 // region aligned_storage
 namespace _Light {
 

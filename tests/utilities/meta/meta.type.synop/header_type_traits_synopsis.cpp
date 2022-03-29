@@ -33,4 +33,9 @@ TEST() {
 
     static_assert(std::is_rvalue_reference<int&&>::value == true);
     static_assert(std::is_rvalue_reference_v<int&&> == true);
+
+    static_assert(std::is_same_v<std::void_t<>, void>);
+    static_assert(std::is_same_v<std::void_t<int>, void>);
+    static_assert(std::is_same_v<std::void_t<int, long>, void>);
+    static_assert(std::is_same_v<std::void_t<int, long, double>, void>);
 }
