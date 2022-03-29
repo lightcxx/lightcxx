@@ -136,7 +136,9 @@ template<class _T>
 struct reference_wrapper;
 // endregion
 
-// region utility-core
+// region stuff from other headers
+
+using max_align_t = long double;
 
 template<class _T>
 decltype(_Light::__declval_impl<_T>(0)) declval() noexcept;
@@ -2082,7 +2084,7 @@ requires(_N <= sizeof(_Head)) struct _FindBySize<_N, _TypeList<_Head, _Tail...>>
     using _T = _Head;
 };
 
-using _SignedTs = _TypeList<signed char, signed short, signed int, signed long, signed long long>;
+using _SignedTs = _TypeList<signed char, short, int, long, long long>;
 
 using _UnsignedTs
   = _TypeList<unsigned char, unsigned short, unsigned int, unsigned long, unsigned long long>;
@@ -2337,11 +2339,79 @@ using type_identity_t = _T;
 // endregion
 
 // region aligned_storage
-// TODO: Implement aligned_storage
+namespace _Light {
+
+template<size_t _N, class _T>
+struct _BestAlignImpl;
+
+template<size_t _N, class _Head, class _Tail1, class... _Tail>
+requires(_N < alignof(_Tail1)) struct _BestAlignImpl<_N, _TypeList<_Head, _Tail1, _Tail...>> {
+    using _T = _Head;
+};
+
+template<size_t _N, class _Head, class _Tail1, class... _Tail>
+requires(_N >= alignof(_Tail1)) struct _BestAlignImpl<_N, _TypeList<_Head, _Tail1, _Tail...>> {
+    using _T = typename _BestAlignImpl<_N, _TypeList<_Tail1, _Tail...>>::_T;
+};
+
+template<size_t _N, class _Head>
+struct _BestAlignImpl<_N, _TypeList<_Head>> {
+    using _T = _Head;
+};
+
+template<size_t _N, class _Head, class... _Tail>
+requires(_N <= alignof(_Head)) struct _BestAlignImpl<_N, _TypeList<_Head, _Tail...>> {
+    using _T = _Head;
+};
+
+template<size_t _Len>
+inline constexpr size_t _BestAlign = alignof(
+  typename _BestAlignImpl<_Len, _TypeList<char, short, int, long, long long, long double>>::_T);
+
+}  // namespace _Light
+
+template<size_t _Len, size_t _Align = _Light::_BestAlign<_Len>>
+struct aligned_storage {
+    static_assert(_Len > 0, "Length of std::aligned_storage must be non-zero.");
+
+    struct type {
+        alignas(_Align) unsigned char __data[_Len];
+    };
+};
+
+template<size_t _Len, size_t _Align = _Light::_BestAlign<_Len>>
+using aligned_storage_t = typename aligned_storage<_Len, _Align>::type;
 // endregion
 
 // region aligned_union
-// TODO: Implement aligned_union
+namespace _Light {
+
+// TODO: Use the constexpr max(...) after it's implemented, and remove this type.
+template<size_t... _I>
+struct _Max;
+
+template<size_t _I>
+struct _Max<_I> : integral_constant<size_t, _I> {};
+
+template<size_t _I1, size_t _I2, size_t... _I>
+struct _Max<_I1, _I2, _I...> : _Max<(_I1 < _I2 ? _I2 : _I1), _I...> {};
+
+}  // namespace _Light
+
+template<size_t _Len, class... _Ts>
+struct aligned_union {
+    static_assert(sizeof...(_Ts) > 0, "At least one type is required for std::aligned_union.");
+    static_assert(((sizeof(_Ts) > 0 && is_object_v<_Ts>) && ...),
+                  "All types must be complete object types for std::aligned_union.");
+    static inline constexpr size_t alignment_value = _Light::_Max<alignof(_Ts)...>::value;
+
+    struct type {
+        alignas(alignment_value) unsigned char __data[_Light::_Max<_Len, sizeof(_Ts)...>::value];
+    };
+};
+
+template<size_t _Len, class... _Ts>
+using aligned_union_t = typename aligned_union<_Len, _Ts...>::type;
 // endregion
 
 // region remove_cvref

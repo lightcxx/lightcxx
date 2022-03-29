@@ -27,7 +27,7 @@ using ptrdiff_t = decltype(static_cast<int*>(nullptr) - static_cast<int*>(nullpt
 
 using size_t = decltype(sizeof(void*));
 
-using max_align_t = long double;
+// max_align_t defined in <type_traits>
 
 using nullptr_t = decltype(nullptr);
 
