@@ -2401,7 +2401,7 @@ struct _Max<_I1, _I2, _I...> : _Max<(_I1 < _I2 ? _I2 : _I1), _I...> {};
 template<size_t _Len, class... _Ts>
 struct aligned_union {
     static_assert(sizeof...(_Ts) > 0, "At least one type is required for std::aligned_union.");
-    static_assert(((sizeof(_Ts) > 0 && is_object_v<_Ts>) && ...),
+    static_assert(((sizeof(_Ts) > 0 && is_object_v<_Ts>)&&...),
                   "All types must be complete object types for std::aligned_union.");
     static inline constexpr size_t alignment_value = _Light::_Max<alignof(_Ts)...>::value;
 
@@ -2427,6 +2427,11 @@ using remove_cvref_t = typename remove_cv<typename remove_reference<_T>::type>::
 // region decay
 template<class _T>
 struct decay {
+    using type = remove_cv_t<_T>;
+};
+
+template<_Light::_Referenceable _T>
+struct decay<_T> {
   private:
     using _U = remove_reference_t<_T>;
 
@@ -2441,7 +2446,16 @@ using decay_t = typename decay<_T>::type;
 // endregion
 
 // region enable_if
-// TODO: Implement enable_if
+template<bool, class _T = void>
+struct enable_if {};
+
+template<class _T>
+struct enable_if<true, _T> {
+    using type = _T;
+};
+
+template<bool _B, class _T = void>
+using enable_if_t = typename enable_if<_B, _T>::type;
 // endregion
 
 // region conditional
