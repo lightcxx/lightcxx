@@ -1,1 +1,31 @@
-// REQUEST:SKIP "TODO Not tested"
+#include <type_traits>
+
+#include "meta/test_unary_trait.h"
+#include "testing.h"
+
+namespace std {
+
+template<class T>
+struct TEST : bool_constant<is_same_v<T, typename type_identity<T>::type>> {};
+
+template<class T>
+inline constexpr bool TEST_v = is_same_v<T, type_identity_t<T>>;
+
+}  // namespace std
+
+DECLARE_TRAIT_V_READER(TEST_v);
+
+TEST_UNARY_TRAIT_AGAINST_VOID(true, TEST, NO_CV);
+TEST_UNARY_TRAIT_AGAINST_NULLPTR_T(true, TEST, NO_CV);
+TEST_UNARY_TRAIT_AGAINST_INTEGRAL(true, TEST, NO_CV);
+TEST_UNARY_TRAIT_AGAINST_FLOATING_POINT(true, TEST, NO_CV);
+TEST_UNARY_TRAIT_AGAINST_ARRAY(true, TEST, NO_CV);
+TEST_UNARY_TRAIT_AGAINST_POINTER(true, TEST, NO_CV);
+TEST_UNARY_TRAIT_AGAINST_LVALUE_REFERENCE(true, TEST);
+TEST_UNARY_TRAIT_AGAINST_RVALUE_REFERENCE(true, TEST);
+TEST_UNARY_TRAIT_AGAINST_MEMBER_OBJECT_POINTER(true, TEST, NO_CV);
+TEST_UNARY_TRAIT_AGAINST_MEMBER_FUNCTION_POINTER(true, TEST, NO_CV);
+TEST_UNARY_TRAIT_AGAINST_ENUM(true, TEST, NO_CV);
+TEST_UNARY_TRAIT_AGAINST_UNION(true, TEST, NO_CV);
+TEST_UNARY_TRAIT_AGAINST_CLASS(true, TEST, NO_CV);
+TEST_UNARY_TRAIT_AGAINST_FUNCTION(true, TEST);
