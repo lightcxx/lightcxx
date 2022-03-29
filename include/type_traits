@@ -2539,7 +2539,9 @@ using conditional_t = typename conditional<_B, _T, _F>::type;
 // region [meta.const.eval]
 
 // region is_constant_evaluated
-// TODO: Implement is_constant_evaluated
+constexpr bool is_constant_evaluated() noexcept {
+    return __builtin_is_constant_evaluated();
+}
 // endregion
 
 // endregion
