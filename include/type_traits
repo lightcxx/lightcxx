@@ -126,6 +126,9 @@ struct is_swappable;
 template<class _T>
 struct is_nothrow_swappable;
 
+template<bool _B, class _T, class _F>
+struct conditional;
+
 template<class _T>
 struct decay;
 
@@ -1898,24 +1901,39 @@ struct is_nothrow_invocable_r : bool_constant<is_nothrow_invocable_r_v<_R, _F, _
 
 // endregion
 
+// region [meta.trans.cv]
+
+// region remove_const
 template<class _T>
-struct remove_reference {
+struct remove_const {
     using type = _T;
 };
 
 template<class _T>
-struct remove_reference<_T&> {
+struct remove_const<const _T> {
     using type = _T;
 };
 
 template<class _T>
-struct remove_reference<_T&&> {
+using remove_const_t = typename remove_const<_T>::type;
+// endregion
+
+// region remove_volatile
+template<class _T>
+struct remove_volatile {
     using type = _T;
 };
 
 template<class _T>
-using remove_reference_t = typename remove_reference<_T>::type;
+struct remove_volatile<volatile _T> {
+    using type = _T;
+};
 
+template<class _T>
+using remove_volatile_t = typename remove_volatile<_T>::type;
+// endregion
+
+// region remove_cv
 template<class _T>
 struct remove_cv {
     using type = _T;
@@ -1938,15 +1956,9 @@ struct remove_cv<const volatile _T> {
 
 template<class _T>
 using remove_cv_t = typename remove_cv<_T>::type;
+// endregion
 
-template<class _T>
-struct add_cv {
-    using type = const volatile _T;
-};
-
-template<class _T>
-using add_cv_t = typename add_cv<_T>::type;
-
+// region add_const
 template<class _T>
 struct add_const {
     using type = const _T;
@@ -1954,7 +1966,9 @@ struct add_const {
 
 template<class _T>
 using add_const_t = typename add_const<_T>::type;
+// endregion
 
+// region add_volatile
 template<class _T>
 struct add_volatile {
     using type = volatile _T;
@@ -1962,7 +1976,89 @@ struct add_volatile {
 
 template<class _T>
 using add_volatile_t = typename add_volatile<_T>::type;
+// endregion
 
+// region add_cv
+template<class _T>
+struct add_cv {
+    using type = const volatile _T;
+};
+
+template<class _T>
+using add_cv_t = typename add_cv<_T>::type;
+// endregion
+
+// endregion
+
+// region [meta.trans.ref]
+
+// region remove_reference
+template<class _T>
+struct remove_reference {
+    using type = _T;
+};
+
+template<class _T>
+struct remove_reference<_T&> {
+    using type = _T;
+};
+
+template<class _T>
+struct remove_reference<_T&&> {
+    using type = _T;
+};
+
+template<class _T>
+using remove_reference_t = typename remove_reference<_T>::type;
+// endregion
+
+// region add_lvalue_reference
+template<class _T>
+struct add_lvalue_reference {
+    using type = _T;
+};
+
+template<_Light::_Referenceable _T>
+struct add_lvalue_reference<_T> {
+    using type = remove_reference_t<_T>&;
+};
+
+template<class _T>
+using add_lvalue_reference_t = typename add_lvalue_reference<_T>::type;
+// endregion
+
+// region add_rvalue_reference
+template<class _T>
+struct add_rvalue_reference {
+    using type = _T;
+};
+
+template<_Light::_Referenceable _T>
+struct add_rvalue_reference<_T> {
+    using type = remove_reference_t<_T>&&;
+};
+
+template<class _T>
+using add_rvalue_reference_t = typename add_rvalue_reference<_T>::type;
+// endregion
+
+// endregion
+
+// region [meta.trans.sign]
+
+// region make_signed
+// TODO: Implement make_signed
+// endregion
+
+// region make_unsigned
+// TODO: Implement make_unsigned
+// endregion
+
+// endregion
+
+// region [meta.trans.arr]
+
+// region remove_extent
 template<class _T>
 struct remove_extent {
     using type = _T;
@@ -1980,7 +2076,9 @@ struct remove_extent<_T[_N]> {
 
 template<class _T>
 using remove_extent_t = typename remove_extent<_T>::type;
+// endregion
 
+// region remove_all_extents
 template<class _T>
 struct remove_all_extents {
     using type = _T;
@@ -1998,48 +2096,79 @@ struct remove_all_extents<_T[_N]> {
 
 template<class _T>
 using remove_all_extents_t = typename remove_all_extents<_T>::type;
+// endregion
 
-template<class _T>
-struct add_lvalue_reference {
-    using type = _T;
-};
+// endregion
 
-template<_Light::_Referenceable _T>
-struct add_lvalue_reference<_T> {
-    using type = remove_reference_t<_T>&;
-};
+// region [meta.trans.ptr]
 
-template<class _T>
-using add_lvalue_reference_t = typename add_lvalue_reference<_T>::type;
+// region remove_pointer
+// TODO: Implement remove_pointer
+// endregion
 
-template<class _T>
-struct add_rvalue_reference {
-    using type = _T;
-};
-
-template<_Light::_Referenceable _T>
-struct add_rvalue_reference<_T> {
-    using type = remove_reference_t<_T>&&;
-};
-
-template<class _T>
-using add_rvalue_reference_t = typename add_rvalue_reference<_T>::type;
-
+// region add_pointer
 template<class _T>
 struct add_pointer {
     using type = _T;
 };
 
-// clang-format off
-template<class _T> requires _Light::_Referenceable<_T> || is_void_v<_T>
+template<class _T>
+requires _Light::_Referenceable<_T> || is_void_v<_T>
 struct add_pointer<_T> {
     using type = remove_reference_t<_T>*;
 };
-// clang-format on
 
 template<class _T>
 using add_pointer_t = typename add_pointer<_T>::type;
+// endregion
 
+// endregion
+
+// region [meta.trans.other]
+
+// region type_identity
+template<class _T>
+struct type_identity {
+    using type = _T;
+};
+
+template<class _T>
+using type_identity_t = _T;
+// endregion
+
+// region aligned_storage
+// TODO: Implement aligned_storage
+// endregion
+
+// region aligned_union
+// TODO: Implement aligned_union
+// endregion
+
+// region remove_cvref
+// TODO: Implement remove_cvref
+// endregion
+
+// region decay
+template<class _T>
+struct decay {
+  private:
+    using _U = remove_reference_t<_T>;
+
+  public:
+    using type = typename conditional<
+      is_array_v<_U>, remove_extent_t<_U>*,
+      typename conditional<is_function_v<_U>, add_pointer_t<_U>, remove_cv_t<_U>>::type>::type;
+};
+
+template<class _T>
+using decay_t = typename decay<_T>::type;
+// endregion
+
+// region enable_if
+// TODO: Implement enable_if
+// endregion
+
+// region conditional
 template<bool _B, class _T, class _F>
 struct conditional {
     using type = _T;
@@ -2052,20 +2181,73 @@ struct conditional<false, _T, _F> {
 
 template<bool _B, class _T, class _F>
 using conditional_t = typename conditional<_B, _T, _F>::type;
+// endregion
 
-template<class _T>
-struct decay {
-  private:
-    using _U = remove_reference_t<_T>;
+// region common_type
+// TODO: Implement common_type
+// endregion
 
-  public:
-    using type
-      = conditional_t<is_array_v<_U>, remove_extent_t<_U>*,
-                      conditional_t<is_function_v<_U>, add_pointer_t<_U>, remove_cv_t<_U>>>;
-};
+// region basic_common_reference
+// TODO: Implement basic_common_reference
+// endregion
 
-template<class _T>
-using decay_t = typename decay<_T>::type;
+// region common_reference
+// TODO: Implement common_reference
+// endregion
+
+// region underlying_type
+// TODO: Implement underlying_type
+// endregion
+
+// region invoke_result
+// TODO: Implement invoke_result
+// endregion
+
+// region unwrap_reference
+// TODO: Implement unwrap_reference
+// endregion
+
+// region unwrap_ref_decay
+// TODO: Implement unwrap_ref_decay
+// endregion
+
+// endregion
+
+// region [meta.logical]
+
+// region conjunction
+// TODO: Implement conjunction
+// endregion
+
+// region disjunction
+// TODO: Implement disjunction
+// endregion
+
+// region negation
+// TODO: Implement negation
+// endregion
+
+// endregion
+
+// region [meta.member]
+
+// region is_pointer_interconvertible_with_class
+// TODO: Implement is_pointer_interconvertible_with_class
+// endregion
+
+// region is_corresponding_member
+// TODO: Implement is_corresponding_member
+// endregion
+
+// endregion
+
+// region [meta.const.eval]
+
+// region is_constant_evaluated
+// TODO: Implement is_constant_evaluated
+// endregion
+
+// endregion
 
 }  // namespace std
 
