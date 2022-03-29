@@ -51,3 +51,10 @@ TEST_UNARY_TRAIT_AGAINST_ENUM(true, TEST, EVERY_CV);
 TEST_UNARY_TRAIT_AGAINST_UNION(true, TEST, EVERY_CV);
 TEST_UNARY_TRAIT_AGAINST_CLASS(true, TEST, EVERY_CV);
 TEST_UNARY_TRAIT_AGAINST_FUNCTION(true, TEST);
+
+TEST(example_from_std) {
+    static_assert(std::is_same_v<std::remove_all_extents_t<int>, int>);;
+    static_assert(std::is_same_v<std::remove_all_extents_t<int[2]>, int>);;
+    static_assert(std::is_same_v<std::remove_all_extents_t<int[2][3]>, int>);;
+    static_assert(std::is_same_v<std::remove_all_extents_t<int[][3]>, int>);;
+}
