@@ -2103,7 +2103,33 @@ using remove_all_extents_t = typename remove_all_extents<_T>::type;
 // region [meta.trans.ptr]
 
 // region remove_pointer
-// TODO: Implement remove_pointer
+template<class _T>
+struct remove_pointer {
+    using type = _T;
+};
+
+template<class _T>
+struct remove_pointer<_T*> {
+    using type = _T;
+};
+
+template<class _T>
+struct remove_pointer<_T* const> {
+    using type = _T;
+};
+
+template<class _T>
+struct remove_pointer<_T* volatile> {
+    using type = _T;
+};
+
+template<class _T>
+struct remove_pointer<_T* const volatile> {
+    using type = _T;
+};
+
+template<class _T>
+using remove_pointer_t = typename remove_pointer<_T>::type;
 // endregion
 
 // region add_pointer

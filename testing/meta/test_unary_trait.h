@@ -196,6 +196,6 @@ constexpr bool test_unary_prop_query() {
 
 #define TEST_UNARY_TRAIT_AGAINST_FUNCTION(EXPECTED, TRAIT)                                         \
     TEST_UNARY_TRAIT_AGAINST_TYPES(EXPECTED, TRAIT, NO_CV, void(), int(), int(int), int(int, int), \
-                                   int(int()), int(...))
+                                   int(int()), int(...), int() noexcept)
 
 #endif
