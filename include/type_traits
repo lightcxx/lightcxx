@@ -2045,13 +2045,187 @@ using add_rvalue_reference_t = typename add_rvalue_reference<_T>::type;
 // endregion
 
 // region [meta.trans.sign]
+namespace _Light {
+template<class _From, class _To>
+struct _CopyCV {
+    using _T = _To;
+};
+
+template<class _From, class _To>
+struct _CopyCV<const _From, _To> {
+    using _T = const _To;
+};
+
+template<class _From, class _To>
+struct _CopyCV<volatile _From, _To> {
+    using _T = volatile _To;
+};
+
+template<class _From, class _To>
+struct _CopyCV<const volatile _From, _To> {
+    using _T = const volatile _To;
+};
+
+template<class... _Ts>
+struct _TypeList;
+
+template<size_t _N, class _T>
+struct _FindBySize;
+
+template<size_t _N, class _Head, class... _Tail>
+requires(_N > sizeof(_Head)) struct _FindBySize<_N, _TypeList<_Head, _Tail...>> {
+    using _T = typename _FindBySize<_N, _TypeList<_Tail...>>::_T;
+};
+
+template<size_t _N, class _Head, class... _Tail>
+requires(_N <= sizeof(_Head)) struct _FindBySize<_N, _TypeList<_Head, _Tail...>> {
+    using _T = _Head;
+};
+
+using _SignedTs = _TypeList<signed char, signed short, signed int, signed long, signed long long>;
+
+using _UnsignedTs
+  = _TypeList<unsigned char, unsigned short, unsigned int, unsigned long, unsigned long long>;
+
+}  // namespace _Light
 
 // region make_signed
-// TODO: Implement make_signed
+template<class _T>
+struct make_signed {
+    static_assert((is_integral_v<_T> || is_enum_v<_T>)&&!is_same_v<remove_cv_t<_T>, bool>,
+                  "make_signed cannot be instantiated with this type");
+
+    using type =
+      typename _Light::_CopyCV<_T,
+                               typename _Light::_FindBySize<sizeof(_T), _Light::_SignedTs>::_T>::_T;
+};
+
+template<class _T>
+requires(is_same_v<remove_cv_t<_T>, char>) struct make_signed<_T> {
+    using type = typename _Light::_CopyCV<_T, signed char>::_T;
+};
+
+template<class _T>
+requires(is_same_v<remove_cv_t<_T>, unsigned char>) struct make_signed<_T> {
+    using type = typename _Light::_CopyCV<_T, signed char>::_T;
+};
+
+template<class _T>
+requires(is_same_v<remove_cv_t<_T>, signed char>) struct make_signed<_T> {
+    using type = typename _Light::_CopyCV<_T, signed char>::_T;
+};
+
+template<class _T>
+requires(is_same_v<remove_cv_t<_T>, short>) struct make_signed<_T> {
+    using type = typename _Light::_CopyCV<_T, short>::_T;
+};
+
+template<class _T>
+requires(is_same_v<remove_cv_t<_T>, unsigned short>) struct make_signed<_T> {
+    using type = typename _Light::_CopyCV<_T, short>::_T;
+};
+
+template<class _T>
+requires(is_same_v<remove_cv_t<_T>, int>) struct make_signed<_T> {
+    using type = typename _Light::_CopyCV<_T, int>::_T;
+};
+
+template<class _T>
+requires(is_same_v<remove_cv_t<_T>, unsigned int>) struct make_signed<_T> {
+    using type = typename _Light::_CopyCV<_T, int>::_T;
+};
+
+template<class _T>
+requires(is_same_v<remove_cv_t<_T>, long>) struct make_signed<_T> {
+    using type = typename _Light::_CopyCV<_T, long>::_T;
+};
+
+template<class _T>
+requires(is_same_v<remove_cv_t<_T>, unsigned long>) struct make_signed<_T> {
+    using type = typename _Light::_CopyCV<_T, long>::_T;
+};
+
+template<class _T>
+requires(is_same_v<remove_cv_t<_T>, long long>) struct make_signed<_T> {
+    using type = typename _Light::_CopyCV<_T, long long>::_T;
+};
+
+template<class _T>
+requires(is_same_v<remove_cv_t<_T>, unsigned long long>) struct make_signed<_T> {
+    using type = typename _Light::_CopyCV<_T, long long>::_T;
+};
+
+template<class _T>
+using make_signed_t = typename make_signed<_T>::type;
 // endregion
 
 // region make_unsigned
-// TODO: Implement make_unsigned
+template<class _T>
+struct make_unsigned {
+    static_assert((is_integral_v<_T> || is_enum_v<_T>)&&!is_same_v<remove_cv_t<_T>, bool>,
+                  "make_unsigned cannot be instantiated with this type");
+
+    using type = typename _Light::_CopyCV<
+      _T, typename _Light::_FindBySize<sizeof(_T), _Light::_UnsignedTs>::_T>::_T;
+};
+
+template<class _T>
+requires(is_same_v<remove_cv_t<_T>, char>) struct make_unsigned<_T> {
+    using type = typename _Light::_CopyCV<_T, unsigned char>::_T;
+};
+
+template<class _T>
+requires(is_same_v<remove_cv_t<_T>, unsigned char>) struct make_unsigned<_T> {
+    using type = typename _Light::_CopyCV<_T, unsigned char>::_T;
+};
+
+template<class _T>
+requires(is_same_v<remove_cv_t<_T>, signed char>) struct make_unsigned<_T> {
+    using type = typename _Light::_CopyCV<_T, unsigned char>::_T;
+};
+
+template<class _T>
+requires(is_same_v<remove_cv_t<_T>, short>) struct make_unsigned<_T> {
+    using type = typename _Light::_CopyCV<_T, unsigned short>::_T;
+};
+
+template<class _T>
+requires(is_same_v<remove_cv_t<_T>, unsigned short>) struct make_unsigned<_T> {
+    using type = typename _Light::_CopyCV<_T, unsigned short>::_T;
+};
+
+template<class _T>
+requires(is_same_v<remove_cv_t<_T>, int>) struct make_unsigned<_T> {
+    using type = typename _Light::_CopyCV<_T, unsigned int>::_T;
+};
+
+template<class _T>
+requires(is_same_v<remove_cv_t<_T>, unsigned int>) struct make_unsigned<_T> {
+    using type = typename _Light::_CopyCV<_T, unsigned int>::_T;
+};
+
+template<class _T>
+requires(is_same_v<remove_cv_t<_T>, long>) struct make_unsigned<_T> {
+    using type = typename _Light::_CopyCV<_T, unsigned long>::_T;
+};
+
+template<class _T>
+requires(is_same_v<remove_cv_t<_T>, unsigned long>) struct make_unsigned<_T> {
+    using type = typename _Light::_CopyCV<_T, unsigned long>::_T;
+};
+
+template<class _T>
+requires(is_same_v<remove_cv_t<_T>, long long>) struct make_unsigned<_T> {
+    using type = typename _Light::_CopyCV<_T, unsigned long long>::_T;
+};
+
+template<class _T>
+requires(is_same_v<remove_cv_t<_T>, unsigned long long>) struct make_unsigned<_T> {
+    using type = typename _Light::_CopyCV<_T, unsigned long long>::_T;
+};
+
+template<class _T>
+using make_unsigned_t = typename make_unsigned<_T>::type;
 // endregion
 
 // endregion
