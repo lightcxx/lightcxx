@@ -1,5 +1,5 @@
-#ifndef __LIGHTCXX_GUARD_VERSION
-#define __LIGHTCXX_GUARD_VERSION
+#ifndef _LIGHTCXX_GUARD_VERSION
+#define _LIGHTCXX_GUARD_VERSION
 
 // also in <memory>
 #ifndef __cpp_lib_addressof_constexpr

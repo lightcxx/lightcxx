@@ -1,5 +1,5 @@
-#ifndef __LIGHTCXX_GUARD_MEMORY
-#define __LIGHTCXX_GUARD_MEMORY
+#ifndef _LIGHTCXX_GUARD_MEMORY
+#define _LIGHTCXX_GUARD_MEMORY
 
 namespace std {
 

@@ -1,5 +1,5 @@
-#ifndef __LIGHTCXX_GUARD_TYPEINFO
-#define __LIGHTCXX_GUARD_TYPEINFO
+#ifndef _LIGHTCXX_GUARD_TYPEINFO
+#define _LIGHTCXX_GUARD_TYPEINFO
 
 #include <exception>
 

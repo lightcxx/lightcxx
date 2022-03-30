@@ -1,5 +1,5 @@
-#ifndef __LIGHTCXX_GUARD_NEW
-#define __LIGHTCXX_GUARD_NEW
+#ifndef _LIGHTCXX_GUARD_NEW
+#define _LIGHTCXX_GUARD_NEW
 
 #include <exception>
 

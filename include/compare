@@ -1,5 +1,5 @@
-#ifndef __LIGHTCXX_GUARD_COMPARE
-#define __LIGHTCXX_GUARD_COMPARE
+#ifndef _LIGHTCXX_GUARD_COMPARE
+#define _LIGHTCXX_GUARD_COMPARE
 
 #include <type_traits>
 

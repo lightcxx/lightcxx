@@ -1,5 +1,5 @@
-#ifndef __LIGHTCXX_GUARD_CSTDINT
-#define __LIGHTCXX_GUARD_CSTDINT
+#ifndef _LIGHTCXX_GUARD_CSTDINT
+#define _LIGHTCXX_GUARD_CSTDINT
 
 // TODO: Don't include C headers in the C++ headers.
 #include <stdint.h>

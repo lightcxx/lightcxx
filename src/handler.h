@@ -1,5 +1,5 @@
-#ifndef __LIGHTCXX_GUARD_SRC_HANDLER_H
-#define __LIGHTCXX_GUARD_SRC_HANDLER_H
+#ifndef _LIGHTCXX_GUARD_SRC_HANDLER_H
+#define _LIGHTCXX_GUARD_SRC_HANDLER_H
 
 // TODO: Remove dependency on C's <stdatomic.h> once <atomic> is implemented.
 #include <stdatomic.h>

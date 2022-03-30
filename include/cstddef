@@ -1,5 +1,5 @@
-#ifndef __LIGHTCXX_GUARD_CSTDDEF
-#define __LIGHTCXX_GUARD_CSTDDEF
+#ifndef _LIGHTCXX_GUARD_CSTDDEF
+#define _LIGHTCXX_GUARD_CSTDDEF
 
 #include <type_traits>
 

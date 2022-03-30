@@ -1,5 +1,5 @@
-#ifndef __LIGHTCXX_GUARD_CSIGNAL
-#define __LIGHTCXX_GUARD_CSIGNAL
+#ifndef _LIGHTCXX_GUARD_CSIGNAL
+#define _LIGHTCXX_GUARD_CSIGNAL
 
 // TODO: Don't include C headers in the C++ headers.
 #include <signal.h>

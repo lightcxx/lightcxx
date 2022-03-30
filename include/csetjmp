@@ -1,5 +1,5 @@
-#ifndef __LIGHTCXX_GUARD_CSETJMP
-#define __LIGHTCXX_GUARD_CSETJMP
+#ifndef _LIGHTCXX_GUARD_CSETJMP
+#define _LIGHTCXX_GUARD_CSETJMP
 
 // TODO: Don't include C headers in the C++ headers.
 #include <setjmp.h>

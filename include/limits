@@ -1,5 +1,5 @@
-#ifndef __LIGHTCXX_GUARD_LIMITS
-#define __LIGHTCXX_GUARD_LIMITS
+#ifndef _LIGHTCXX_GUARD_LIMITS
+#define _LIGHTCXX_GUARD_LIMITS
 
 namespace std {
 
