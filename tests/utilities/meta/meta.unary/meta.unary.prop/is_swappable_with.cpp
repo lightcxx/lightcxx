@@ -231,8 +231,7 @@ static_assert(test_scalar<Class * Class::*>());
 static_assert(test_scalar<int (Class::*)(int, int)>());
 static_assert(test_scalar<Class (Class::*)(int, Class Class::*)>());
 static_assert(test_scalar<Class Class::* (Class::*)(int, int)>());
-static_assert(
-  test_is_swappable_with<false, int (Class::*)(int, int), Class Class::* (Class::*)(int, int)>());
+static_assert(test_is_swappable_with<false, int (Class::*)(int, int), Class Class::* (Class::*)(int, int)>());
 static_assert(test_scalar<Enum>());
 static_assert(test_scalar<EnumClass>());
 static_assert(test_is_swappable_with<false, Enum, EnumClass>());

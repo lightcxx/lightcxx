@@ -95,9 +95,7 @@ class weak_ordering {
     static const weak_ordering greater;
 
     constexpr explicit(false) operator partial_ordering() const noexcept {
-        return __value == 0  ? partial_ordering::equivalent
-               : __value < 0 ? partial_ordering::less
-                             : partial_ordering::greater;
+        return __value == 0 ? partial_ordering::equivalent : __value < 0 ? partial_ordering::less : partial_ordering::greater;
     }
 
     friend constexpr bool operator==(weak_ordering __v, weak_ordering __w) noexcept = default;
@@ -164,15 +162,11 @@ class strong_ordering {
     static const strong_ordering greater;
 
     constexpr explicit(false) operator partial_ordering() const noexcept {
-        return __value == 0  ? partial_ordering::equivalent
-               : __value < 0 ? partial_ordering::less
-                             : partial_ordering::greater;
+        return __value == 0 ? partial_ordering::equivalent : __value < 0 ? partial_ordering::less : partial_ordering::greater;
     }
 
     constexpr explicit(false) operator weak_ordering() const noexcept {
-        return __value == 0  ? weak_ordering::equivalent
-               : __value < 0 ? weak_ordering::less
-                             : weak_ordering::greater;
+        return __value == 0 ? weak_ordering::equivalent : __value < 0 ? weak_ordering::less : weak_ordering::greater;
     }
 
     friend constexpr bool operator==(strong_ordering __v, strong_ordering __w) noexcept = default;
@@ -312,8 +306,7 @@ using common_comparison_category_t = typename common_comparison_category<_Ts...>
 
 template<class _T, class _U = _T>
 struct compare_three_way_result {
-    using type = decltype(std::declval<const std::remove_reference_t<_T>&>()
-                          <=> std::declval<const std::remove_reference_t<_U>&>());
+    using type = decltype(declval<const remove_reference_t<_T>&>() <=> declval<const remove_reference_t<_U>&>());
 };
 
 template<class _T, class _U = _T>

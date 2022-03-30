@@ -16,7 +16,7 @@ TEST() {
     try {
         Foo& f = dynamic_cast<Foo&>(b);
         fail();
-    } catch (const std::bad_cast& e) {
-        expect(default_constructed.what() == e.what());
-    } catch (...) { fail(); }
+    } catch (const std::bad_cast& e) { expect(default_constructed.what() == e.what()); } catch (...) {
+        fail();
+    }
 }

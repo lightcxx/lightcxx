@@ -24,9 +24,9 @@ TEST() {
 
     try {
         throw default_constructed;
-    } catch (std::bad_alloc& thrown) {
-        expect(default_constructed.what() == thrown.what());
-    } catch (...) { fail(); }
+    } catch (std::bad_alloc& thrown) { expect(default_constructed.what() == thrown.what()); } catch (...) {
+        fail();
+    }
 
     static_assert(std::is_polymorphic_v<std::bad_alloc>);
 

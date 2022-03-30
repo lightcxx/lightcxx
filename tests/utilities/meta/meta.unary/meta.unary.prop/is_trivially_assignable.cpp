@@ -13,8 +13,7 @@ constexpr bool test_is_trivially_assignable() {
     bool b7 = std::is_trivially_assignable<T, U>{}() == e;
     bool b8 = noexcept(std::is_trivially_assignable<T, U>{}());
     bool b9 = std::is_same_v<bool, decltype(std::is_trivially_assignable<T, U>{}())>;
-    bool b10
-      = std::is_same_v<typename std::is_trivially_assignable<T, U>::type, std::bool_constant<e>>;
+    bool b10 = std::is_same_v<typename std::is_trivially_assignable<T, U>::type, std::bool_constant<e>>;
     bool b11 = std::is_same_v<decltype(std::is_trivially_assignable_v<T, U>), const bool>;
     bool b12 = std::is_trivially_assignable_v<T, U> == e;
     return b1 && b2 && b3 && b4 && b5 && b6 && b7 && b8 && b9 && b10 && b11 && b12;
@@ -190,8 +189,7 @@ static_assert(test_scalar_or_union<Class * Class::*>());
 static_assert(test_scalar_or_union<int (Class::*)(int, int)>());
 static_assert(test_scalar_or_union<Class (Class::*)(int, Class Class::*)>());
 static_assert(test_scalar_or_union<Class Class::* (Class::*)(int, int)>());
-static_assert(test_is_trivially_assignable<false, int (Class::*)(int, int),
-                                           Class Class::* (Class::*)(int, int)>());
+static_assert(test_is_trivially_assignable<false, int (Class::*)(int, int), Class Class::* (Class::*)(int, int)>());
 static_assert(test_scalar_or_union<Enum>());
 static_assert(test_scalar_or_union<EnumClass>());
 static_assert(test_is_trivially_assignable<false, Enum, EnumClass>());
@@ -297,8 +295,7 @@ static_assert(test_is_trivially_assignable<false, const Class&, const volatile D
 static_assert(test_is_trivially_assignable<false, const volatile Class&, Derived&>());
 static_assert(test_is_trivially_assignable<false, const volatile Class&, const Derived&>());
 static_assert(test_is_trivially_assignable<false, const volatile Class&, volatile Derived&>());
-static_assert(
-  test_is_trivially_assignable<false, const volatile Class&, const volatile Derived&>());
+static_assert(test_is_trivially_assignable<false, const volatile Class&, const volatile Derived&>());
 
 static_assert(test_is_trivially_assignable<true, Class&, Derived&&>());
 static_assert(test_is_trivially_assignable<true, Class&, const Derived&&>());
@@ -315,8 +312,7 @@ static_assert(test_is_trivially_assignable<false, const Class&, const volatile D
 static_assert(test_is_trivially_assignable<false, const volatile Class&, Derived&&>());
 static_assert(test_is_trivially_assignable<false, const volatile Class&, const Derived&&>());
 static_assert(test_is_trivially_assignable<false, const volatile Class&, volatile Derived&&>());
-static_assert(
-  test_is_trivially_assignable<false, const volatile Class&, const volatile Derived&&>());
+static_assert(test_is_trivially_assignable<false, const volatile Class&, const volatile Derived&&>());
 
 static_assert(test_is_trivially_assignable<true, Class&>());
 static_assert(test_is_trivially_assignable<true, Class&, Class>());
@@ -417,8 +413,7 @@ static_assert(test_is_trivially_assignable<false, const Class&&, const volatile 
 static_assert(test_is_trivially_assignable<false, const volatile Class&&, Derived&>());
 static_assert(test_is_trivially_assignable<false, const volatile Class&&, const Derived&>());
 static_assert(test_is_trivially_assignable<false, const volatile Class&&, volatile Derived&>());
-static_assert(
-  test_is_trivially_assignable<false, const volatile Class&&, const volatile Derived&>());
+static_assert(test_is_trivially_assignable<false, const volatile Class&&, const volatile Derived&>());
 
 static_assert(test_is_trivially_assignable<true, Class&&, Derived&&>());
 static_assert(test_is_trivially_assignable<true, Class&&, const Derived&&>());
@@ -435,8 +430,7 @@ static_assert(test_is_trivially_assignable<false, const Class&&, const volatile 
 static_assert(test_is_trivially_assignable<false, const volatile Class&&, Derived&&>());
 static_assert(test_is_trivially_assignable<false, const volatile Class&&, const Derived&&>());
 static_assert(test_is_trivially_assignable<false, const volatile Class&&, volatile Derived&&>());
-static_assert(
-  test_is_trivially_assignable<false, const volatile Class&&, const volatile Derived&&>());
+static_assert(test_is_trivially_assignable<false, const volatile Class&&, const volatile Derived&&>());
 
 static_assert(test_is_trivially_assignable<true, Class&&>());
 static_assert(test_is_trivially_assignable<true, Class&&, Class>());

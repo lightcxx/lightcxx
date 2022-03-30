@@ -15,8 +15,7 @@ constexpr bool test_add_const() {
     static_assert(std::is_same_v<typename std::add_const<volatile T>::type, const volatile T>);
 
     static_assert(std::is_same_v<std::add_const_t<const volatile T>, const volatile T>);
-    static_assert(
-      std::is_same_v<typename std::add_const<const volatile T>::type, const volatile T>);
+    static_assert(std::is_same_v<typename std::add_const<const volatile T>::type, const volatile T>);
 
     return true;
 }

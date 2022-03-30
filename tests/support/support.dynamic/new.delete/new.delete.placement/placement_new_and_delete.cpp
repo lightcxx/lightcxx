@@ -13,8 +13,7 @@ TEST() {
     expect(placed_ptr_natural == static_cast<void*>(space));
     ::operator delete(placed_ptr_natural, space);
 
-    const auto placed_arr_explicit
-      = ::operator new[](sizeof(long double), static_cast<void*>(space));
+    const auto placed_arr_explicit = ::operator new[](sizeof(long double), static_cast<void*>(space));
     expect(placed_arr_explicit == static_cast<void*>(space));
     ::operator delete[](placed_arr_explicit, space);
 

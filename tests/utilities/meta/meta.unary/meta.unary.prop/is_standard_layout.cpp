@@ -65,10 +65,8 @@ class ArrayElemBaseAsBase : public Empty {
     [[maybe_unused]] EmptyDerived arr[10];
 };
 
-TEST_UNARY_TRAIT_AGAINST_TYPES(true, is_standard_layout, EVERY_CV, Empty, EmptyDerived, Bits,
-                               AllPublic, AllProtected, AllPrivate, AllPublicDerived,
-                               AllPublicDerivedTwice, AllProtectedDerived, AllPrivateDerived,
-                               AllPrivateDerivedTwice, AllPublicWrapper, AllProtectedWrapper,
+TEST_UNARY_TRAIT_AGAINST_TYPES(true, is_standard_layout, EVERY_CV, Empty, EmptyDerived, Bits, AllPublic, AllProtected, AllPrivate, AllPublicDerived,
+                               AllPublicDerivedTwice, AllProtectedDerived, AllPrivateDerived, AllPrivateDerivedTwice, AllPublicWrapper, AllProtectedWrapper,
                                AllPrivateWrapper, MixedWrapper, ArrayElemBaseAsBase);
 
 class Mixed1 {
@@ -197,12 +195,9 @@ class UnionMemberAsBase : public AllPublic {
     };
 };
 
-TEST_UNARY_TRAIT_AGAINST_TYPES(false, is_standard_layout, EVERY_CV, Mixed1, Mixed2, Mixed3, Mixed4,
-                               Virtual1, Virtual2, Virtual3, Virtual4, VirtualBase1, VirtualBase2,
-                               Ref1, Ref2, Ref3, Ref4, Ref5, Ref6, Ref7, Ref8, NonStdLayoutMember,
-                               NonStdLayoutBase, DuplicateBaseClass, TwoBasesWithMembers,
-                               MembersAndBaseWithMembers, ArrayElemAsBase, ArrayElemAsIndirectBase,
-                               UnionMemberAsBase);
+TEST_UNARY_TRAIT_AGAINST_TYPES(false, is_standard_layout, EVERY_CV, Mixed1, Mixed2, Mixed3, Mixed4, Virtual1, Virtual2, Virtual3, Virtual4, VirtualBase1,
+                               VirtualBase2, Ref1, Ref2, Ref3, Ref4, Ref5, Ref6, Ref7, Ref8, NonStdLayoutMember, NonStdLayoutBase, DuplicateBaseClass,
+                               TwoBasesWithMembers, MembersAndBaseWithMembers, ArrayElemAsBase, ArrayElemAsIndirectBase, UnionMemberAsBase);
 
 union OneIntVariant {
     [[maybe_unused]] int x;
@@ -218,8 +213,7 @@ union StdLayoutArrayVariant {
     [[maybe_unused]] AllPublicDerived pub[10];
 };
 
-TEST_UNARY_TRAIT_AGAINST_TYPES(true, is_standard_layout, EVERY_CV, OneIntVariant, StdLayoutVariant,
-                               StdLayoutArrayVariant);
+TEST_UNARY_TRAIT_AGAINST_TYPES(true, is_standard_layout, EVERY_CV, OneIntVariant, StdLayoutVariant, StdLayoutArrayVariant);
 
 union NonStdLayoutVariant {
     [[maybe_unused]] int x, y, z;
@@ -236,5 +230,4 @@ union NonStdLayoutArrayVariant {
     [[maybe_unused]] UnionMemberAsBase invalid[10];
 };
 
-TEST_UNARY_TRAIT_AGAINST_TYPES(false, is_standard_layout, EVERY_CV, NonStdLayoutVariant,
-                               NonStdLayoutAndArrayVariant, NonStdLayoutArrayVariant);
+TEST_UNARY_TRAIT_AGAINST_TYPES(false, is_standard_layout, EVERY_CV, NonStdLayoutVariant, NonStdLayoutAndArrayVariant, NonStdLayoutArrayVariant);

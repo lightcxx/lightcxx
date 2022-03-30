@@ -20,7 +20,7 @@ using test_is_same_different_cv2 = std::is_same<const volatile T, T>;
 
 template<class T>
 inline constexpr auto test_is_same_different_cv2_v = is_same_v<const volatile T, T>;
-}
+}  // namespace std
 
 DECLARE_TRAIT_V_READER(test_is_same_true_v);
 DECLARE_TRAIT_V_READER(test_is_same_different_cv1_v);
@@ -68,11 +68,11 @@ TEST_UNARY_TRAIT_AGAINST_CLASS(false, test_is_same_different_cv2, NO_CV);
 // Test some conversion/similar type cases
 static_assert(!std::is_same_v<void*, std::nullptr_t>);
 static_assert(!std::is_same_v<int, long>);
-static_assert(!std::is_same_v<int(), int(&)()>);
-static_assert(!std::is_same_v<int(*)(), int(&)()>);
-static_assert(!std::is_same_v<int(*)(), int()>);
-static_assert(!std::is_same_v<int(*)(int), int(*)(long)>);
-static_assert(!std::is_same_v<int(*)(int), long(*)(int)>);
+static_assert(!std::is_same_v<int(), int (&)()>);
+static_assert(!std::is_same_v<int (*)(), int (&)()>);
+static_assert(!std::is_same_v<int (*)(), int()>);
+static_assert(!std::is_same_v<int (*)(int), int (*)(long)>);
+static_assert(!std::is_same_v<int (*)(int), long (*)(int)>);
 static_assert(!std::is_same_v<int*, int[]>);
 static_assert(!std::is_same_v<int*, int[10]>);
 static_assert(!std::is_same_v<int*, int[][10]>);

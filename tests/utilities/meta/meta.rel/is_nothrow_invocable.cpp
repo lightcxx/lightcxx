@@ -15,8 +15,7 @@ constexpr void expect_is_nothrow_invocable() {
     static_assert(std::is_nothrow_invocable<T...>{}() == e);
     static_assert(noexcept(std::is_nothrow_invocable<T...>{}()));
     static_assert(std::is_same_v<bool, decltype(std::is_nothrow_invocable<T...>{}())>);
-    static_assert(
-      std::is_same_v<typename std::is_nothrow_invocable<T...>::type, std::bool_constant<e>>);
+    static_assert(std::is_same_v<typename std::is_nothrow_invocable<T...>::type, std::bool_constant<e>>);
     static_assert(std::is_same_v<decltype(std::is_nothrow_invocable_v<T...>), const bool>);
     static_assert(std::is_nothrow_invocable_v<T...> == e);
 }

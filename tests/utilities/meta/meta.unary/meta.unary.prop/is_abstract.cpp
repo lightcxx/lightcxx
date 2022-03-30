@@ -38,8 +38,7 @@ class PrivatePolymorphicBase : private VirtualMethod {};
 
 class VirtualPolymorphicBase : virtual VirtualMethod {};
 
-TEST_UNARY_TRAIT_AGAINST_TYPES(false, is_abstract, EVERY_CV, Class, VirtualBase, VirtualDtor,
-                               VirtualMethod, PublicPolymorphicBase, ProtectedPolymorphicBase,
+TEST_UNARY_TRAIT_AGAINST_TYPES(false, is_abstract, EVERY_CV, Class, VirtualBase, VirtualDtor, VirtualMethod, PublicPolymorphicBase, ProtectedPolymorphicBase,
                                PrivatePolymorphicBase, VirtualPolymorphicBase);
 
 class PureVirtualDtor {
@@ -60,6 +59,5 @@ class PrivateAbstractBase : private PureVirtualMethod {};
 
 class VirtualAbstractBase : virtual PureVirtualMethod {};
 
-TEST_UNARY_TRAIT_AGAINST_TYPES(true, is_abstract, EVERY_CV, PureVirtualDtor, PureVirtualMethod,
-                               PublicAbstractBase, ProtectedAbstractBase, PrivateAbstractBase,
+TEST_UNARY_TRAIT_AGAINST_TYPES(true, is_abstract, EVERY_CV, PureVirtualDtor, PureVirtualMethod, PublicAbstractBase, ProtectedAbstractBase, PrivateAbstractBase,
                                VirtualAbstractBase);

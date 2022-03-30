@@ -39,8 +39,8 @@ static_assert(test_remove_all_extents<int[], int>());
 static_assert(test_remove_all_extents<int[][3], int>());
 static_assert(test_remove_all_extents<int[][3][4], int>());
 // Doesn't work for reference to array
-static_assert(test_remove_all_extents<int(&)[][3][4], int(&)[][3][4]>());
-static_assert(test_remove_all_extents<int(&)[2][3][4], int(&)[2][3][4]>());
+static_assert(test_remove_all_extents<int (&)[][3][4], int (&)[][3][4]>());
+static_assert(test_remove_all_extents<int (&)[2][3][4], int (&)[2][3][4]>());
 
 TEST_UNARY_TRAIT_AGAINST_POINTER(true, TEST, EVERY_CV);
 TEST_UNARY_TRAIT_AGAINST_LVALUE_REFERENCE(true, TEST);
@@ -53,8 +53,12 @@ TEST_UNARY_TRAIT_AGAINST_CLASS(true, TEST, EVERY_CV);
 TEST_UNARY_TRAIT_AGAINST_FUNCTION(true, TEST);
 
 TEST(example_from_std) {
-    static_assert(std::is_same_v<std::remove_all_extents_t<int>, int>);;
-    static_assert(std::is_same_v<std::remove_all_extents_t<int[2]>, int>);;
-    static_assert(std::is_same_v<std::remove_all_extents_t<int[2][3]>, int>);;
-    static_assert(std::is_same_v<std::remove_all_extents_t<int[][3]>, int>);;
+    static_assert(std::is_same_v<std::remove_all_extents_t<int>, int>);
+    ;
+    static_assert(std::is_same_v<std::remove_all_extents_t<int[2]>, int>);
+    ;
+    static_assert(std::is_same_v<std::remove_all_extents_t<int[2][3]>, int>);
+    ;
+    static_assert(std::is_same_v<std::remove_all_extents_t<int[][3]>, int>);
+    ;
 }

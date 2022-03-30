@@ -6,8 +6,7 @@ template<class T, T val>
 constexpr void test_integral_constant() {
     static_assert(std::integral_constant<T, val>::value == val);
     static_assert(std::is_same_v<T, typename std::integral_constant<T, val>::value_type>);
-    static_assert(std::is_same_v<std::integral_constant<T, val>,
-                                 typename std::integral_constant<T, val>::type>);
+    static_assert(std::is_same_v<std::integral_constant<T, val>, typename std::integral_constant<T, val>::type>);
     static_assert(std::integral_constant<T, val>{} == val);
     static_assert((T)std::integral_constant<T, val>{} == val);
     static_assert(noexcept((T)std::integral_constant<T, val>{}));

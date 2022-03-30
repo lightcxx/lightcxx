@@ -41,9 +41,9 @@ TEST(nullptr_t) {
 TEST(final_class) {
     try {
         std::throw_with_nested(Final());
-    } catch (Final& f) {
-        expect(dynamic_cast<const std::nested_exception*>(&f) == nullptr);
-    } catch (...) { fail(); }
+    } catch (Final& f) { expect(dynamic_cast<const std::nested_exception*>(&f) == nullptr); } catch (...) {
+        fail();
+    }
 }
 
 TEST(catch_by_original_type) {

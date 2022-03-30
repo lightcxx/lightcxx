@@ -15,8 +15,10 @@ namespace std {
 template<class T>
 struct TEST : bool_constant<test_add_lvalue_reference<T, T&>()> {};
 
-template<class T> requires is_void_v<T> || is_lvalue_reference_v<T>
-struct TEST<T> : bool_constant<test_add_lvalue_reference<T, T>()> {};
+template<class T>
+requires is_void_v<T> || is_lvalue_reference_v<T>
+struct TEST<T> : bool_constant<test_add_lvalue_reference<T, T>()> {
+};
 
 template<class T>
 inline constexpr bool TEST_v = TEST<T>::value;

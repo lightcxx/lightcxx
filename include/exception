@@ -108,9 +108,7 @@ struct _WithNested : public _T, public nested_exception {
 template<class _T>
 [[noreturn]] void throw_with_nested(_T&& __t) {
     using _U = decay_t<_T>;
-    static_assert(
-      is_copy_constructible_v<_U>,
-      "Decayed type of argument for std::throw_with_nested must be copy constructible.");
+    static_assert(is_copy_constructible_v<_U>, "Decayed type of argument for std::throw_with_nested must be copy constructible.");
     if constexpr (is_class_v<_U> && !is_final_v<_U> && !is_base_of_v<nested_exception, _U>) {
         throw _Light::_WithNested<_U>(forward<_T>(__t));
     } else {
@@ -121,8 +119,7 @@ template<class _T>
 template<class _E>
 void rethrow_if_nested(const _E& __e) {
     if constexpr (is_polymorphic_v<_E>) {
-        if constexpr (!is_base_of_v<nested_exception,
-                                    _E> || is_convertible_v<const _E*, const nested_exception*>) {
+        if constexpr (!is_base_of_v<nested_exception, _E> || is_convertible_v<const _E*, const nested_exception*>) {
             if (const auto __n_exc = dynamic_cast<const nested_exception*>(addressof(__e))) {
                 __n_exc->rethrow_nested();
             }

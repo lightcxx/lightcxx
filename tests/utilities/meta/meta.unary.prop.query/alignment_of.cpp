@@ -4,8 +4,7 @@
 
 DECLARE_TRAIT_V_READER(alignment_of_v);
 
-#define TEST_TYPE(TP, value)                                                                              \
-    static_assert(test_unary_prop_query<std::alignment_of, alignment_of_v_reader, TP, value>())
+#define TEST_TYPE(TP, value) static_assert(test_unary_prop_query<std::alignment_of, alignment_of_v_reader, TP, value>())
 
 TEST_TYPE(bool, 1);
 TEST_TYPE(char, 1);

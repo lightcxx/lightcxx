@@ -32,16 +32,11 @@ TEST_UNARY_TRAIT_AGAINST_POINTER(true, is_nothrow_swappable, VOLATILE);
 TEST_UNARY_TRAIT_AGAINST_POINTER(false, is_nothrow_swappable, CONST);
 TEST_UNARY_TRAIT_AGAINST_POINTER(false, is_nothrow_swappable, CONST_VOLATILE);
 
-TEST_UNARY_TRAIT_AGAINST_TYPES(true, is_nothrow_swappable, NO_CV, int&, volatile int&, int*&,
-                               int* volatile&);
-TEST_UNARY_TRAIT_AGAINST_TYPES(false, is_nothrow_swappable, NO_CV, const int&, const volatile int&,
-                               int* const&, int* const volatile&, int (&)(int));
+TEST_UNARY_TRAIT_AGAINST_TYPES(true, is_nothrow_swappable, NO_CV, int&, volatile int&, int*&, int* volatile&);
+TEST_UNARY_TRAIT_AGAINST_TYPES(false, is_nothrow_swappable, NO_CV, const int&, const volatile int&, int* const&, int* const volatile&, int (&)(int));
 
-TEST_UNARY_TRAIT_AGAINST_TYPES(true, is_nothrow_swappable, NO_CV, int&&, volatile int&&, int*&&,
-                               int* volatile&&);
-TEST_UNARY_TRAIT_AGAINST_TYPES(false, is_nothrow_swappable, NO_CV, const int&&,
-                               const volatile int&&, int* const&&, int* const volatile&&,
-                               int(&&)(int));
+TEST_UNARY_TRAIT_AGAINST_TYPES(true, is_nothrow_swappable, NO_CV, int&&, volatile int&&, int*&&, int* volatile&&);
+TEST_UNARY_TRAIT_AGAINST_TYPES(false, is_nothrow_swappable, NO_CV, const int&&, const volatile int&&, int* const&&, int* const volatile&&, int(&&)(int));
 
 TEST_UNARY_TRAIT_AGAINST_MEMBER_OBJECT_POINTER(true, is_nothrow_swappable, NO_CV);
 TEST_UNARY_TRAIT_AGAINST_MEMBER_OBJECT_POINTER(true, is_nothrow_swappable, VOLATILE);
@@ -118,8 +113,7 @@ void swap(ADLSwap&, ADLSwap&) noexcept(false) {}
 
 }  // namespace ns
 
-TEST_UNARY_TRAIT_AGAINST_TYPES(false, is_nothrow_swappable, EVERY_CV, NoMoveCtorNoMoveAssign,
-                               NoMoveCtor, NoMoveAssign, ns2::GlobalSwap, ns2::GlobalNothrowSwap,
+TEST_UNARY_TRAIT_AGAINST_TYPES(false, is_nothrow_swappable, EVERY_CV, NoMoveCtorNoMoveAssign, NoMoveCtor, NoMoveAssign, ns2::GlobalSwap, ns2::GlobalNothrowSwap,
                                HiddenFriendSwap, ns::ADLSwap);
 
 struct HiddenFriendNothrowSwap {
@@ -140,11 +134,7 @@ void swap(ADLNothrowSwap&, ADLNothrowSwap&) noexcept {}
 
 }  // namespace ns
 
-TEST_UNARY_TRAIT_AGAINST_TYPES(true, is_nothrow_swappable, NO_CV, HiddenFriendNothrowSwap,
-                               ns::ADLNothrowSwap);
-TEST_UNARY_TRAIT_AGAINST_TYPES(false, is_nothrow_swappable, VOLATILE, HiddenFriendNothrowSwap,
-                               ns::ADLNothrowSwap);
-TEST_UNARY_TRAIT_AGAINST_TYPES(false, is_nothrow_swappable, CONST, HiddenFriendNothrowSwap,
-                               ns::ADLNothrowSwap);
-TEST_UNARY_TRAIT_AGAINST_TYPES(false, is_nothrow_swappable, CONST_VOLATILE, HiddenFriendNothrowSwap,
-                               ns::ADLNothrowSwap);
+TEST_UNARY_TRAIT_AGAINST_TYPES(true, is_nothrow_swappable, NO_CV, HiddenFriendNothrowSwap, ns::ADLNothrowSwap);
+TEST_UNARY_TRAIT_AGAINST_TYPES(false, is_nothrow_swappable, VOLATILE, HiddenFriendNothrowSwap, ns::ADLNothrowSwap);
+TEST_UNARY_TRAIT_AGAINST_TYPES(false, is_nothrow_swappable, CONST, HiddenFriendNothrowSwap, ns::ADLNothrowSwap);
+TEST_UNARY_TRAIT_AGAINST_TYPES(false, is_nothrow_swappable, CONST_VOLATILE, HiddenFriendNothrowSwap, ns::ADLNothrowSwap);

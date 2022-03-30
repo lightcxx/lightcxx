@@ -15,14 +15,11 @@ class NoDfltCtor {
 class ThrowingDfltCtor {
     ThrowingDfltCtor() noexcept(false);
 };
-TEST_UNARY_TRAIT_AGAINST_TYPES(true, is_nothrow_default_constructible, EVERY_CV, int[10],
-                               int[10][10], Class[10], Class[10][10], Enum[10], Enum[10][10],
+TEST_UNARY_TRAIT_AGAINST_TYPES(true, is_nothrow_default_constructible, EVERY_CV, int[10], int[10][10], Class[10], Class[10][10], Enum[10], Enum[10][10],
                                Union[10], Union[10][10]);
-TEST_UNARY_TRAIT_AGAINST_TYPES(false, is_nothrow_default_constructible, EVERY_CV, int[], int[][10],
-                               int[][10][10], Class[], Class[][10], Enum[], Enum[][10], Union[],
-                               Union[][10], NoDfltCtor[10], NoDfltCtor[10][10], NoDfltCtor[],
-                               NoDfltCtor[][10], ThrowingDfltCtor[10], ThrowingDfltCtor[10][10],
-                               ThrowingDfltCtor[], ThrowingDfltCtor[][10]);
+TEST_UNARY_TRAIT_AGAINST_TYPES(false, is_nothrow_default_constructible, EVERY_CV, int[], int[][10], int[][10][10], Class[], Class[][10], Enum[], Enum[][10],
+                               Union[], Union[][10], NoDfltCtor[10], NoDfltCtor[10][10], NoDfltCtor[], NoDfltCtor[][10], ThrowingDfltCtor[10],
+                               ThrowingDfltCtor[10][10], ThrowingDfltCtor[], ThrowingDfltCtor[][10]);
 
 TEST_UNARY_TRAIT_AGAINST_POINTER(true, is_nothrow_default_constructible, EVERY_CV);
 TEST_UNARY_TRAIT_AGAINST_LVALUE_REFERENCE(false, is_nothrow_default_constructible);
@@ -32,6 +29,5 @@ TEST_UNARY_TRAIT_AGAINST_MEMBER_FUNCTION_POINTER(true, is_nothrow_default_constr
 TEST_UNARY_TRAIT_AGAINST_ENUM(true, is_nothrow_default_constructible, EVERY_CV);
 TEST_UNARY_TRAIT_AGAINST_UNION(true, is_nothrow_default_constructible, EVERY_CV);
 TEST_UNARY_TRAIT_AGAINST_CLASS(true, is_nothrow_default_constructible, EVERY_CV);
-TEST_UNARY_TRAIT_AGAINST_TYPES(false, is_nothrow_default_constructible, EVERY_CV, NoDfltCtor,
-                               ThrowingDfltCtor);
+TEST_UNARY_TRAIT_AGAINST_TYPES(false, is_nothrow_default_constructible, EVERY_CV, NoDfltCtor, ThrowingDfltCtor);
 TEST_UNARY_TRAIT_AGAINST_FUNCTION(false, is_nothrow_default_constructible);

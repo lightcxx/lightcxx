@@ -17,8 +17,7 @@ TEST() {
     std::exception_ptr exc_ptr;
 
     expect_type(std::exception_ptr, std::current_exception());
-    [[maybe_unused]] const auto rethrow_exception_lambda
-      = [&exc_ptr]() { std::rethrow_exception(exc_ptr); };
+    [[maybe_unused]] const auto rethrow_exception_lambda = [&exc_ptr]() { std::rethrow_exception(exc_ptr); };
     expect_type(std::exception_ptr, std::make_exception_ptr(14));
 
     static_assert(std::is_same_v<std::add_pointer_t<int>, int*>);

@@ -189,8 +189,7 @@ static_assert(test_scalar_or_union<Class * Class::*>());
 static_assert(test_scalar_or_union<int (Class::*)(int, int)>());
 static_assert(test_scalar_or_union<Class (Class::*)(int, Class Class::*)>());
 static_assert(test_scalar_or_union<Class Class::* (Class::*)(int, int)>());
-static_assert(
-  test_is_assignable<false, int (Class::*)(int, int), Class Class::* (Class::*)(int, int)>());
+static_assert(test_is_assignable<false, int (Class::*)(int, int), Class Class::* (Class::*)(int, int)>());
 static_assert(test_scalar_or_union<Enum>());
 static_assert(test_scalar_or_union<EnumClass>());
 static_assert(test_is_assignable<false, Enum, EnumClass>());

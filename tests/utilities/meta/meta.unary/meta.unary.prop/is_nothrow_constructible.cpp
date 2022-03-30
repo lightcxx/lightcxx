@@ -13,8 +13,7 @@ constexpr bool test_is_nothrow_constructible() {
     bool b7 = std::is_nothrow_constructible<T, Args...>{}() == e;
     bool b8 = noexcept(std::is_nothrow_constructible<T, Args...>{}());
     bool b9 = std::is_same_v<bool, decltype(std::is_nothrow_constructible<T, Args...>{}())>;
-    bool b10 = std::is_same_v<typename std::is_nothrow_constructible<T, Args...>::type,
-                              std::bool_constant<e>>;
+    bool b10 = std::is_same_v<typename std::is_nothrow_constructible<T, Args...>::type, std::bool_constant<e>>;
     bool b11 = std::is_same_v<decltype(std::is_nothrow_constructible_v<T, Args...>), const bool>;
     bool b12 = std::is_nothrow_constructible_v<T, Args...> == e;
     return b1 && b2 && b3 && b4 && b5 && b6 && b7 && b8 && b9 && b10 && b11 && b12;
@@ -125,8 +124,7 @@ constexpr bool test_scalar_or_union() {
     static_assert(test_is_nothrow_constructible<!is_union, const volatile T, volatile U &&>());
     static_assert(test_is_nothrow_constructible<!is_union, const volatile T, const volatile U>());
     static_assert(test_is_nothrow_constructible<!is_union, const volatile T, const volatile U&>());
-    static_assert(
-      test_is_nothrow_constructible<!is_union, const volatile T, const volatile U &&>());
+    static_assert(test_is_nothrow_constructible<!is_union, const volatile T, const volatile U &&>());
     // With an implicit conversion
     static_assert(test_is_nothrow_constructible<true, const volatile T, ConvertsTo<U>>());
     static_assert(test_is_nothrow_constructible<true, const volatile T, ConvertsTo<U>&>());
@@ -196,8 +194,7 @@ static_assert(test_scalar_or_union<Class * Class::*>());
 static_assert(test_scalar_or_union<int (Class::*)(int, int)>());
 static_assert(test_scalar_or_union<Class (Class::*)(int, Class Class::*)>());
 static_assert(test_scalar_or_union<Class Class::* (Class::*)(int, int)>());
-static_assert(test_is_nothrow_constructible<false, int (Class::*)(int, int),
-                                            Class Class::* (Class::*)(int, int)>());
+static_assert(test_is_nothrow_constructible<false, int (Class::*)(int, int), Class Class::* (Class::*)(int, int)>());
 static_assert(test_scalar_or_union<Enum>());
 static_assert(test_scalar_or_union<EnumClass>());
 static_assert(test_is_nothrow_constructible<false, Enum, EnumClass>());
@@ -310,8 +307,7 @@ static_assert(test_is_nothrow_constructible<false, const Class&, const volatile 
 static_assert(test_is_nothrow_constructible<true, const volatile Class&, Derived&>());
 static_assert(test_is_nothrow_constructible<true, const volatile Class&, const Derived&>());
 static_assert(test_is_nothrow_constructible<true, const volatile Class&, volatile Derived&>());
-static_assert(
-  test_is_nothrow_constructible<true, const volatile Class&, const volatile Derived&>());
+static_assert(test_is_nothrow_constructible<true, const volatile Class&, const volatile Derived&>());
 
 static_assert(test_is_nothrow_constructible<false, Class&, Derived&&>());
 static_assert(test_is_nothrow_constructible<false, Class&, const Derived&&>());
@@ -328,8 +324,7 @@ static_assert(test_is_nothrow_constructible<false, const Class&, const volatile 
 static_assert(test_is_nothrow_constructible<false, const volatile Class&, Derived&&>());
 static_assert(test_is_nothrow_constructible<false, const volatile Class&, const Derived&&>());
 static_assert(test_is_nothrow_constructible<false, const volatile Class&, volatile Derived&&>());
-static_assert(
-  test_is_nothrow_constructible<false, const volatile Class&, const volatile Derived&&>());
+static_assert(test_is_nothrow_constructible<false, const volatile Class&, const volatile Derived&&>());
 // endregion
 
 // region rvalue reference
@@ -412,8 +407,7 @@ static_assert(test_is_nothrow_constructible<false, const Class&&, const volatile
 static_assert(test_is_nothrow_constructible<false, const volatile Class&&, Derived&>());
 static_assert(test_is_nothrow_constructible<false, const volatile Class&&, const Derived&>());
 static_assert(test_is_nothrow_constructible<false, const volatile Class&&, volatile Derived&>());
-static_assert(
-  test_is_nothrow_constructible<false, const volatile Class&&, const volatile Derived&>());
+static_assert(test_is_nothrow_constructible<false, const volatile Class&&, const volatile Derived&>());
 
 static_assert(test_is_nothrow_constructible<true, Class&&, Derived&&>());
 static_assert(test_is_nothrow_constructible<false, Class&&, const Derived&&>());
@@ -430,8 +424,7 @@ static_assert(test_is_nothrow_constructible<false, const Class&&, const volatile
 static_assert(test_is_nothrow_constructible<true, const volatile Class&&, Derived&&>());
 static_assert(test_is_nothrow_constructible<true, const volatile Class&&, const Derived&&>());
 static_assert(test_is_nothrow_constructible<true, const volatile Class&&, volatile Derived&&>());
-static_assert(
-  test_is_nothrow_constructible<true, const volatile Class&&, const volatile Derived&&>());
+static_assert(test_is_nothrow_constructible<true, const volatile Class&&, const volatile Derived&&>());
 // endregion
 
 // region union

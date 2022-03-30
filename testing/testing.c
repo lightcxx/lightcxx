@@ -7,8 +7,7 @@ static int testing_stored_argc;
 static char** testing_stored_argv;
 
 void testing_fail_impl(const char* func, const char* file, int line) {
-    fprintf(stderr, "EXPECTATION FAILED in test %s: in function %s (%s:%d)\n",
-            testing_current_test_name, func, file, line);
+    fprintf(stderr, "EXPECTATION FAILED in test %s: in function %s (%s:%d)\n", testing_current_test_name, func, file, line);
     _Exit(1);
 }
 

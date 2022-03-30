@@ -12,7 +12,7 @@ TEST() {
     try {
         [[maybe_unused]] const char* name = typeid(*p).name();
         fail();
-    } catch (const std::bad_typeid& e) {
-        expect(default_constructed.what() == e.what());
-    } catch (...) { fail(); }
+    } catch (const std::bad_typeid& e) { expect(default_constructed.what() == e.what()); } catch (...) {
+        fail();
+    }
 }

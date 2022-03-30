@@ -29,8 +29,7 @@ TEST() {
     expect_ct_and_rt((::std::size_t)5 == 5);
 
     [[maybe_unused]] const auto env_var = ::std::getenv("ENV_VAR");
-    [[maybe_unused]] const auto system_lambda
-      = []() { return ::std::system("echo ::std::system"); };
+    [[maybe_unused]] const auto system_lambda = []() { return ::std::system("echo ::std::system"); };
 
     // We don't actually want to call these, just see that they compile.
     [[maybe_unused]] auto abort_lambda = []() { ::std::abort(); };
@@ -83,18 +82,15 @@ TEST() {
     ::std::free(characters);
 
     int a[] = {5, 2, 4, 1, 3};
-    ::std::qsort(a, 5, sizeof(int),
-                 [](const void* a, const void* b) { return *((int*)a) - *((int*)b); });
+    ::std::qsort(a, 5, sizeof(int), [](const void* a, const void* b) { return *((int*)a) - *((int*)b); });
     expect(a[0] == 1 && a[1] == 2 && a[2] == 3 && a[3] == 4 && a[4] == 5);
 
     int key = 2;
-    auto ptr = ::std::bsearch(&key, a, 5, sizeof(int),
-                              [](const void* a, const void* b) { return *((int*)a) - *((int*)b); });
+    auto ptr = ::std::bsearch(&key, a, 5, sizeof(int), [](const void* a, const void* b) { return *((int*)a) - *((int*)b); });
     expect(*((int*)ptr) == 2);
     expect(((int*)ptr - (int*)a) == 1);
     key = 16;
-    ptr = ::std::bsearch(&key, a, 5, sizeof(int),
-                         [](const void* a, const void* b) { return *((int*)a) - *((int*)b); });
+    ptr = ::std::bsearch(&key, a, 5, sizeof(int), [](const void* a, const void* b) { return *((int*)a) - *((int*)b); });
     expect(ptr == nullptr);
 
     ::std::srand(5);

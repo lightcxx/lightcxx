@@ -20,7 +20,6 @@ constexpr bool test_is_base_of() {
     return true;
 }
 
-
 template<class Base, class Derived, bool e>
 constexpr bool test_all_cvs() {
     static_assert(test_is_base_of<Base, Derived, e>());
@@ -65,13 +64,13 @@ static_assert(test_all_cvs<int, B, false>());
 static_assert(test_all_cvs<B&, B*, false>());
 static_assert(test_all_cvs<int, int, false>());
 
-struct B_protected: protected B {};
+struct B_protected : protected B {};
 static_assert(test_all_cvs<B, B_protected, true>());
 
-struct B_private: private B {};
+struct B_private : private B {};
 static_assert(test_all_cvs<B, B_private, true>());
 
-struct B_virtual: virtual B {};
+struct B_virtual : virtual B {};
 static_assert(test_all_cvs<B, B_virtual, true>());
 
 // Examples provided in the standard draft

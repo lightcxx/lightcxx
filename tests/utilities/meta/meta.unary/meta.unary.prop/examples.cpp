@@ -11,9 +11,9 @@ static_assert(std::is_const_v<const int[3]>);
 
 // #unary.prop-7
 // Given:
-struct P final { };
-union U1 { };
-union U2 final { };
+struct P final {};
+union U1 {};
+union U2 final {};
 
 // the following assertions hold:
 static_assert(!std::is_final_v<int>);

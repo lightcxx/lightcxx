@@ -13,8 +13,7 @@ constexpr void expect_is_nothrow_convertible() {
     static_assert(std::is_nothrow_convertible<From, To>{}() == e);
     static_assert(noexcept(std::is_nothrow_convertible<From, To>{}()));
     static_assert(std::is_same_v<bool, decltype(std::is_nothrow_convertible<From, To>{}())>);
-    static_assert(
-      std::is_same_v<typename std::is_nothrow_convertible<From, To>::type, std::bool_constant<e>>);
+    static_assert(std::is_same_v<typename std::is_nothrow_convertible<From, To>::type, std::bool_constant<e>>);
     static_assert(std::is_same_v<decltype(std::is_nothrow_convertible_v<From, To>), const bool>);
     static_assert(std::is_nothrow_convertible_v<From, To> == e);
 }

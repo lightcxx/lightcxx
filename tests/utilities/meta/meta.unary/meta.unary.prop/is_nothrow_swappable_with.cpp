@@ -13,8 +13,7 @@ constexpr bool test_is_nothrow_swappable_with() {
     bool b7 = std::is_nothrow_swappable_with<T, U>{}() == e;
     bool b8 = noexcept(std::is_nothrow_swappable_with<T, U>{}());
     bool b9 = std::is_same_v<bool, decltype(std::is_nothrow_swappable_with<T, U>{}())>;
-    bool b10
-      = std::is_same_v<typename std::is_nothrow_swappable_with<T, U>::type, std::bool_constant<e>>;
+    bool b10 = std::is_same_v<typename std::is_nothrow_swappable_with<T, U>::type, std::bool_constant<e>>;
     bool b11 = std::is_same_v<decltype(std::is_nothrow_swappable_with_v<T, U>), const bool>;
     bool b12 = std::is_nothrow_swappable_with_v<T, U> == e;
     return b1 && b2 && b3 && b4 && b5 && b6 && b7 && b8 && b9 && b10 && b11 && b12;
@@ -310,8 +309,7 @@ static_assert(test_scalar<Class * Class::*>());
 static_assert(test_scalar<int (Class::*)(int, int)>());
 static_assert(test_scalar<Class (Class::*)(int, Class Class::*)>());
 static_assert(test_scalar<Class Class::* (Class::*)(int, int)>());
-static_assert(test_is_nothrow_swappable_with<false, int (Class::*)(int, int),
-                                             Class Class::* (Class::*)(int, int)>());
+static_assert(test_is_nothrow_swappable_with<false, int (Class::*)(int, int), Class Class::* (Class::*)(int, int)>());
 static_assert(test_scalar<Enum>());
 static_assert(test_scalar<EnumClass>());
 static_assert(test_is_nothrow_swappable_with<false, Enum, EnumClass>());

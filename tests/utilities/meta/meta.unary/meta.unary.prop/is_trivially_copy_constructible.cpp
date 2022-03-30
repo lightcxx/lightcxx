@@ -13,10 +13,8 @@ TEST_UNARY_TRAIT_AGAINST_POINTER(true, is_trivially_copy_constructible, EVERY_CV
 TEST_UNARY_TRAIT_AGAINST_LVALUE_REFERENCE(true, is_trivially_copy_constructible);
 
 // rvalue references -- false for everything except function references
-TEST_UNARY_TRAIT_AGAINST_TYPES(false, is_trivially_copy_constructible, NO_CV, int&&, const int&&,
-                               volatile int&&, const volatile int&&, int*&&, int* const&&,
-                               int* volatile&&, int* const volatile&&, incomplete_type&&,
-                               const incomplete_type&&, volatile incomplete_type&&,
+TEST_UNARY_TRAIT_AGAINST_TYPES(false, is_trivially_copy_constructible, NO_CV, int&&, const int&&, volatile int&&, const volatile int&&, int*&&, int* const&&,
+                               int* volatile&&, int* const volatile&&, incomplete_type&&, const incomplete_type&&, volatile incomplete_type&&,
                                const volatile incomplete_type&&);
 TEST_UNARY_TRAIT_AGAINST_TYPES(true, is_trivially_copy_constructible, NO_CV, int(&&)(int));
 
@@ -56,7 +54,6 @@ TEST_UNARY_TRAIT_AGAINST_TYPES(true, is_trivially_copy_constructible, NO_CV, NoM
 TEST_UNARY_TRAIT_AGAINST_TYPES(true, is_trivially_copy_constructible, CONST, NoMoveCtor);
 TEST_UNARY_TRAIT_AGAINST_TYPES(false, is_trivially_copy_constructible, VOLATILE, NoMoveCtor);
 TEST_UNARY_TRAIT_AGAINST_TYPES(false, is_trivially_copy_constructible, CONST_VOLATILE, NoMoveCtor);
-TEST_UNARY_TRAIT_AGAINST_TYPES(false, is_trivially_copy_constructible, EVERY_CV, NoCopyCtor,
-                               NoCopyNoMoveCtor, NonTrivialCopyCtor);
+TEST_UNARY_TRAIT_AGAINST_TYPES(false, is_trivially_copy_constructible, EVERY_CV, NoCopyCtor, NoCopyNoMoveCtor, NonTrivialCopyCtor);
 
 TEST_UNARY_TRAIT_AGAINST_FUNCTION(false, is_trivially_copy_constructible);

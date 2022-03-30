@@ -28,20 +28,13 @@ TEST_UNARY_TRAIT_AGAINST_POINTER(true, is_nothrow_move_assignable, VOLATILE);
 TEST_UNARY_TRAIT_AGAINST_POINTER(false, is_nothrow_move_assignable, CONST);
 TEST_UNARY_TRAIT_AGAINST_POINTER(false, is_nothrow_move_assignable, CONST_VOLATILE);
 
-TEST_UNARY_TRAIT_AGAINST_TYPES(false, is_nothrow_move_assignable, NO_CV, const int&,
-                               const volatile int&, int (&)(int), int* const&, int* const volatile&,
-                               incomplete_type&, const incomplete_type&, volatile incomplete_type&,
-                               const volatile incomplete_type&);
-TEST_UNARY_TRAIT_AGAINST_TYPES(true, is_nothrow_move_assignable, NO_CV, int&, volatile int&, int*&,
-                               int* volatile&);
+TEST_UNARY_TRAIT_AGAINST_TYPES(false, is_nothrow_move_assignable, NO_CV, const int&, const volatile int&, int (&)(int), int* const&, int* const volatile&,
+                               incomplete_type&, const incomplete_type&, volatile incomplete_type&, const volatile incomplete_type&);
+TEST_UNARY_TRAIT_AGAINST_TYPES(true, is_nothrow_move_assignable, NO_CV, int&, volatile int&, int*&, int* volatile&);
 
-TEST_UNARY_TRAIT_AGAINST_TYPES(false, is_nothrow_move_assignable, NO_CV, const int&&,
-                               const volatile int&&, int* const&&, int* const volatile&&,
-                               incomplete_type&&, const incomplete_type&&,
-                               volatile incomplete_type&&, const volatile incomplete_type&&,
-                               int(&&)(int));
-TEST_UNARY_TRAIT_AGAINST_TYPES(true, is_nothrow_move_assignable, NO_CV, int&&, volatile int&&,
-                               int*&&, int* volatile&&);
+TEST_UNARY_TRAIT_AGAINST_TYPES(false, is_nothrow_move_assignable, NO_CV, const int&&, const volatile int&&, int* const&&, int* const volatile&&,
+                               incomplete_type&&, const incomplete_type&&, volatile incomplete_type&&, const volatile incomplete_type&&, int(&&)(int));
+TEST_UNARY_TRAIT_AGAINST_TYPES(true, is_nothrow_move_assignable, NO_CV, int&&, volatile int&&, int*&&, int* volatile&&);
 
 TEST_UNARY_TRAIT_AGAINST_MEMBER_OBJECT_POINTER(true, is_nothrow_move_assignable, NO_CV);
 TEST_UNARY_TRAIT_AGAINST_MEMBER_OBJECT_POINTER(true, is_nothrow_move_assignable, VOLATILE);
@@ -96,7 +89,6 @@ TEST_UNARY_TRAIT_AGAINST_TYPES(true, is_nothrow_move_assignable, NO_CV, NoCopyNo
 TEST_UNARY_TRAIT_AGAINST_TYPES(false, is_nothrow_move_assignable, CONST, NoCopyAssignOp);
 TEST_UNARY_TRAIT_AGAINST_TYPES(false, is_nothrow_move_assignable, VOLATILE, NoCopyAssignOp);
 TEST_UNARY_TRAIT_AGAINST_TYPES(false, is_nothrow_move_assignable, CONST_VOLATILE, NoCopyAssignOp);
-TEST_UNARY_TRAIT_AGAINST_TYPES(false, is_nothrow_move_assignable, EVERY_CV, NoCopyAssignOp,
-                               NoMoveAssignOp, NoCopyNoMoveAssignOp);
+TEST_UNARY_TRAIT_AGAINST_TYPES(false, is_nothrow_move_assignable, EVERY_CV, NoCopyAssignOp, NoMoveAssignOp, NoCopyNoMoveAssignOp);
 
 TEST_UNARY_TRAIT_AGAINST_FUNCTION(false, is_nothrow_move_assignable);

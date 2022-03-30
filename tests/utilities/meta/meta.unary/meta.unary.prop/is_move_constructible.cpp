@@ -12,12 +12,9 @@ TEST_UNARY_TRAIT_AGAINST_ARRAY(false, is_move_constructible, EVERY_CV);
 TEST_UNARY_TRAIT_AGAINST_POINTER(true, is_move_constructible, EVERY_CV);
 
 // lvalue references -- false for everything except function & const references
-TEST_UNARY_TRAIT_AGAINST_TYPES(false, is_move_constructible, NO_CV, int&, volatile int&,
-                               const volatile int&, int*&, int* volatile&, int* const volatile&,
-                               incomplete_type&, volatile incomplete_type&,
-                               const volatile incomplete_type&);
-TEST_UNARY_TRAIT_AGAINST_TYPES(true, is_move_constructible, NO_CV, const int&, int (&)(int),
-                               int* const&, const incomplete_type&);
+TEST_UNARY_TRAIT_AGAINST_TYPES(false, is_move_constructible, NO_CV, int&, volatile int&, const volatile int&, int*&, int* volatile&, int* const volatile&,
+                               incomplete_type&, volatile incomplete_type&, const volatile incomplete_type&);
+TEST_UNARY_TRAIT_AGAINST_TYPES(true, is_move_constructible, NO_CV, const int&, int (&)(int), int* const&, const incomplete_type&);
 
 TEST_UNARY_TRAIT_AGAINST_RVALUE_REFERENCE(true, is_move_constructible);
 TEST_UNARY_TRAIT_AGAINST_MEMBER_OBJECT_POINTER(true, is_move_constructible, EVERY_CV);

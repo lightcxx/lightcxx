@@ -9,8 +9,7 @@ TEST_UNARY_TRAIT_AGAINST_NULLPTR_T(true, is_trivially_destructible, EVERY_CV);
 TEST_UNARY_TRAIT_AGAINST_INTEGRAL(true, is_trivially_destructible, EVERY_CV);
 TEST_UNARY_TRAIT_AGAINST_FLOATING_POINT(true, is_trivially_destructible, EVERY_CV);
 TEST_UNARY_TRAIT_AGAINST_TYPES(true, is_trivially_destructible, EVERY_CV, int[10], int[10][10]);
-TEST_UNARY_TRAIT_AGAINST_TYPES(false, is_trivially_destructible, EVERY_CV, int[], int[][10],
-                               int[][10][10]);
+TEST_UNARY_TRAIT_AGAINST_TYPES(false, is_trivially_destructible, EVERY_CV, int[], int[][10], int[][10][10]);
 TEST_UNARY_TRAIT_AGAINST_POINTER(true, is_trivially_destructible, EVERY_CV);
 TEST_UNARY_TRAIT_AGAINST_LVALUE_REFERENCE(true, is_trivially_destructible);
 TEST_UNARY_TRAIT_AGAINST_RVALUE_REFERENCE(true, is_trivially_destructible);
@@ -90,12 +89,9 @@ class ClassWithProtectedDtorBaseAndDefinedDtor : public ClassWithProtectedDtor {
     ~ClassWithProtectedDtorBaseAndDefinedDtor() {}
 };
 
-TEST_UNARY_TRAIT_AGAINST_TYPES(false, is_trivially_destructible, EVERY_CV, ClassWithDeletedDtor,
-                               ClassWithDeletedDtorMember, ClassWithProtectedDtor,
-                               ClassWithPrivateDtor, ClassWithPrivateDtorBase, IncompleteClass,
-                               UnionWithDeletedDtor, UnionWithProtectedDtor, UnionWithPrivateDtor,
-                               ClassWithDefinedDtor, UnionWithDefinedDtor,
-                               ClassWithProtectedDtorBase,
+TEST_UNARY_TRAIT_AGAINST_TYPES(false, is_trivially_destructible, EVERY_CV, ClassWithDeletedDtor, ClassWithDeletedDtorMember, ClassWithProtectedDtor,
+                               ClassWithPrivateDtor, ClassWithPrivateDtorBase, IncompleteClass, UnionWithDeletedDtor, UnionWithProtectedDtor,
+                               UnionWithPrivateDtor, ClassWithDefinedDtor, UnionWithDefinedDtor, ClassWithProtectedDtorBase,
                                ClassWithProtectedDtorBaseAndDefinedDtor);
 
 class ClassWithDefaultedDtor {
@@ -113,5 +109,4 @@ union UnionWithDefaultedDtor {
     ~UnionWithDefaultedDtor() = default;
 };
 
-TEST_UNARY_TRAIT_AGAINST_TYPES(true, is_trivially_destructible, EVERY_CV, ClassWithDefaultedDtor,
-                               UnionWithDefaultedDtor);
+TEST_UNARY_TRAIT_AGAINST_TYPES(true, is_trivially_destructible, EVERY_CV, ClassWithDefaultedDtor, UnionWithDefaultedDtor);

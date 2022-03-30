@@ -29,14 +29,20 @@ inline constexpr bool same_type<T, T> = true;
 
 }  // namespace Testing
 
+namespace tests_namespace {
+
+using namespace ::Testing;
+
+}  // namespace tests_namespace
+
 #define fail() testing_fail_impl(__func__, __FILE__, __LINE__)
 
 #define step(...) testing_step_impl(__VA_ARGS__)
 
 #define expect(cnd) testing_expect_impl(cnd, __func__, __FILE__, __LINE__)
 
-#define expect_ct_and_rt(...)                                                                      \
-    testing_expect_impl(__VA_ARGS__, __func__, __FILE__, __LINE__);                                \
+#define expect_ct_and_rt(...)                                                                                                                                  \
+    testing_expect_impl(__VA_ARGS__, __func__, __FILE__, __LINE__);                                                                                            \
     static_assert(__VA_ARGS__)
 
 #define expect_is_noexcept(...) static_assert(noexcept(__VA_ARGS__))
@@ -44,18 +50,17 @@ inline constexpr bool same_type<T, T> = true;
 
 #define expect_same_type(...) static_assert(::Testing::same_type<__VA_ARGS__>)
 
-#define expect_type(expected_type, expr)                                                           \
-    static_assert(::Testing::same_type<expected_type, decltype((expr))>)
+#define expect_type(expected_type, expr) static_assert(::Testing::same_type<expected_type, decltype((expr))>)
 
-#define expect_type_and_value(expr, type, value)                                                   \
-    expect_ct_and_rt(::Testing::same_type<type, decltype((expr))>);                                \
+#define expect_type_and_value(expr, type, value)                                                                                                               \
+    expect_ct_and_rt(::Testing::same_type<type, decltype((expr))>);                                                                                            \
     expect((expr) == value)
 
-#define TEST(name)                                                                                 \
-    namespace Testing {                                                                            \
-    static void test_##name();                                                                     \
-    static ::Testing::TestRegisterer test_register_##name{test_##name, #name};                     \
-    }                                                                                              \
-    static void Testing::test_##name()
+#define TEST(name)                                                                                                                                             \
+    namespace tests_namespace {                                                                                                                                \
+    static void test_##name();                                                                                                                                 \
+    static ::Testing::TestRegisterer test_register_##name{test_##name, #name};                                                                                 \
+    }                                                                                                                                                          \
+    static void tests_namespace::test_##name()
 
 #endif

@@ -13,8 +13,7 @@ constexpr bool test_is_constructible() {
     bool b7 = std::is_constructible<T, Args...>{}() == e;
     bool b8 = noexcept(std::is_constructible<T, Args...>{}());
     bool b9 = std::is_same_v<bool, decltype(std::is_constructible<T, Args...>{}())>;
-    bool b10
-      = std::is_same_v<typename std::is_constructible<T, Args...>::type, std::bool_constant<e>>;
+    bool b10 = std::is_same_v<typename std::is_constructible<T, Args...>::type, std::bool_constant<e>>;
     bool b11 = std::is_same_v<decltype(std::is_constructible_v<T, Args...>), const bool>;
     bool b12 = std::is_constructible_v<T, Args...> == e;
     return b1 && b2 && b3 && b4 && b5 && b6 && b7 && b8 && b9 && b10 && b11 && b12;
@@ -195,8 +194,7 @@ static_assert(test_scalar_or_union<Class * Class::*>());
 static_assert(test_scalar_or_union<int (Class::*)(int, int)>());
 static_assert(test_scalar_or_union<Class (Class::*)(int, Class Class::*)>());
 static_assert(test_scalar_or_union<Class Class::* (Class::*)(int, int)>());
-static_assert(
-  test_is_constructible<false, int (Class::*)(int, int), Class Class::* (Class::*)(int, int)>());
+static_assert(test_is_constructible<false, int (Class::*)(int, int), Class Class::* (Class::*)(int, int)>());
 static_assert(test_scalar_or_union<Enum>());
 static_assert(test_scalar_or_union<EnumClass>());
 static_assert(test_is_constructible<false, Enum, EnumClass>());

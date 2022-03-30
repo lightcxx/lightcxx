@@ -25,7 +25,6 @@ TEST() {
     test_aligned_union<3 * sizeof(float), alignof(float), 0, float[3], float>();
     test_aligned_union<15 * sizeof(float), alignof(float), 15 * sizeof(float), float[3], float>();
 
-    constexpr auto size
-      = (33 * sizeof(char) + alignof(long long) - 1) / alignof(long long) * alignof(long long);
+    constexpr auto size = (33 * sizeof(char) + alignof(long long) - 1) / alignof(long long) * alignof(long long);
     test_aligned_union<size, alignof(long long), 0, char[33], long long>();
 }

@@ -39,10 +39,8 @@ TEST(Trivial) {
     expect_is_noexcept(std::swap(arr_a, arr_b));
 
     std::swap(arr_a, arr_b);
-    expect(arr_a[0].x == 7 && arr_a[0].y == 8 && arr_a[1].x == 9 && arr_a[1].y == 10
-           && arr_a[2].x == 11 && arr_a[2].y == 12);
-    expect(arr_b[0].x == 1 && arr_b[0].y == 2 && arr_b[1].x == 3 && arr_b[1].y == 4
-           && arr_b[2].x == 5 && arr_b[2].y == 6);
+    expect(arr_a[0].x == 7 && arr_a[0].y == 8 && arr_a[1].x == 9 && arr_a[1].y == 10 && arr_a[2].x == 11 && arr_a[2].y == 12);
+    expect(arr_b[0].x == 1 && arr_b[0].y == 2 && arr_b[1].x == 3 && arr_b[1].y == 4 && arr_b[2].x == 5 && arr_b[2].y == 6);
 }
 
 struct NonTrivialNoexcept {
@@ -81,10 +79,8 @@ TEST(NonTrivialNoexcept) {
     expect_is_noexcept(std::swap(arr_a, arr_b));
 
     std::swap(arr_a, arr_b);
-    expect(arr_a[0].x == 7 && arr_a[0].y == 8 && arr_a[1].x == 9 && arr_a[1].y == 10
-           && arr_a[2].x == 11 && arr_a[2].y == 12);
-    expect(arr_b[0].x == 1 && arr_b[0].y == 2 && arr_b[1].x == 3 && arr_b[1].y == 4
-           && arr_b[2].x == 5 && arr_b[2].y == 6);
+    expect(arr_a[0].x == 7 && arr_a[0].y == 8 && arr_a[1].x == 9 && arr_a[1].y == 10 && arr_a[2].x == 11 && arr_a[2].y == 12);
+    expect(arr_b[0].x == 1 && arr_b[0].y == 2 && arr_b[1].x == 3 && arr_b[1].y == 4 && arr_b[2].x == 5 && arr_b[2].y == 6);
     expect(NonTrivialNoexcept::num_move_ops == 3 * 3);
 }
 
@@ -127,7 +123,7 @@ struct CopyOnly {
     int y;
 
     CopyOnly(int x, int y): x(x), y(y) {}
-    CopyOnly(const CopyOnly& other) noexcept : x(other.x), y(other.y) {
+    CopyOnly(const CopyOnly& other) noexcept: x(other.x), y(other.y) {
         num_copy_ops += 1;
     }
 
@@ -157,9 +153,7 @@ TEST(CopyOnly) {
     expect_is_noexcept(std::swap(arr_a, arr_b));
 
     std::swap(arr_a, arr_b);
-    expect(arr_a[0].x == 7 && arr_a[0].y == 8 && arr_a[1].x == 9 && arr_a[1].y == 10
-           && arr_a[2].x == 11 && arr_a[2].y == 12);
-    expect(arr_b[0].x == 1 && arr_b[0].y == 2 && arr_b[1].x == 3 && arr_b[1].y == 4
-           && arr_b[2].x == 5 && arr_b[2].y == 6);
+    expect(arr_a[0].x == 7 && arr_a[0].y == 8 && arr_a[1].x == 9 && arr_a[1].y == 10 && arr_a[2].x == 11 && arr_a[2].y == 12);
+    expect(arr_b[0].x == 1 && arr_b[0].y == 2 && arr_b[1].x == 3 && arr_b[1].y == 4 && arr_b[2].x == 5 && arr_b[2].y == 6);
     expect(CopyOnly::num_copy_ops == 3 * 3);
 }

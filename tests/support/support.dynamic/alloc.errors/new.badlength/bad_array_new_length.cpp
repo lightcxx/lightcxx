@@ -15,8 +15,7 @@ TEST() {
     copy_assigned = default_constructed;
     expect(default_constructed.what() == copy_assigned.what());
 
-    std::bad_array_new_length move_constructed{
-      static_cast<std::bad_array_new_length&&>(copy_constructed)};
+    std::bad_array_new_length move_constructed{static_cast<std::bad_array_new_length&&>(copy_constructed)};
     expect(default_constructed.what() == move_constructed.what());
 
     std::bad_array_new_length move_assigned;
@@ -25,9 +24,9 @@ TEST() {
 
     try {
         throw default_constructed;
-    } catch (std::bad_array_new_length& thrown) {
-        expect(default_constructed.what() == thrown.what());
-    } catch (...) { fail(); }
+    } catch (std::bad_array_new_length& thrown) { expect(default_constructed.what() == thrown.what()); } catch (...) {
+        fail();
+    }
 
     static_assert(std::is_polymorphic_v<std::bad_array_new_length>);
 

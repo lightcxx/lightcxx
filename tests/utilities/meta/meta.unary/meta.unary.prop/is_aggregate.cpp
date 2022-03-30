@@ -245,42 +245,32 @@ class DeletedPrivateCtor {
 
 // All types of arrays I could think of.
 TEST_UNARY_TRAIT_AGAINST_ARRAY(true, is_aggregate, EVERY_CV);
-TEST_UNARY_TRAIT_AGAINST_TYPES(
-  true, is_aggregate, EVERY_CV, Empty[10], EmptyDerived[10], Bits[10], AllPublic[10],
-  AllPublicDerived[10], AllPublicDerivedTwice[10], AllProtectedDerived[10], AllPrivateDerived[10],
-  AllPrivateDerivedTwice[10], AllPublicWrapper[10], AllProtectedWrapper[10], AllPrivateWrapper[10],
-  MixedWrapper[10], ArrayElemBaseAsBase[10], Ref1[10], Ref2[10], Ref3[10], Ref4[10], Ref5[10],
-  Ref6[10], Ref7[10], Ref8[10], DuplicateBaseClass[10], TwoBasesWithMembers[10],
-  MembersAndBaseWithMembers[10], ArrayElemAsBase[10], ArrayElemAsIndirectBase[10],
-  NonAggregateMember[10], UnionMemberAsBase[10], AllProtected[10], AllPrivate[10], PublicCtor[10],
-  ProtectedCtor[10], PrivateCtor[10], InheritedPublicCtor[10], InheritedProtectedCtor[10],
-  InheritedPrivateCtor[10], DeletedPublicCtor[10], DeletedProtectedCtor[10], DeletedPrivateCtor[10],
-  Empty[], EmptyDerived[], Bits[], AllPublic[], AllPublicDerived[], AllPublicDerivedTwice[],
-  AllProtectedDerived[], AllPrivateDerived[], AllPrivateDerivedTwice[], AllPublicWrapper[],
-  AllProtectedWrapper[], AllPrivateWrapper[], MixedWrapper[], ArrayElemBaseAsBase[], Ref1[], Ref2[],
-  Ref3[], Ref4[], Ref5[], Ref6[], Ref7[], Ref8[], DuplicateBaseClass[], TwoBasesWithMembers[],
-  MembersAndBaseWithMembers[], ArrayElemAsBase[], ArrayElemAsIndirectBase[], NonAggregateMember[],
-  UnionMemberAsBase[], AllProtected[], AllPrivate[], PublicCtor[], ProtectedCtor[], PrivateCtor[],
-  InheritedPublicCtor[], InheritedProtectedCtor[], InheritedPrivateCtor[], DeletedPublicCtor[],
-  DeletedProtectedCtor[], DeletedPrivateCtor[]);
+TEST_UNARY_TRAIT_AGAINST_TYPES(true, is_aggregate, EVERY_CV, Empty[10], EmptyDerived[10], Bits[10], AllPublic[10], AllPublicDerived[10],
+                               AllPublicDerivedTwice[10], AllProtectedDerived[10], AllPrivateDerived[10], AllPrivateDerivedTwice[10], AllPublicWrapper[10],
+                               AllProtectedWrapper[10], AllPrivateWrapper[10], MixedWrapper[10], ArrayElemBaseAsBase[10], Ref1[10], Ref2[10], Ref3[10],
+                               Ref4[10], Ref5[10], Ref6[10], Ref7[10], Ref8[10], DuplicateBaseClass[10], TwoBasesWithMembers[10], MembersAndBaseWithMembers[10],
+                               ArrayElemAsBase[10], ArrayElemAsIndirectBase[10], NonAggregateMember[10], UnionMemberAsBase[10], AllProtected[10],
+                               AllPrivate[10], PublicCtor[10], ProtectedCtor[10], PrivateCtor[10], InheritedPublicCtor[10], InheritedProtectedCtor[10],
+                               InheritedPrivateCtor[10], DeletedPublicCtor[10], DeletedProtectedCtor[10], DeletedPrivateCtor[10], Empty[], EmptyDerived[],
+                               Bits[], AllPublic[], AllPublicDerived[], AllPublicDerivedTwice[], AllProtectedDerived[], AllPrivateDerived[],
+                               AllPrivateDerivedTwice[], AllPublicWrapper[], AllProtectedWrapper[], AllPrivateWrapper[], MixedWrapper[], ArrayElemBaseAsBase[],
+                               Ref1[], Ref2[], Ref3[], Ref4[], Ref5[], Ref6[], Ref7[], Ref8[], DuplicateBaseClass[], TwoBasesWithMembers[],
+                               MembersAndBaseWithMembers[], ArrayElemAsBase[], ArrayElemAsIndirectBase[], NonAggregateMember[], UnionMemberAsBase[],
+                               AllProtected[], AllPrivate[], PublicCtor[], ProtectedCtor[], PrivateCtor[], InheritedPublicCtor[], InheritedProtectedCtor[],
+                               InheritedPrivateCtor[], DeletedPublicCtor[], DeletedProtectedCtor[], DeletedPrivateCtor[]);
 
-TEST_UNARY_TRAIT_AGAINST_TYPES(true, is_aggregate, EVERY_CV, Empty, EmptyDerived, Bits, AllPublic,
-                               AllPublicDerived, AllPublicDerivedTwice, AllProtectedDerived,
-                               AllPrivateDerived, AllPrivateDerivedTwice, AllPublicWrapper,
-                               AllProtectedWrapper, AllPrivateWrapper, MixedWrapper,
-                               ArrayElemBaseAsBase, Ref1, Ref2, Ref3, Ref4, Ref5, Ref6, Ref7, Ref8,
-                               DuplicateBaseClass, TwoBasesWithMembers, MembersAndBaseWithMembers,
-                               ArrayElemAsBase, ArrayElemAsIndirectBase, NonAggregateMember,
-                               UnionMemberAsBase);
+TEST_UNARY_TRAIT_AGAINST_TYPES(true, is_aggregate, EVERY_CV, Empty, EmptyDerived, Bits, AllPublic, AllPublicDerived, AllPublicDerivedTwice, AllProtectedDerived,
+                               AllPrivateDerived, AllPrivateDerivedTwice, AllPublicWrapper, AllProtectedWrapper, AllPrivateWrapper, MixedWrapper,
+                               ArrayElemBaseAsBase, Ref1, Ref2, Ref3, Ref4, Ref5, Ref6, Ref7, Ref8, DuplicateBaseClass, TwoBasesWithMembers,
+                               MembersAndBaseWithMembers, ArrayElemAsBase, ArrayElemAsIndirectBase, NonAggregateMember, UnionMemberAsBase);
 
-TEST_UNARY_TRAIT_AGAINST_TYPES(
-  false, is_aggregate, EVERY_CV, AllProtected, AllPrivate, Mixed1, Mixed2, Mixed3, Mixed4, Virtual1,
-  Virtual2, Virtual3, Virtual4, VirtualBase1, VirtualBase2, NonAggregateBase, PublicCtor,
-  ProtectedCtor, PrivateCtor, DeletedPublicCtor, DeletedProtectedCtor, DeletedPrivateCtor
-  // TODO: Double-check if these should be aggregates or not. All tested implementations (at the
-  //  time of writing), when compiling in any C++ standard mode say that
-  //  std::is_aggregate_v<X> == true for all three.
-  //   , InheritedPublicCtor, InheritedProtectedCtor, InheritedPrivateCtor
+TEST_UNARY_TRAIT_AGAINST_TYPES(false, is_aggregate, EVERY_CV, AllProtected, AllPrivate, Mixed1, Mixed2, Mixed3, Mixed4, Virtual1, Virtual2, Virtual3, Virtual4,
+                               VirtualBase1, VirtualBase2, NonAggregateBase, PublicCtor, ProtectedCtor, PrivateCtor, DeletedPublicCtor, DeletedProtectedCtor,
+                               DeletedPrivateCtor
+                               // TODO: Double-check if these should be aggregates or not. All tested implementations (at the
+                               //  time of writing), when compiling in any C++ standard mode say that
+                               //  std::is_aggregate_v<X> == true for all three.
+                               //   , InheritedPublicCtor, InheritedProtectedCtor, InheritedPrivateCtor
 );
 
 union OneIntVariant {
@@ -312,6 +302,5 @@ union NonAggregateArrayVariant {
     [[maybe_unused]] VirtualBase2 invalid[10];
 };
 
-TEST_UNARY_TRAIT_AGAINST_TYPES(true, is_aggregate, EVERY_CV, OneIntVariant, AggregateVariant,
-                               AggregateArrayVariant, NonAggregateVariant,
+TEST_UNARY_TRAIT_AGAINST_TYPES(true, is_aggregate, EVERY_CV, OneIntVariant, AggregateVariant, AggregateArrayVariant, NonAggregateVariant,
                                NonAggregateAndArrayVariant, NonAggregateArrayVariant);

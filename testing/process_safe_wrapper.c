@@ -19,8 +19,7 @@ int main(int argc, char** argv) {
     int status = 0;
     int wait_ret = wait(&status);
     if (wait_ret != pid) {
-        printf("EXPECTATION FAILED: WAIT FAILED. return=%d, errno=%d, message=%s", wait_ret, errno,
-               strerror(errno));
+        printf("EXPECTATION FAILED: WAIT FAILED. return=%d, errno=%d, message=%s", wait_ret, errno, strerror(errno));
         return 1;
     }
     printf("\n----\n");

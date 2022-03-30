@@ -60,8 +60,7 @@ TEST() {
     // (void*, size_t, align_val_t) instead.
     ::operator delete (ptr3_natural, sizeof(Tp), ::std::align_val_t{alignof(Tp)});
 
-    const auto ptr4_explicit
-      = ::operator new (sizeof(Tp), ::std::align_val_t{alignof(Tp)}, ::std::nothrow);
+    const auto ptr4_explicit = ::operator new (sizeof(Tp), ::std::align_val_t{alignof(Tp)}, ::std::nothrow);
     ::operator delete (ptr4_explicit, ::std::align_val_t{alignof(Tp)}, ::std::nothrow);
 
     const auto ptr4_natural = new (::std::align_val_t{alignof(Tp)}, ::std::nothrow) Tp();
@@ -91,8 +90,7 @@ TEST() {
     // (void*, size_t, align_val_t) instead.
     ::operator delete[](arr3_natural, sizeof(Tp), ::std::align_val_t{alignof(Tp)});
 
-    const auto arr4_explicit
-      = ::operator new[](sizeof(Tp), ::std::align_val_t{alignof(Tp)}, ::std::nothrow);
+    const auto arr4_explicit = ::operator new[](sizeof(Tp), ::std::align_val_t{alignof(Tp)}, ::std::nothrow);
     ::operator delete[](arr4_explicit, ::std::align_val_t{alignof(Tp)}, ::std::nothrow);
 
     const auto arr4_natural = new (::std::align_val_t{alignof(Tp)}, ::std::nothrow) Tp[1];

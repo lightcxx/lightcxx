@@ -13,15 +13,13 @@ constexpr bool test_extent() {
     static_assert(std::extent<T, I>{}() == e);
     static_assert(noexcept(std::extent<T, I>{}()));
     static_assert(std::is_same_v<std::size_t, decltype(std::extent<T, I>{}())>);
-    static_assert(
-      std::is_same_v<typename std::extent<T, I>::type, std::integral_constant<std::size_t, e>>);
+    static_assert(std::is_same_v<typename std::extent<T, I>::type, std::integral_constant<std::size_t, e>>);
     static_assert(std::is_same_v<decltype(std::extent_v<T, I>), const std::size_t>);
     static_assert(std::extent_v<T, I> == e);
     return true;
 }
 
-template<std::size_t ext0, std::size_t ext1, std::size_t ext2, std::size_t ext3, std::size_t ext4,
-         class... T>
+template<std::size_t ext0, std::size_t ext1, std::size_t ext2, std::size_t ext3, std::size_t ext4, class... T>
 constexpr bool test_extents() {
     (test_extent<T, 0, ext0>() && ...);
     (test_extent<T, 1, ext1>() && ...);
@@ -31,8 +29,7 @@ constexpr bool test_extents() {
     return true;
 }
 
-static_assert(test_extents<0, 0, 0, 0, 0, void, std::nullptr_t, void*, int, unsigned long long,
-                           float, double, int (*)(), int(int), int (&)(int)>());
+static_assert(test_extents<0, 0, 0, 0, 0, void, std::nullptr_t, void*, int, unsigned long long, float, double, int (*)(), int(int), int (&)(int)>());
 
 static_assert(test_extents<0, 0, 0, 0, 0, int[], int*[], void*[]>());
 

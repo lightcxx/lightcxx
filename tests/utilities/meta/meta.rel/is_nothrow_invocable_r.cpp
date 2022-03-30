@@ -15,8 +15,7 @@ constexpr void expect_is_nothrow_invocable_r() {
     static_assert(std::is_nothrow_invocable_r<T...>{}() == e);
     static_assert(noexcept(std::is_nothrow_invocable_r<T...>{}()));
     static_assert(std::is_same_v<bool, decltype(std::is_nothrow_invocable_r<T...>{}())>);
-    static_assert(
-      std::is_same_v<typename std::is_nothrow_invocable_r<T...>::type, std::bool_constant<e>>);
+    static_assert(std::is_same_v<typename std::is_nothrow_invocable_r<T...>::type, std::bool_constant<e>>);
     static_assert(std::is_same_v<decltype(std::is_nothrow_invocable_r_v<T...>), const bool>);
     static_assert(std::is_nothrow_invocable_r_v<T...> == e);
 }
@@ -341,7 +340,7 @@ TEST(member_data_pointer) {
     expect_is_nothrow_invocable_r<true, const volatile void, MemDPtr, A>();
     // Invalid calls
     expect_is_nothrow_invocable_r<false, int, MemDPtr, A, int, long, double>();  // Too many args
-    expect_is_nothrow_invocable_r<false, int, MemDPtr, int>();  // Invalid argument type
+    expect_is_nothrow_invocable_r<false, int, MemDPtr, int>();                   // Invalid argument type
 
     // With subclass
     struct B : A {};

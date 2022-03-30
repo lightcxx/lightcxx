@@ -39,8 +39,8 @@ static_assert(test_remove_extent<int[], int>());
 static_assert(test_remove_extent<int[][3], int[3]>());
 static_assert(test_remove_extent<int[][3][4], int[3][4]>());
 // Doesn't work for reference to array
-static_assert(test_remove_extent<int(&)[][3][4], int(&)[][3][4]>());
-static_assert(test_remove_extent<int(&)[2][3][4], int(&)[2][3][4]>());
+static_assert(test_remove_extent<int (&)[][3][4], int (&)[][3][4]>());
+static_assert(test_remove_extent<int (&)[2][3][4], int (&)[2][3][4]>());
 
 TEST_UNARY_TRAIT_AGAINST_POINTER(true, TEST, EVERY_CV);
 TEST_UNARY_TRAIT_AGAINST_LVALUE_REFERENCE(true, TEST);

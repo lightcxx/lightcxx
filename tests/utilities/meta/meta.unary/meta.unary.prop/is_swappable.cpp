@@ -32,15 +32,11 @@ TEST_UNARY_TRAIT_AGAINST_POINTER(true, is_swappable, VOLATILE);
 TEST_UNARY_TRAIT_AGAINST_POINTER(false, is_swappable, CONST);
 TEST_UNARY_TRAIT_AGAINST_POINTER(false, is_swappable, CONST_VOLATILE);
 
-TEST_UNARY_TRAIT_AGAINST_TYPES(true, is_swappable, NO_CV, int&, volatile int&, int*&,
-                               int* volatile&);
-TEST_UNARY_TRAIT_AGAINST_TYPES(false, is_swappable, NO_CV, const int&, const volatile int&,
-                               int* const&, int* const volatile&, int (&)(int));
+TEST_UNARY_TRAIT_AGAINST_TYPES(true, is_swappable, NO_CV, int&, volatile int&, int*&, int* volatile&);
+TEST_UNARY_TRAIT_AGAINST_TYPES(false, is_swappable, NO_CV, const int&, const volatile int&, int* const&, int* const volatile&, int (&)(int));
 
-TEST_UNARY_TRAIT_AGAINST_TYPES(true, is_swappable, NO_CV, int&&, volatile int&&, int*&&,
-                               int* volatile&&);
-TEST_UNARY_TRAIT_AGAINST_TYPES(false, is_swappable, NO_CV, const int&&, const volatile int&&,
-                               int* const&&, int* const volatile&&, int(&&)(int));
+TEST_UNARY_TRAIT_AGAINST_TYPES(true, is_swappable, NO_CV, int&&, volatile int&&, int*&&, int* volatile&&);
+TEST_UNARY_TRAIT_AGAINST_TYPES(false, is_swappable, NO_CV, const int&&, const volatile int&&, int* const&&, int* const volatile&&, int(&&)(int));
 
 TEST_UNARY_TRAIT_AGAINST_MEMBER_OBJECT_POINTER(true, is_swappable, NO_CV);
 TEST_UNARY_TRAIT_AGAINST_MEMBER_OBJECT_POINTER(true, is_swappable, VOLATILE);
@@ -93,8 +89,7 @@ struct GlobalSwap {
 
 void swap(ns2::GlobalSwap&, ns2::GlobalSwap&) {}
 
-TEST_UNARY_TRAIT_AGAINST_TYPES(false, is_swappable, EVERY_CV, NoMoveCtorNoMoveAssign, NoMoveCtor,
-                               NoMoveAssign, ns2::GlobalSwap);
+TEST_UNARY_TRAIT_AGAINST_TYPES(false, is_swappable, EVERY_CV, NoMoveCtorNoMoveAssign, NoMoveCtor, NoMoveAssign, ns2::GlobalSwap);
 
 struct HiddenFriendSwap {
     HiddenFriendSwap(HiddenFriendSwap&&) = delete;

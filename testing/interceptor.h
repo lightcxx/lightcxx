@@ -33,17 +33,14 @@ class CFunctionInterceptor<R(Args...)> {
         raw_replacement_state = reinterpret_cast<void*>(&state);
         raw_replacement = reinterpret_cast<void*>(repl);
         replacement = [](void* raw_repl, void* raw_state, Args... args) {
-            return reinterpret_cast<R (*)(T&, Args...)>(raw_repl)(*reinterpret_cast<T*>(raw_state),
-                                                                  args...);
+            return reinterpret_cast<R (*)(T&, Args...)>(raw_repl)(*reinterpret_cast<T*>(raw_state), args...);
         };
     }
 
     void replace(R (*repl)(Args...)) {
         raw_replacement_state = nullptr;
         raw_replacement = reinterpret_cast<void*>(repl);
-        replacement = [](void* raw_repl, void*, Args... args) {
-            return reinterpret_cast<R (*)(Args...)>(raw_repl)(args...);
-        };
+        replacement = [](void* raw_repl, void*, Args... args) { return reinterpret_cast<R (*)(Args...)>(raw_repl)(args...); };
     }
 
     // Since this is only intended for libc & system functions, there is no need to worry about

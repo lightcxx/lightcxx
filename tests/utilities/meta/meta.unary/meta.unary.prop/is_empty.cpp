@@ -44,8 +44,7 @@ class FinalBoss : public DoubleEmptyDerived, private NoUniqueAddrEmptyMember {
     [[maybe_unused, no_unique_address]] NoUniqueAddrEmptyMember nua_mem;
 };
 
-TEST_UNARY_TRAIT_AGAINST_TYPES(true, is_empty, EVERY_CV, Empty, EmptyDerived, EmptyDerivedTwo,
-                               EmptyDerivedTwice, DoubleEmptyDerived, ZeroBits,
+TEST_UNARY_TRAIT_AGAINST_TYPES(true, is_empty, EVERY_CV, Empty, EmptyDerived, EmptyDerivedTwo, EmptyDerivedTwice, DoubleEmptyDerived, ZeroBits,
                                NoUniqueAddrEmptyMember, FinalBoss);
 
 class NonEmpty {
@@ -80,6 +79,5 @@ class VirtualPolymorphicBase : virtual PureVirtualMethod {};
 
 class PolymorphicBase : public VirtualMethod {};
 
-TEST_UNARY_TRAIT_AGAINST_TYPES(false, is_empty, EVERY_CV, NonEmpty, VirtualDtor, VirtualMethod,
-                               PureVirtualMethod, VirtualBase, VirtualPolymorphicBase,
+TEST_UNARY_TRAIT_AGAINST_TYPES(false, is_empty, EVERY_CV, NonEmpty, VirtualDtor, VirtualMethod, PureVirtualMethod, VirtualBase, VirtualPolymorphicBase,
                                PolymorphicBase);

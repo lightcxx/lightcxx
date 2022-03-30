@@ -20,11 +20,8 @@ TEST() {
     expect(is_lteq(std::strong_ordering::equal));
     expect(is_gt(std::partial_ordering::greater));
     expect(is_gteq(std::partial_ordering::equivalent));
-    expect_same_type(
-      std::partial_ordering,
-      std::common_comparison_category<std::weak_ordering, std::partial_ordering>::type);
-    expect_same_type(std::weak_ordering,
-                     std::common_comparison_category_t<std::weak_ordering, std::strong_ordering>);
+    expect_same_type(std::partial_ordering, std::common_comparison_category<std::weak_ordering, std::partial_ordering>::type);
+    expect_same_type(std::weak_ordering, std::common_comparison_category_t<std::weak_ordering, std::strong_ordering>);
 
     // TODO: Test that [cmp.concept] is available once implemented.
 
