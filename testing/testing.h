@@ -40,6 +40,7 @@ inline constexpr bool same_type<T, T> = true;
     static_assert(__VA_ARGS__)
 
 #define expect_is_noexcept(...) static_assert(noexcept(__VA_ARGS__))
+#define expect_is_not_noexcept(...) static_assert(!noexcept(__VA_ARGS__))
 
 #define expect_same_type(...) static_assert(::Testing::same_type<__VA_ARGS__>)
 

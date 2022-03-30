@@ -1,0 +1,34 @@
+#ifndef __LIGHTCXX_GUARD_UTILITY
+#define __LIGHTCXX_GUARD_UTILITY
+
+#include <compare>
+#include <initializer_list>
+#include <type_traits>
+
+namespace std {
+
+using ::std::swap;
+
+struct in_place_t {
+    explicit in_place_t() = default;
+};
+inline constexpr in_place_t in_place{};
+
+template<class _T>
+struct in_place_type_t {
+    explicit in_place_type_t() = default;
+};
+template<class _T>
+inline constexpr in_place_type_t<_T> in_place_type{};
+
+template<size_t _I>
+struct in_place_index_t {
+    explicit in_place_index_t() = default;
+};
+
+template<size_t _I>
+inline constexpr in_place_index_t<_I> in_place_index{};
+
+}  // namespace std
+
+#endif
