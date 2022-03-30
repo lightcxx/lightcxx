@@ -3,11 +3,101 @@
 
 #include <compare>
 #include <initializer_list>
+#include <limits>
 #include <type_traits>
 
 namespace std {
 
-using ::std::swap;
+// region [utility.swap]
+using ::std::swap;  // defined in <type_traits>
+// endregion
+
+// region [utility.exchange]
+template<class _T, class _U = _T>
+constexpr _T exchange(_T& __obj, _U&& __new_val) noexcept(is_nothrow_move_constructible_v<_T>&& is_nothrow_assignable_v<_T&, decltype(__new_val)>) requires(
+  is_move_constructible_v<_T>&& is_assignable_v<_T&, decltype(__new_val)>) {
+    _T __old_val{move(__obj)};
+    __obj = forward<_U>(__new_val);
+    return __old_val;
+}
+// endregion
+
+// region [forward]
+using ::std::forward;  // defined in <type_traits>
+
+using ::std::move;  // defined in <type_traits>
+
+template<class _T>
+constexpr const _T& move_if_noexcept(_T& __x) noexcept {
+    return __x;
+}
+
+template<class _T>
+requires is_nothrow_move_constructible_v<_T>
+constexpr _T&& move_if_noexcept(_T& __x) noexcept {
+    return move(__x);
+}
+// endregion
+
+// region [utility.as.const]
+template<class _T>
+constexpr add_const_t<_T>& as_const(_T& __t) noexcept {
+    return __t;
+}
+// endregion
+
+// region [declval]
+using ::std::declval;  // defined in <type_traits>
+// endregion
+
+// region [utility.intcmp]
+template<integral _T, integral _U>
+constexpr bool cmp_equal(_T __t, _U __u) noexcept {
+    if constexpr (is_signed_v<_T> == is_signed_v<_U>) {
+        return __t == __u;
+    } else if constexpr (is_signed_v<_T>) {
+        return __t >= 0 && make_unsigned_t<_T>(__t) == __u;
+    } else {
+        return __u >= 0 && __t == make_unsigned_t<_U>(__u);
+    }
+}
+
+template<integral _T, integral _U>
+constexpr bool cmp_not_equal(_T __t, _U __u) noexcept {
+    return !cmp_equal(__t, __u);
+}
+
+template<integral _T, integral _U>
+constexpr bool cmp_less(_T __t, _U __u) noexcept {
+    if constexpr (is_signed_v<_T> == is_signed_v<_U>) {
+        return __t < __u;
+    } else if constexpr (is_signed_v<_T>) {
+        return __t < 0 || make_unsigned_t<_T>(__t) < __u;
+    } else {
+        return __u >= 0 && __t < make_unsigned_t<_U>(__u);
+    }
+}
+
+template<integral _T, integral _U>
+constexpr bool cmp_greater(_T __t, _U __u) noexcept {
+    return cmp_less(__u, __t);
+}
+
+template<integral _T, integral _U>
+constexpr bool cmp_less_equal(_T __t, _U __u) noexcept {
+    return !cmp_greater(__t, __u);
+}
+
+template<integral _T, integral _U>
+constexpr bool cmp_greater_equal(_T __t, _U __u) noexcept {
+    return !cmp_less(__t, __u);
+}
+
+template<integral _R, integral _T>
+constexpr bool in_range(_T __t) noexcept {
+    return cmp_greater_equal(__t, numeric_limits<_R>::min()) && cmp_less_equal(__t, numeric_limits<_R>::max());
+}
+// endregion
 
 struct in_place_t {
     explicit in_place_t() = default;

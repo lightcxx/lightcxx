@@ -194,7 +194,7 @@ template<class _T>
 inline constexpr bool is_null_pointer_v = is_null_pointer<_T>::value;
 // endregion
 
-// region is_integral
+// region is_integral, integral
 #if __LIGHTCXX_USE_BUILTIN(__is_integral)
 
 template<class _T>
@@ -229,6 +229,9 @@ template<class _T>
 inline constexpr bool is_integral_v = is_integral<_T>::value;
 
 #endif  // endregion
+
+template<class _T>
+concept integral = is_integral_v<_T>;
 
 // region is_floating_point
 #if __LIGHTCXX_USE_BUILTIN(__is_floating_point)
