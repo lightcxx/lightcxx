@@ -20,12 +20,12 @@ struct B {
     }
 };
 
-#define expect_compare_three_way_result(type_1, type_2, result)                                                                                                \
-    expect_same_type(std::compare_three_way_result<type_1, type_2>::type, result);                                                                             \
+#define expect_compare_three_way_result(type_1, type_2, result)                    \
+    expect_same_type(std::compare_three_way_result<type_1, type_2>::type, result); \
     expect_same_type(std::compare_three_way_result_t<type_1, type_2>, result)
 
-#define expect_compare_three_way_result_single(T, result)                                                                                                      \
-    expect_same_type(std::compare_three_way_result<T>::type, result);                                                                                          \
+#define expect_compare_three_way_result_single(T, result)             \
+    expect_same_type(std::compare_three_way_result<T>::type, result); \
     expect_same_type(std::compare_three_way_result_t<T>, result)
 
 TEST(A_spaceship_A) {

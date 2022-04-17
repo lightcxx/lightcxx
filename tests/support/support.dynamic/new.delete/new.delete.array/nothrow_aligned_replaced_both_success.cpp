@@ -14,7 +14,9 @@ void* operator new[](std::size_t size, std::align_val_t align, const std::nothro
     step("new_nothrow");
     try {
         return ::operator new[](size, align);
-    } catch (...) { return nullptr; }
+    } catch (...) {
+        return nullptr;
+    }
 }
 
 void operator delete[](void* ptr) noexcept {

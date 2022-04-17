@@ -14,8 +14,10 @@ using ::std::swap;  // defined in <type_traits>
 
 // region [utility.exchange]
 template<class _T, class _U = _T>
-constexpr _T exchange(_T& __obj, _U&& __new_val) noexcept(is_nothrow_move_constructible_v<_T>&& is_nothrow_assignable_v<_T&, decltype(__new_val)>) requires(
-  is_move_constructible_v<_T>&& is_assignable_v<_T&, decltype(__new_val)>) {
+constexpr _T exchange(_T& __obj, _U&& __new_val) noexcept(is_nothrow_move_constructible_v<_T>&& is_nothrow_assignable_v<_T&, decltype(__new_val)>)
+    requires(
+      is_move_constructible_v<_T> && is_assignable_v<_T&, decltype(__new_val)>)
+{
     _T __old_val{move(__obj)};
     __obj = forward<_U>(__new_val);
     return __old_val;
@@ -33,7 +35,7 @@ constexpr const _T& move_if_noexcept(_T& __x) noexcept {
 }
 
 template<class _T>
-requires is_nothrow_move_constructible_v<_T>
+    requires is_nothrow_move_constructible_v<_T>
 constexpr _T&& move_if_noexcept(_T& __x) noexcept {
     return move(__x);
 }
@@ -114,10 +116,12 @@ using index_sequence = integer_sequence<size_t, _I...>;
 
 #if _LIGHTCXX_USE_BUILTIN(__make_integer_seq)
 template<integral _T, _T _N>
-requires(_N >= 0) using make_integer_sequence = __make_integer_seq<integer_sequence, _T, _N>;
+    requires(_N >= 0)
+using make_integer_sequence = __make_integer_seq<integer_sequence, _T, _N>;
 #else
 template<integral _T, _T _N>
-requires(_N >= 0) struct make_integer_sequence {
+    requires(_N >= 0)
+struct make_integer_sequence {
     static_assert(_Light::_False<_T>, "std::make_integer_sequence is not supported on this compiler.");
 };
 #endif

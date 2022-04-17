@@ -16,7 +16,7 @@ TEST_UNARY_TRAIT_AGAINST_LVALUE_REFERENCE(true, is_trivially_copy_constructible)
 TEST_UNARY_TRAIT_AGAINST_TYPES(false, is_trivially_copy_constructible, NO_CV, int&&, const int&&, volatile int&&, const volatile int&&, int*&&, int* const&&,
                                int* volatile&&, int* const volatile&&, incomplete_type&&, const incomplete_type&&, volatile incomplete_type&&,
                                const volatile incomplete_type&&);
-TEST_UNARY_TRAIT_AGAINST_TYPES(true, is_trivially_copy_constructible, NO_CV, int(&&)(int));
+TEST_UNARY_TRAIT_AGAINST_TYPES(true, is_trivially_copy_constructible, NO_CV, int (&&)(int));
 
 TEST_UNARY_TRAIT_AGAINST_MEMBER_OBJECT_POINTER(true, is_trivially_copy_constructible, EVERY_CV);
 TEST_UNARY_TRAIT_AGAINST_MEMBER_FUNCTION_POINTER(true, is_trivially_copy_constructible, EVERY_CV);

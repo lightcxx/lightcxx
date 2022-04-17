@@ -36,7 +36,9 @@ TEST() {
     try {
         [[maybe_unused]] auto failed_ptr = ::operator new(4);
         fail();
-    } catch (std::bad_alloc&) { step("catch"); }
+    } catch (std::bad_alloc&) {
+        step("catch");
+    }
 
     expect(std::set_new_handler(g) == nullptr);
 }

@@ -65,7 +65,9 @@ TEST(rethrow_nested_exception) {
         try {
             std::rethrow_if_nested(std::nested_exception());
             fail();
-        } catch (int& v) { expect(v == 3); } catch (...) {
+        } catch (int& v) {
+            expect(v == 3);
+        } catch (...) {
             fail();
         }
     }
@@ -85,7 +87,9 @@ TEST(rethrow_derived_from_nested_exception) {
         try {
             std::rethrow_if_nested(ExceptionWithNested());
             fail();
-        } catch (int& v) { expect(v == 3); } catch (...) {
+        } catch (int& v) {
+            expect(v == 3);
+        } catch (...) {
             fail();
         }
     }
@@ -100,7 +104,9 @@ TEST(rethrow_value_with_dynamic_type_derived_from_nested_exception) {
             std::exception& e = exc;
             std::rethrow_if_nested(e);
             fail();
-        } catch (int& v) { expect(v == 3); } catch (...) {
+        } catch (int& v) {
+            expect(v == 3);
+        } catch (...) {
             fail();
         }
     }

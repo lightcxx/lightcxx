@@ -6,33 +6,31 @@
 using NullptrT = decltype(nullptr);
 
 class Class {
-    [[maybe_unused]] int x[2];
-    [[maybe_unused]] char y[4];
+    int x[2];
+    char y[4];
 };
 
 union Union {
-    [[maybe_unused]] int x[2];
-    [[maybe_unused]] char y[4];
+    int x[2];
+    char y[4];
 };
 
-enum [[maybe_unused]] Enum{
-  e_ok,
-  e_error,
+enum Enum {
+    e_ok,
+    e_error,
 };
 
-enum class [[maybe_unused]] EnumClass{
-  ok,
-  error,
+enum class EnumClass {
+    ok,
+    error,
 };
 
 struct incomplete_type;
 
-#define DECLARE_TRAIT_V_READER(TRAIT)                                                                                                                          \
-    template<class T>                                                                                                                                          \
-    struct TRAIT##_reader {                                                                                                                                    \
-        constexpr auto read() const noexcept {                                                                                                                 \
-            return ::std::TRAIT<T>;                                                                                                                            \
-        }                                                                                                                                                      \
+#define DECLARE_TRAIT_V_READER(TRAIT)                                    \
+    template<class T>                                                    \
+    struct TRAIT##_reader {                                              \
+        constexpr auto read() const noexcept { return ::std::TRAIT<T>; } \
     }
 
 template<template<class> class Trait, template<class> class Trait_v_reader, bool e, class T>
@@ -126,41 +124,41 @@ constexpr bool test_unary_prop_query() {
     return true;
 }
 
-#define TEST_UNARY_TRAIT_AGAINST_TYPES(EXPECTED, TRAIT, SUFFIX, ...)                                                                                           \
+#define TEST_UNARY_TRAIT_AGAINST_TYPES(EXPECTED, TRAIT, SUFFIX, ...) \
     static_assert(test_unary_trait_against_type_##SUFFIX<std::TRAIT, TRAIT##_v_reader, EXPECTED, __VA_ARGS__>())
 
 #define TEST_UNARY_TRAIT_AGAINST_VOID(EXPECTED, TRAIT, SUFFIX) TEST_UNARY_TRAIT_AGAINST_TYPES(EXPECTED, TRAIT, SUFFIX, void)
 
 #define TEST_UNARY_TRAIT_AGAINST_NULLPTR_T(EXPECTED, TRAIT, SUFFIX) TEST_UNARY_TRAIT_AGAINST_TYPES(EXPECTED, TRAIT, SUFFIX, NullptrT)
 
-#define TEST_UNARY_TRAIT_AGAINST_INTEGRAL(EXPECTED, TRAIT, SUFFIX)                                                                                             \
-    TEST_UNARY_TRAIT_AGAINST_TYPES(EXPECTED, TRAIT, SUFFIX, bool, char, char8_t, char16_t, char32_t, wchar_t, signed char, short int, int, long int,           \
+#define TEST_UNARY_TRAIT_AGAINST_INTEGRAL(EXPECTED, TRAIT, SUFFIX)                                                                                   \
+    TEST_UNARY_TRAIT_AGAINST_TYPES(EXPECTED, TRAIT, SUFFIX, bool, char, char8_t, char16_t, char32_t, wchar_t, signed char, short int, int, long int, \
                                    long long int, unsigned char, unsigned short int, unsigned int, unsigned long int, unsigned long long int)
 
 #define TEST_UNARY_TRAIT_AGAINST_FLOATING_POINT(EXPECTED, TRAIT, SUFFIX) TEST_UNARY_TRAIT_AGAINST_TYPES(EXPECTED, TRAIT, SUFFIX, float, double, long double)
 
-#define TEST_UNARY_TRAIT_AGAINST_ARRAY(EXPECTED, TRAIT, SUFFIX)                                                                                                \
+#define TEST_UNARY_TRAIT_AGAINST_ARRAY(EXPECTED, TRAIT, SUFFIX) \
     TEST_UNARY_TRAIT_AGAINST_TYPES(EXPECTED, TRAIT, SUFFIX, int[10], int[10][10], int[], int[][10], int[][10][10])
 
-#define TEST_UNARY_TRAIT_AGAINST_POINTER(EXPECTED, TRAIT, SUFFIX)                                                                                              \
-    TEST_UNARY_TRAIT_AGAINST_TYPES(EXPECTED, TRAIT, SUFFIX, void*, const void*, volatile void*, const volatile void*, int*, int**, int***, incomplete_type*,   \
+#define TEST_UNARY_TRAIT_AGAINST_POINTER(EXPECTED, TRAIT, SUFFIX)                                                                                            \
+    TEST_UNARY_TRAIT_AGAINST_TYPES(EXPECTED, TRAIT, SUFFIX, void*, const void*, volatile void*, const volatile void*, int*, int**, int***, incomplete_type*, \
                                    int (**)(int), int (*)(int))
 
-#define TEST_UNARY_TRAIT_AGAINST_LVALUE_REFERENCE(EXPECTED, TRAIT)                                                                                             \
-    TEST_UNARY_TRAIT_AGAINST_TYPES(EXPECTED, TRAIT, NO_CV, int&, const int&, volatile int&, const volatile int&, int (&)(int), int*&, int* const&,             \
-                                   int* volatile&, int* const volatile&, incomplete_type&, const incomplete_type&, volatile incomplete_type&,                  \
+#define TEST_UNARY_TRAIT_AGAINST_LVALUE_REFERENCE(EXPECTED, TRAIT)                                                                                 \
+    TEST_UNARY_TRAIT_AGAINST_TYPES(EXPECTED, TRAIT, NO_CV, int&, const int&, volatile int&, const volatile int&, int (&)(int), int*&, int* const&, \
+                                   int* volatile&, int* const volatile&, incomplete_type&, const incomplete_type&, volatile incomplete_type&,      \
                                    const volatile incomplete_type&)
 
-#define TEST_UNARY_TRAIT_AGAINST_RVALUE_REFERENCE(EXPECTED, TRAIT)                                                                                             \
-    TEST_UNARY_TRAIT_AGAINST_TYPES(EXPECTED, TRAIT, NO_CV, int&&, const int&&, volatile int&&, const volatile int&&, int(&&)(int), int*&&, int* const&&,       \
-                                   int* volatile&&, int* const volatile&&, incomplete_type&&, const incomplete_type&&, volatile incomplete_type&&,             \
+#define TEST_UNARY_TRAIT_AGAINST_RVALUE_REFERENCE(EXPECTED, TRAIT)                                                                                        \
+    TEST_UNARY_TRAIT_AGAINST_TYPES(EXPECTED, TRAIT, NO_CV, int&&, const int&&, volatile int&&, const volatile int&&, int (&&)(int), int*&&, int* const&&, \
+                                   int* volatile&&, int* const volatile&&, incomplete_type&&, const incomplete_type&&, volatile incomplete_type&&,        \
                                    const volatile incomplete_type&&)
 
-#define TEST_UNARY_TRAIT_AGAINST_MEMBER_OBJECT_POINTER(EXPECTED, TRAIT, SUFFIX)                                                                                \
+#define TEST_UNARY_TRAIT_AGAINST_MEMBER_OBJECT_POINTER(EXPECTED, TRAIT, SUFFIX) \
     TEST_UNARY_TRAIT_AGAINST_TYPES(EXPECTED, TRAIT, SUFFIX, int Class::*, Class Class::*, Class* Class::*)
 
-#define TEST_UNARY_TRAIT_AGAINST_MEMBER_FUNCTION_POINTER(EXPECTED, TRAIT, SUFFIX)                                                                              \
-    TEST_UNARY_TRAIT_AGAINST_TYPES(EXPECTED, TRAIT, SUFFIX, int (Class::*)(int, int), Class (Class::*)(int, Class Class::*),                                   \
+#define TEST_UNARY_TRAIT_AGAINST_MEMBER_FUNCTION_POINTER(EXPECTED, TRAIT, SUFFIX)                                            \
+    TEST_UNARY_TRAIT_AGAINST_TYPES(EXPECTED, TRAIT, SUFFIX, int (Class::*)(int, int), Class (Class::*)(int, Class Class::*), \
                                    Class Class::* (Class::*)(int, int))
 
 #define TEST_UNARY_TRAIT_AGAINST_ENUM(EXPECTED, TRAIT, SUFFIX) TEST_UNARY_TRAIT_AGAINST_TYPES(EXPECTED, TRAIT, SUFFIX, Enum, EnumClass)
@@ -169,7 +167,7 @@ constexpr bool test_unary_prop_query() {
 
 #define TEST_UNARY_TRAIT_AGAINST_CLASS(EXPECTED, TRAIT, SUFFIX) TEST_UNARY_TRAIT_AGAINST_TYPES(EXPECTED, TRAIT, SUFFIX, Class)
 
-#define TEST_UNARY_TRAIT_AGAINST_FUNCTION(EXPECTED, TRAIT)                                                                                                     \
+#define TEST_UNARY_TRAIT_AGAINST_FUNCTION(EXPECTED, TRAIT) \
     TEST_UNARY_TRAIT_AGAINST_TYPES(EXPECTED, TRAIT, NO_CV, void(), int(), int(int), int(int, int), int(int()), int(...), int() noexcept)
 
 #endif

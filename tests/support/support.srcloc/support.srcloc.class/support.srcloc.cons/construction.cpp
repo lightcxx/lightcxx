@@ -8,18 +8,20 @@ struct A {
     std::source_location loc = std::source_location::current();
 
     A() = default;
-    A(int): A() {}
+    A(int)
+            : A() {}
 };
 
 struct B {
     A a;
 
     B() = default;
-    explicit B(int): a(3) {}
+    explicit B(int)
+            : a(3) {}
 };
 
 void function_with_default_parameter(std::source_location loc = std::source_location::current()) {
-    expect(loc.line() == 41);
+    expect(loc.line() == 43);
     expect(loc.column() > 0);
     expect(strcmp(loc.function_name(), "test_") == 0);
     expect(strstr(loc.file_name(), "construction.cpp") != nullptr);
@@ -33,7 +35,7 @@ TEST() {
     expect(strcmp(loc.file_name(), "") == 0);
 
     std::source_location current = std::source_location::current();
-    expect(current.line() == 35);
+    expect(current.line() == 37);
     expect(current.column() > 0);
     expect(strcmp(current.function_name(), "test_") == 0);
     expect(strstr(current.file_name(), "construction.cpp") != nullptr);

@@ -21,7 +21,9 @@ TEST() {
     try {
         [[maybe_unused]] const auto const_ptr = ::operator new(256);
         fail();
-    } catch (std::bad_alloc& exception) { step("throw"); } catch (...) {
+    } catch (std::bad_alloc& exception) {
+        step("throw");
+    } catch (...) {
         fail();
     }
 }

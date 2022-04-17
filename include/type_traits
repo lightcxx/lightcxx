@@ -56,32 +56,30 @@ concept same_as = is_same_v<_T, _U>;
 // region implementation-details
 
 namespace _Light {
-    template<class _T>
-    inline constexpr bool _False = false;
+template<class _T>
+inline constexpr bool _False = false;
 
-    template<class _T>
-    using _NonSfinaeAddReference = _T&;
+template<class _T>
+using _NonSfinaeAddReference = _T&;
 
-    template<class _T>
-    concept _Referenceable = requires {
-        typename _NonSfinaeAddReference<_T>;
-    };
+template<class _T>
+concept _Referenceable = requires { typename _NonSfinaeAddReference<_T>; };
 
-    template<class _T>
-    _T&& _Declval(int);
+template<class _T>
+_T&& _Declval(int);
 
-    template<class _T>
-    _T _Declval(long);
+template<class _T>
+_T _Declval(long);
 };  // namespace _Light
 
-#define _UNARY_TRAIT_TRUE_FOR_ALL_CV(_Trait, _T)                                                                                                               \
-    template<>                                                                                                                                                 \
-    struct _Trait<_T> : ::std::true_type {};                                                                                                                   \
-    template<>                                                                                                                                                 \
-    struct _Trait<_T const> : ::std::true_type {};                                                                                                             \
-    template<>                                                                                                                                                 \
-    struct _Trait<_T volatile> : ::std::true_type {};                                                                                                          \
-    template<>                                                                                                                                                 \
+#define _UNARY_TRAIT_TRUE_FOR_ALL_CV(_Trait, _T)      \
+    template<>                                        \
+    struct _Trait<_T> : ::std::true_type {};          \
+    template<>                                        \
+    struct _Trait<_T const> : ::std::true_type {};    \
+    template<>                                        \
+    struct _Trait<_T volatile> : ::std::true_type {}; \
+    template<>                                        \
     struct _Trait<_T const volatile> : ::std::true_type {}
 
 #ifdef _LIGHTCXX_DONT_USE_BUILTINS
@@ -578,20 +576,8 @@ inline constexpr bool is_object_v = __is_object(_T);
 
 #else
 
-// clang-format off
 template<class _T>
-inline constexpr bool is_object_v
-  = is_null_pointer_v<_T>
-    || is_integral_v<_T>
-    || is_floating_point_v<_T>
-    || is_enum_v<_T>
-    || is_pointer_v<_T>
-    || is_member_object_pointer_v<_T>
-    || is_member_function_pointer_v<_T>
-    || is_array_v<_T>
-    || is_union_v<_T>
-    || is_class_v<_T>;
-// clang-format on
+inline constexpr bool is_object_v = is_null_pointer_v<_T> || is_integral_v<_T> || is_floating_point_v<_T> || is_enum_v<_T> || is_pointer_v<_T> || is_member_object_pointer_v<_T> || is_member_function_pointer_v<_T> || is_array_v<_T> || is_union_v<_T> || is_class_v<_T>;
 
 template<class _T>
 struct is_object : bool_constant<is_object_v<_T>> {};
@@ -609,17 +595,8 @@ inline constexpr bool is_scalar_v = __is_scalar(_T);
 
 #else
 
-// clang-format off
 template<class _T>
-inline constexpr bool is_scalar_v
-  = is_null_pointer_v<_T>
-    || is_integral_v<_T>
-    || is_floating_point_v<_T>
-    || is_enum_v<_T>
-    || is_pointer_v<_T>
-    || is_member_object_pointer_v<_T>
-    || is_member_function_pointer_v<_T>;
-// clang-format on
+inline constexpr bool is_scalar_v = is_null_pointer_v<_T> || is_integral_v<_T> || is_floating_point_v<_T> || is_enum_v<_T> || is_pointer_v<_T> || is_member_object_pointer_v<_T> || is_member_function_pointer_v<_T>;
 
 template<class _T>
 struct is_scalar : bool_constant<is_scalar_v<_T>> {};
@@ -767,17 +744,15 @@ inline constexpr bool is_polymorphic_v = __is_polymorphic(_T);
 
 #else
 
-// clang-format off
 template<class _T>
-inline constexpr bool is_polymorphic_v = requires {
-    { dynamic_cast<const volatile void*>(declval<_T*>()) };
+inline constexpr bool is_polymorphic_v =
+    requires
+{
+    {dynamic_cast<const volatile void*>(declval<_T*>())};
 };
 
 template<class _T>
-struct is_polymorphic: bool_constant<requires {
-    { dynamic_cast<const volatile void*>(declval<_T*>()) };
-}> {};
-// clang-format on
+struct is_polymorphic : bool_constant<is_polymorphic_v<_T>> {};
 
 #endif  // endregion
 
@@ -860,18 +835,16 @@ inline constexpr bool is_signed_v = __is_signed(_T) && is_arithmetic_v<_T>;
 template<class _T>
 struct is_signed : false_type {};
 
-// clang-format off
-template<class _T> requires is_arithmetic_v<_T>
+template<class _T>
+    requires is_arithmetic_v<_T>
 struct is_signed<_T> : bool_constant<_T(-1) < _T(0)> {};
-// clang-format on
 
 template<class _T>
 inline constexpr bool is_signed_v = false;
 
-// clang-format off
-template<class _T> requires is_arithmetic_v<_T>
+template<class _T>
+    requires is_arithmetic_v<_T>
 inline constexpr bool is_signed_v<_T> = (_T(-1) < _T(0));
-// clang-format on
 
 #endif
 
@@ -888,18 +861,16 @@ inline constexpr bool is_unsigned_v = __is_unsigned(_T) && is_arithmetic_v<_T>;
 template<class _T>
 struct is_unsigned : false_type {};
 
-// clang-format off
-template<class _T> requires is_arithmetic_v<_T>
+template<class _T>
+    requires is_arithmetic_v<_T>
 struct is_unsigned<_T> : bool_constant<_T(0) < _T(-1)> {};
-// clang-format on
 
 template<class _T>
 inline constexpr bool is_unsigned_v = false;
 
-// clang-format off
-template<class _T> requires is_arithmetic_v<_T>
+template<class _T>
+    requires is_arithmetic_v<_T>
 inline constexpr bool is_unsigned_v<_T> = (_T(0) < _T(-1));
-// clang-format on
 
 #endif
 
@@ -945,25 +916,29 @@ inline constexpr bool is_constructible_v = __is_constructible(_T, _Args...);
 
 #else
 
-// clang-format off
-
 template<class _T, class... _Args>
-inline constexpr bool is_constructible_v = requires {
+inline constexpr bool is_constructible_v =
+    requires
+{
     { new _T(declval<_Args>()...) } -> same_as<typename add_pointer<_T>::type>;
 };
 
 template<class _T, class _From>
-inline constexpr bool is_constructible_v<_T&, _From> = requires {
-    { static_cast<_T&>(declval<_From>()) };
+inline constexpr bool is_constructible_v<_T&, _From> =
+    requires
+{
+    {static_cast<_T&>(declval<_From>())};
 };
 
 template<class _T, class _From>
-inline constexpr bool is_constructible_v<_T&&, _From> = requires {
-    { static_cast<_T&&>(declval<_From>()) };
+inline constexpr bool is_constructible_v<_T&&, _From> =
+    requires
+{
+    {static_cast<_T&&>(declval<_From>())};
 };
 
 template<class _T, class _From>
-inline constexpr bool is_constructible_v<_T&&, _From&> = is_function_v<_T> &&
+inline constexpr bool is_constructible_v<_T&&, _From&> = is_function_v<_T>&&
   is_same_v<typename remove_cv<_T>::type, typename remove_cv<_From>::type>;
 
 template<class _T, size_t _N>
@@ -971,8 +946,6 @@ inline constexpr bool is_constructible_v<_T[_N]> = is_constructible_v<_T>;
 
 template<class _T, class... _Args>
 struct is_constructible : bool_constant<is_constructible_v<_T, _Args...>> {};
-
-// clang-format on
 
 #endif
 
@@ -1008,13 +981,15 @@ inline constexpr bool is_assignable_v = __is_assignable(_T, _U);
 
 #else
 
-// clang-format off
 template<class _T, class _U>
-struct is_assignable : bool_constant<requires { { declval<_T>() = declval<_U>() }; }> {};
+  struct is_assignable : bool_constant < requires { {declval<_T>() = declval<_U>()}; } > {};
 
 template<class _T, class _U>
-inline constexpr bool is_assignable_v = requires { { declval<_T>() = declval<_U>() }; };
-    // clang-format on
+inline constexpr bool is_assignable_v =
+    requires
+{
+    {declval<_T>() = declval<_U>()};
+};
 
 #endif
 
@@ -1040,10 +1015,11 @@ struct is_destructible : bool_constant<__is_destructible(_T)> {};
 template<class _T>
 inline constexpr bool is_destructible_v = __is_destructible(_T);
 #else
-// clang-format off
 template<class _T>
-inline constexpr bool is_destructible_v = requires {
-    { declval<_T&>().~_T() };
+inline constexpr bool is_destructible_v =
+    requires
+{
+    {declval<_T&>().~_T()};
 };
 
 template<class _T>
@@ -1057,7 +1033,6 @@ inline constexpr bool is_destructible_v<_T[]> = is_destructible_v<_T>;
 
 template<class _T, size_t _N>
 inline constexpr bool is_destructible_v<_T[_N]> = is_destructible_v<_T>;
-// clang-format on
 
 template<class _T>
 struct is_destructible : bool_constant<is_destructible_v<_T>> {};
@@ -1188,18 +1163,30 @@ inline constexpr bool is_trivially_move_assignable_v = is_trivially_move_assigna
 template<class _T>
 struct is_trivially_destructible : false_type {};
 
-// clang-format off
-template<class _T> requires is_destructible_v<_T>
+template<class _T>
+    requires is_destructible_v<_T>
 struct is_trivially_destructible<_T> : bool_constant<__is_trivially_destructible(_T)> {};
-// clang-format on
 
 template<class _T>
 inline constexpr bool is_trivially_destructible_v = false;
 
-// clang-format off
-template<class _T> requires is_destructible_v<_T>
+template<class _T>
+    requires is_destructible_v<_T>
 inline constexpr bool is_trivially_destructible_v<_T> = __is_trivially_destructible(_T);
-// clang-format on
+#elif _LIGHTCXX_USE_BUILTIN(__has_trivial_destructor)
+template<class _T>
+struct is_trivially_destructible : false_type {};
+
+template<class _T>
+    requires is_destructible_v<_T>
+struct is_trivially_destructible<_T> : bool_constant<__has_trivial_destructor(_T)> {};
+
+template<class _T>
+inline constexpr bool is_trivially_destructible_v = false;
+
+template<class _T>
+    requires is_destructible_v<_T>
+inline constexpr bool is_trivially_destructible_v<_T> = __has_trivial_destructor(_T);
 #else
 template<class _T>
 struct is_trivially_destructible : false_type {
@@ -1216,26 +1203,19 @@ inline constexpr bool is_trivially_destructible_v = is_trivially_destructible<_T
 //  assignment operators deleted is trivially copyable, which contradicts [class.prop] paragraph
 //  1.1).
 
-#if _LIGHTCXX_USE_BUILTIN(__is_trivially_constructible) && _LIGHTCXX_USE_BUILTIN(__is_trivially_assignable)                                                    \
+#if _LIGHTCXX_USE_BUILTIN(__is_trivially_constructible) && _LIGHTCXX_USE_BUILTIN(__is_trivially_assignable) \
   && _LIGHTCXX_USE_BUILTIN(__is_trivially_destructible) && _LIGHTCXX_USE_BUILTIN(__is_class) && _LIGHTCXX_USE_BUILTIN(__is_enum)
 
 template<class _T>
 constexpr bool is_trivially_copyable_v = []() {
     using _U = typename remove_cv<typename remove_all_extents<typename remove_cv<_T>::type>::type>::type;
-    return is_scalar_v<_U>
-      || (is_class_v<_U>
-         // class.prop # 1.1
-         && (is_copy_constructible_v<_U>
-             || is_copy_assignable_v<_U>
-             || is_move_constructible_v<_U>
-             || is_move_assignable_v<_U>)
-         // class.prop # 1.2
-         && (!is_copy_constructible_v<_U> || is_trivially_copy_constructible_v<_U>)
-         && (!is_copy_assignable_v<_U> || is_trivially_copy_assignable_v<_U>)
-         && (!is_move_constructible_v<_U> || is_trivially_move_constructible_v<_U>)
-         && (!is_move_assignable_v<_U> || is_trivially_move_assignable_v<_U>)
-         //  class.prop # 1.3
-         && is_trivially_destructible_v<_U>);
+    return is_scalar_v<_U> || (is_class_v<_U>
+                               // class.prop # 1.1
+                               && (is_copy_constructible_v<_U> || is_copy_assignable_v<_U> || is_move_constructible_v<_U> || is_move_assignable_v<_U>)
+                               // class.prop # 1.2
+                               &&(!is_copy_constructible_v<_U> || is_trivially_copy_constructible_v<_U>)&&(!is_copy_assignable_v<_U> || is_trivially_copy_assignable_v<_U>)&&(!is_move_constructible_v<_U> || is_trivially_move_constructible_v<_U>)&&(!is_move_assignable_v<_U> || is_trivially_move_assignable_v<_U>)
+                               //  class.prop # 1.3
+                               &&is_trivially_destructible_v<_U>);
 }();
 
 template<class _T>
@@ -1258,7 +1238,7 @@ inline constexpr bool is_trivially_copyable_v = is_trivially_copyable<_T>::value
 //  fully standard compliant (says a class with all copy/move constructors &
 //  assignment operators deleted is trivial, which contradicts [class.prop] paragraph 1.1).
 
-#if _LIGHTCXX_USE_BUILTIN(__is_trivially_constructible) && _LIGHTCXX_USE_BUILTIN(__is_trivially_assignable)                                                    \
+#if _LIGHTCXX_USE_BUILTIN(__is_trivially_constructible) && _LIGHTCXX_USE_BUILTIN(__is_trivially_assignable) \
   && _LIGHTCXX_USE_BUILTIN(__is_trivially_destructible) && _LIGHTCXX_USE_BUILTIN(__is_class) && _LIGHTCXX_USE_BUILTIN(__is_enum)
 
 template<class _T>
@@ -1287,33 +1267,36 @@ struct is_nothrow_constructible : bool_constant<__is_nothrow_constructible(_T, _
 template<class _T, class... _Args>
 constexpr bool is_nothrow_constructible_v = __is_nothrow_constructible(_T, _Args...);
 #else
-// clang-format off
 template<class _T, class... _Args>
-inline constexpr bool is_nothrow_constructible_v = requires {
+inline constexpr bool is_nothrow_constructible_v =
+    requires
+{
     { new _T(declval<_Args>()...) } -> same_as<typename add_pointer<_T>::type>;
     { _T(declval<_Args>()...) } noexcept;
 };
 
 template<class _T, class _From>
-inline constexpr bool is_nothrow_constructible_v<_T&, _From> = requires {
+inline constexpr bool is_nothrow_constructible_v<_T&, _From> =
+    requires
+{
     { static_cast<_T&>(declval<_From>()) } noexcept;
 };
 
 template<class _T, class _From>
-inline constexpr bool is_nothrow_constructible_v<_T&&, _From> = requires {
+inline constexpr bool is_nothrow_constructible_v<_T&&, _From> =
+    requires
+{
     { static_cast<_T&&>(declval<_From>()) } noexcept;
 };
 
 template<class _T, class _From>
-inline constexpr bool is_nothrow_constructible_v<_T&&, _From&> = is_function_v<_T> &&
-  is_same_v<typename remove_cv<_T>::type, typename remove_cv<_From>::type>;
+inline constexpr bool is_nothrow_constructible_v<_T&&, _From&> = is_function_v<_T>&& is_same_v<typename remove_cv<_T>::type, typename remove_cv<_From>::type>;
 
 template<class _T, size_t _N>
 inline constexpr bool is_nothrow_constructible_v<_T[_N]> = is_nothrow_constructible_v<_T>;
 
 template<class _T, class... _Args>
 struct is_nothrow_constructible : bool_constant<is_nothrow_constructible_v<_T, _Args...>> {};
-// clang-format on
 #endif
 
 template<class _T>
@@ -1347,17 +1330,15 @@ inline constexpr bool is_nothrow_assignable_v = __is_nothrow_assignable(_T, _U);
 
 #else
 
-// clang-format off
 template<class _T, class _U>
-struct is_nothrow_assignable : bool_constant<requires {
-    { declval<_T>() = declval<_U>() } noexcept;
-}> {};
-
-template<class _T, class _U>
-inline constexpr bool is_nothrow_assignable_v = requires {
+inline constexpr bool is_nothrow_assignable_v =
+    requires
+{
     { declval<_T>() = declval<_U>() } noexcept;
 };
-    // clang-format on
+
+template<class _T, class _U>
+struct is_nothrow_assignable : bool_constant<is_nothrow_assignable_v<_T, _U>> {};
 
 #endif
 
@@ -1378,9 +1359,10 @@ inline constexpr bool is_nothrow_move_assignable_v = is_nothrow_assignable_v<typ
 
 // region is_nothrow_destructible
 
-// clang-format off
 template<class _T>
-inline constexpr bool is_nothrow_destructible_v = requires {
+inline constexpr bool is_nothrow_destructible_v =
+    requires
+{
     { declval<_T&>().~_T() } noexcept;
 };
 
@@ -1395,7 +1377,6 @@ inline constexpr bool is_nothrow_destructible_v<_T[]> = is_nothrow_destructible_
 
 template<class _T, size_t _N>
 inline constexpr bool is_nothrow_destructible_v<_T[_N]> = is_nothrow_destructible_v<_T>;
-// clang-format on
 
 template<class _T>
 struct is_nothrow_destructible : bool_constant<is_nothrow_destructible_v<_T>> {};
@@ -1403,17 +1384,17 @@ struct is_nothrow_destructible : bool_constant<is_nothrow_destructible_v<_T>> {}
 // endregion
 
 // region swap, is_swappable_with, is_swappable, is_nothrow_swappable_with, is_nothrow_swappable
-// clang-format off
 
-template<class _T> requires is_move_constructible_v<_T> && is_move_assignable_v<_T>
-constexpr void swap(_T& __a, _T& __b)
-        noexcept(is_nothrow_move_constructible_v<_T> && is_nothrow_move_assignable_v<_T>) {
+template<class _T>
+    requires is_move_constructible_v<_T> && is_move_assignable_v<_T>
+constexpr void swap(_T& __a, _T& __b) noexcept(is_nothrow_move_constructible_v<_T>&& is_nothrow_move_assignable_v<_T>) {
     _T __tmp{move(__a)};
     __a = move(__b);
     __b = move(__tmp);
 }
 
-template<class _T, size_t _N> requires is_swappable<_T>::value
+template<class _T, size_t _N>
+    requires is_swappable<_T>::value
 constexpr void swap(_T (&__a)[_N], _T (&__b)[_N]) noexcept(is_nothrow_swappable<_T>::value) {
     // TODO: More efficient algorithm for trivial types? memcpy chunks?
     //  Check and document whether the compiler does this loop efficiently.
@@ -1423,9 +1404,11 @@ constexpr void swap(_T (&__a)[_N], _T (&__b)[_N]) noexcept(is_nothrow_swappable<
 }
 
 template<class _T, class _U>
-inline constexpr bool is_swappable_with_v = requires {
-    { swap(declval<_T>(), declval<_U>()) };
-    { swap(declval<_U>(), declval<_T>()) };
+inline constexpr bool is_swappable_with_v =
+    requires
+{
+    {swap(declval<_T>(), declval<_U>())};
+    {swap(declval<_U>(), declval<_T>())};
 };
 
 template<class _T, class _U>
@@ -1441,7 +1424,9 @@ template<class _T>
 struct is_swappable : bool_constant<is_swappable_v<_T>> {};
 
 template<class _T, class _U>
-inline constexpr bool is_nothrow_swappable_with_v = requires {
+inline constexpr bool is_nothrow_swappable_with_v =
+    requires
+{
     { swap(declval<_T>(), declval<_U>()) } noexcept;
     { swap(declval<_U>(), declval<_T>()) } noexcept;
 };
@@ -1458,7 +1443,6 @@ inline constexpr bool is_nothrow_swappable_v<_T> = is_nothrow_swappable_with_v<_
 template<class _T>
 struct is_nothrow_swappable : bool_constant<is_nothrow_swappable_v<_T>> {};
 
-// clang-format on
 // endregion
 
 // region has_virtual_destructor
@@ -1564,7 +1548,7 @@ inline constexpr auto extent_v = extent<_T, _I>::value;
 // is_same defined above
 
 // region is_base_of
-#if _LIGHTCXX_USE_BUILTIN(__is_base_of)                                                                                                                        \
+#if _LIGHTCXX_USE_BUILTIN(__is_base_of) \
   || (!defined(_LIGHTCXX_TESTING_DISALLOW_IS_BASE_OF_BUILTIN) && (defined(__is_base_of) || (defined(__has_builtin) && __has_builtin(__is_base_of))))
 template<class _B, class _D>
 struct is_base_of : bool_constant<__is_base_of(_B, _D)> {};
@@ -1631,10 +1615,11 @@ struct is_convertible : bool_constant<is_convertible_v<_From, _To>> {};
 
 // region is_nothrow_convertible
 template<class _From, class _To>
-inline constexpr bool is_nothrow_convertible_v = (is_void_v<_From> && is_void_v<_To>) || requires {
+inline constexpr bool is_nothrow_convertible_v = (is_void_v<_From> && is_void_v<_To>) ||
+                                                     requires
+{
     {static_cast<_To (*)()>(nullptr)};
-    { declval<void (&)(_To) noexcept>()(declval<_From>()) }
-    noexcept;
+    { declval<void (&)(_To) noexcept>()(declval<_From>()) } noexcept;
 };
 
 template<class _From, class _To>
@@ -1661,37 +1646,49 @@ constexpr bool _IsBaseMemPtr = is_object_v<_Mem> && !is_base_of_v<_T, typename d
 }  // namespace _Light
 
 template<class _F, class... _Args>
-inline constexpr bool is_invocable_v = requires {
+inline constexpr bool is_invocable_v =
+    requires
+{
     {declval<_F>()(declval<_Args>()...)};
 };
 
 template<class _T, class _Mem, class _A, class... _Args>
-requires is_function_v<_Mem> && is_base_of_v<_T, typename decay<_A>::type>
-inline constexpr bool is_invocable_v<_Mem _T::*, _A, _Args...> = requires(_Mem _T::*__f) {
+    requires is_function_v<_Mem> && is_base_of_v<_T, typename decay<_A>::type>
+             inline constexpr bool is_invocable_v<_Mem _T::*, _A, _Args...> =
+                 requires(_Mem _T::*__f)
+{
     {(declval<_A>().*__f)(declval<_Args>()...)};
 };
 
 template<class _T, class _Mem, class _A, class... _Args>
-requires is_function_v<_Mem> && _Light::_IsRefWrapper<typename decay<_A>::type>
-inline constexpr bool is_invocable_v<_Mem _T::*, _A, _Args...> = requires(_Mem _T::*__f) {
+    requires is_function_v<_Mem> && _Light::_IsRefWrapper<typename decay<_A>::type>
+             inline constexpr bool is_invocable_v<_Mem _T::*, _A, _Args...> =
+                 requires(_Mem _T::*__f)
+{
     {(declval<_A>().get().*__f)(declval<_Args>()...)};
 };
 
 template<class _T, class _Mem, class _A>
-requires _Light::_IsBaseMemPtr<_T, _Mem, _A>
-inline constexpr bool is_invocable_v<_Mem _T::*, _A> = requires(_Mem _T::*__f) {
+    requires _Light::_IsBaseMemPtr<_T, _Mem, _A>
+             inline constexpr bool is_invocable_v<_Mem _T::*, _A> =
+                 requires(_Mem _T::*__f)
+{
     {(*declval<_A>()).*__f};
 };
 
 template<class _T, class _Mem, class _A>
-requires is_object_v<_Mem> && is_base_of_v<_T, typename decay<_A>::type>
-inline constexpr bool is_invocable_v<_Mem _T::*, _A> = requires(_Mem _T::*__f) {
+    requires is_object_v<_Mem> && is_base_of_v<_T, typename decay<_A>::type>
+             inline constexpr bool is_invocable_v<_Mem _T::*, _A> =
+                 requires(_Mem _T::*__f)
+{
     {declval<_A>().*__f};
 };
 
 template<class _T, class _Mem, class _A>
-requires is_object_v<_Mem> && _Light::_IsRefWrapper<typename decay<_A>::type>
-inline constexpr bool is_invocable_v<_Mem _T::*, _A> = requires(_Mem _T::*__f) {
+    requires is_object_v<_Mem> && _Light::_IsRefWrapper<typename decay<_A>::type>
+             inline constexpr bool is_invocable_v<_Mem _T::*, _A> =
+                 requires(_Mem _T::*__f)
+{
     {declval<_A>.get().*__f};
 };
 
@@ -1706,37 +1703,49 @@ concept _VoidOrConvertibleTo = is_void_v<_To> || is_convertible_v<_From, _To>;
 }  // namespace _Light
 
 template<class _R, class _F, class... _Args>
-inline constexpr bool is_invocable_r_v = requires {
+inline constexpr bool is_invocable_r_v =
+    requires
+{
     { declval<_F>()(declval<_Args>()...) } -> _Light::_VoidOrConvertibleTo<_R>;
 };
 
 template<class _R, class _T, class _Mem, class _A, class... _Args>
-requires is_function_v<_Mem> && is_base_of_v<_T, typename decay<_A>::type>
-inline constexpr bool is_invocable_r_v<_R, _Mem _T::*, _A, _Args...> = requires(_Mem _T::*__f) {
+    requires is_function_v<_Mem> && is_base_of_v<_T, typename decay<_A>::type>
+             inline constexpr bool is_invocable_r_v<_R, _Mem _T::*, _A, _Args...> =
+                 requires(_Mem _T::*__f)
+{
     { (declval<_A>().*__f)(declval<_Args>()...) } -> _Light::_VoidOrConvertibleTo<_R>;
 };
 
 template<class _R, class _T, class _Mem, class _A, class... _Args>
-requires is_function_v<_Mem> && _Light::_IsRefWrapper<typename decay<_A>::type>
-inline constexpr bool is_invocable_r_v<_R, _Mem _T::*, _A, _Args...> = requires(_Mem _T::*__f) {
+    requires is_function_v<_Mem> && _Light::_IsRefWrapper<typename decay<_A>::type>
+             inline constexpr bool is_invocable_r_v<_R, _Mem _T::*, _A, _Args...> =
+                 requires(_Mem _T::*__f)
+{
     { (declval<_A>().get().*__f)(declval<_Args>()...) } -> _Light::_VoidOrConvertibleTo<_R>;
 };
 
 template<class _R, class _T, class _Mem, class _A>
-requires _Light::_IsBaseMemPtr<_T, _Mem, _A>
-inline constexpr bool is_invocable_r_v<_R, _Mem _T::*, _A> = requires(_Mem _T::*__f) {
+    requires _Light::_IsBaseMemPtr<_T, _Mem, _A>
+             inline constexpr bool is_invocable_r_v<_R, _Mem _T::*, _A> =
+                 requires(_Mem _T::*__f)
+{
     { (*declval<_A>()).*__f } -> _Light::_VoidOrConvertibleTo<_R>;
 };
 
 template<class _R, class _T, class _Mem, class _A>
-requires is_object_v<_Mem> && is_base_of_v<_T, typename decay<_A>::type>
-inline constexpr bool is_invocable_r_v<_R, _Mem _T::*, _A> = requires(_Mem _T::*__f) {
+    requires is_object_v<_Mem> && is_base_of_v<_T, typename decay<_A>::type>
+             inline constexpr bool is_invocable_r_v<_R, _Mem _T::*, _A> =
+                 requires(_Mem _T::*__f)
+{
     { declval<_A>().*__f } -> _Light::_VoidOrConvertibleTo<_R>;
 };
 
 template<class _R, class _T, class _Mem, class _A>
-requires is_object_v<_Mem> && _Light::_IsRefWrapper<typename decay<_A>::type>
-inline constexpr bool is_invocable_r_v<_R, _Mem _T::*, _A> = requires(_Mem _T::*__f) {
+    requires is_object_v<_Mem> && _Light::_IsRefWrapper<typename decay<_A>::type>
+             inline constexpr bool is_invocable_r_v<_R, _Mem _T::*, _A> =
+                 requires(_Mem _T::*__f)
+{
     { declval<_A>.get().*__f } -> _Light::_VoidOrConvertibleTo<_R>;
 };
 
@@ -1746,44 +1755,50 @@ struct is_invocable_r : bool_constant<is_invocable_r_v<_R, _F, _Args...>> {};
 
 // region is_nothrow_invocable
 template<class _F, class... _Args>
-inline constexpr bool is_nothrow_invocable_v = requires {
-    { declval<_F>()(declval<_Args>()...) }
-    noexcept;
+inline constexpr bool is_nothrow_invocable_v =
+    requires
+{
+    { declval<_F>()(declval<_Args>()...) } noexcept;
 };
 
 template<class _T, class _Mem, class _A, class... _Args>
-requires is_function_v<_Mem> && is_base_of_v<_T, typename decay<_A>::type>
-inline constexpr bool is_nothrow_invocable_v<_Mem _T::*, _A, _Args...> = requires(_Mem _T::*__f) {
-    { (declval<_A>().*__f)(declval<_Args>()...) }
-    noexcept;
+    requires is_function_v<_Mem> && is_base_of_v<_T, typename decay<_A>::type>
+             inline constexpr bool is_nothrow_invocable_v<_Mem _T::*, _A, _Args...> =
+                 requires(_Mem _T::*__f)
+{
+    { (declval<_A>().*__f)(declval<_Args>()...) } noexcept;
 };
 
 template<class _T, class _Mem, class _A, class... _Args>
-requires is_function_v<_Mem> && _Light::_IsRefWrapper<typename decay<_A>::type>
-inline constexpr bool is_nothrow_invocable_v<_Mem _T::*, _A, _Args...> = requires(_Mem _T::*__f) {
-    { (declval<_A>().get().*__f)(declval<_Args>()...) }
-    noexcept;
+    requires is_function_v<_Mem> && _Light::_IsRefWrapper<typename decay<_A>::type>
+             inline constexpr bool is_nothrow_invocable_v<_Mem _T::*, _A, _Args...> =
+                 requires(_Mem _T::*__f)
+{
+    { (declval<_A>().get().*__f)(declval<_Args>()...) } noexcept;
 };
 
 template<class _T, class _Mem, class _A>
-requires _Light::_IsBaseMemPtr<_T, _Mem, _A>
-inline constexpr bool is_nothrow_invocable_v<_Mem _T::*, _A> = requires(_Mem _T::*__f) {
-    { (*declval<_A>()).*__f }
-    noexcept;
+    requires _Light::_IsBaseMemPtr<_T, _Mem, _A>
+             inline constexpr bool is_nothrow_invocable_v<_Mem _T::*, _A> =
+                 requires(_Mem _T::*__f)
+{
+    { (*declval<_A>()).*__f } noexcept;
 };
 
 template<class _T, class _Mem, class _A>
-requires is_object_v<_Mem> && is_base_of_v<_T, typename decay<_A>::type>
-inline constexpr bool is_nothrow_invocable_v<_Mem _T::*, _A> = requires(_Mem _T::*__f) {
-    { declval<_A>().*__f }
-    noexcept;
+    requires is_object_v<_Mem> && is_base_of_v<_T, typename decay<_A>::type>
+             inline constexpr bool is_nothrow_invocable_v<_Mem _T::*, _A> =
+                 requires(_Mem _T::*__f)
+{
+    { declval<_A>().*__f } noexcept;
 };
 
 template<class _T, class _Mem, class _A>
-requires is_object_v<_Mem> && _Light::_IsRefWrapper<typename decay<_A>::type>
-inline constexpr bool is_nothrow_invocable_v<_Mem _T::*, _A> = requires(_Mem _T::*__f) {
-    { declval<_A>.get().*__f }
-    noexcept;
+    requires is_object_v<_Mem> && _Light::_IsRefWrapper<typename decay<_A>::type>
+             inline constexpr bool is_nothrow_invocable_v<_Mem _T::*, _A> =
+                 requires(_Mem _T::*__f)
+{
+    { declval<_A>.get().*__f } noexcept;
 };
 
 template<class _F, class... _Args>
@@ -1792,44 +1807,50 @@ struct is_nothrow_invocable : bool_constant<is_nothrow_invocable_v<_F, _Args...>
 
 // region is_nothrow_invocable_r
 template<class _R, class _F, class... _Args>
-inline constexpr bool is_nothrow_invocable_r_v = requires {
-    { declval<_F>()(declval<_Args>()...) }
-    noexcept->_Light::_VoidOrConvertibleTo<_R>;
+inline constexpr bool is_nothrow_invocable_r_v =
+    requires
+{
+    { declval<_F>()(declval<_Args>()...) } noexcept -> _Light::_VoidOrConvertibleTo<_R>;
 };
 
 template<class _R, class _T, class _Mem, class _A, class... _Args>
-requires is_function_v<_Mem> && is_base_of_v<_T, typename decay<_A>::type>
-inline constexpr bool is_nothrow_invocable_r_v<_R, _Mem _T::*, _A, _Args...> = requires(_Mem _T::*__f) {
-    { (declval<_A>().*__f)(declval<_Args>()...) }
-    noexcept->_Light::_VoidOrConvertibleTo<_R>;
+    requires is_function_v<_Mem> && is_base_of_v<_T, typename decay<_A>::type>
+             inline constexpr bool is_nothrow_invocable_r_v<_R, _Mem _T::*, _A, _Args...> =
+                 requires(_Mem _T::*__f)
+{
+    { (declval<_A>().*__f)(declval<_Args>()...) } noexcept -> _Light::_VoidOrConvertibleTo<_R>;
 };
 
 template<class _R, class _T, class _Mem, class _A, class... _Args>
-requires is_function_v<_Mem> && _Light::_IsRefWrapper<typename decay<_A>::type>
-inline constexpr bool is_nothrow_invocable_r_v<_R, _Mem _T::*, _A, _Args...> = requires(_Mem _T::*__f) {
-    { (declval<_A>().get().*__f)(declval<_Args>()...) }
-    noexcept->_Light::_VoidOrConvertibleTo<_R>;
+    requires is_function_v<_Mem> && _Light::_IsRefWrapper<typename decay<_A>::type>
+             inline constexpr bool is_nothrow_invocable_r_v<_R, _Mem _T::*, _A, _Args...> =
+                 requires(_Mem _T::*__f)
+{
+    { (declval<_A>().get().*__f)(declval<_Args>()...) } noexcept -> _Light::_VoidOrConvertibleTo<_R>;
 };
 
 template<class _R, class _T, class _Mem, class _A>
-requires _Light::_IsBaseMemPtr<_T, _Mem, _A>
-inline constexpr bool is_nothrow_invocable_r_v<_R, _Mem _T::*, _A> = requires(_Mem _T::*__f) {
-    { (*declval<_A>()).*__f }
-    noexcept->_Light::_VoidOrConvertibleTo<_R>;
+    requires _Light::_IsBaseMemPtr<_T, _Mem, _A>
+             inline constexpr bool is_nothrow_invocable_r_v<_R, _Mem _T::*, _A> =
+                 requires(_Mem _T::*__f)
+{
+    { (*declval<_A>()).*__f } noexcept -> _Light::_VoidOrConvertibleTo<_R>;
 };
 
 template<class _R, class _T, class _Mem, class _A>
-requires is_object_v<_Mem> && is_base_of_v<_T, typename decay<_A>::type>
-inline constexpr bool is_nothrow_invocable_r_v<_R, _Mem _T::*, _A> = requires(_Mem _T::*__f) {
-    { declval<_A>().*__f }
-    noexcept->_Light::_VoidOrConvertibleTo<_R>;
+    requires is_object_v<_Mem> && is_base_of_v<_T, typename decay<_A>::type>
+             inline constexpr bool is_nothrow_invocable_r_v<_R, _Mem _T::*, _A> =
+                 requires(_Mem _T::*__f)
+{
+    { declval<_A>().*__f } noexcept -> _Light::_VoidOrConvertibleTo<_R>;
 };
 
 template<class _R, class _T, class _Mem, class _A>
-requires is_object_v<_Mem> && _Light::_IsRefWrapper<typename decay<_A>::type>
-inline constexpr bool is_nothrow_invocable_r_v<_R, _Mem _T::*, _A> = requires(_Mem _T::*__f) {
-    { declval<_A>.get().*__f }
-    noexcept->_Light::_VoidOrConvertibleTo<_R>;
+    requires is_object_v<_Mem> && _Light::_IsRefWrapper<typename decay<_A>::type>
+             inline constexpr bool is_nothrow_invocable_r_v<_R, _Mem _T::*, _A> =
+                 requires(_Mem _T::*__f)
+{
+    { declval<_A>.get().*__f } noexcept -> _Light::_VoidOrConvertibleTo<_R>;
 };
 
 template<class _R, class _F, class... _Args>
@@ -2010,12 +2031,14 @@ template<size_t _N, class _T>
 struct _FindBySize;
 
 template<size_t _N, class _Head, class... _Tail>
-requires(_N > sizeof(_Head)) struct _FindBySize<_N, _TypeList<_Head, _Tail...>> {
+    requires(_N > sizeof(_Head))
+struct _FindBySize<_N, _TypeList<_Head, _Tail...>> {
     using _T = typename _FindBySize<_N, _TypeList<_Tail...>>::_T;
 };
 
 template<size_t _N, class _Head, class... _Tail>
-requires(_N <= sizeof(_Head)) struct _FindBySize<_N, _TypeList<_Head, _Tail...>> {
+    requires(_N <= sizeof(_Head))
+struct _FindBySize<_N, _TypeList<_Head, _Tail...>> {
     using _T = _Head;
 };
 
@@ -2034,57 +2057,68 @@ struct make_signed {
 };
 
 template<class _T>
-requires(is_same_v<remove_cv_t<_T>, char>) struct make_signed<_T> {
+    requires(is_same_v<remove_cv_t<_T>, char>)
+struct make_signed<_T> {
     using type = typename _Light::_CopyCV<_T, signed char>::_T;
 };
 
 template<class _T>
-requires(is_same_v<remove_cv_t<_T>, unsigned char>) struct make_signed<_T> {
+    requires(is_same_v<remove_cv_t<_T>, unsigned char>)
+struct make_signed<_T> {
     using type = typename _Light::_CopyCV<_T, signed char>::_T;
 };
 
 template<class _T>
-requires(is_same_v<remove_cv_t<_T>, signed char>) struct make_signed<_T> {
+    requires(is_same_v<remove_cv_t<_T>, signed char>)
+struct make_signed<_T> {
     using type = typename _Light::_CopyCV<_T, signed char>::_T;
 };
 
 template<class _T>
-requires(is_same_v<remove_cv_t<_T>, short>) struct make_signed<_T> {
+    requires(is_same_v<remove_cv_t<_T>, short>)
+struct make_signed<_T> {
     using type = typename _Light::_CopyCV<_T, short>::_T;
 };
 
 template<class _T>
-requires(is_same_v<remove_cv_t<_T>, unsigned short>) struct make_signed<_T> {
+    requires(is_same_v<remove_cv_t<_T>, unsigned short>)
+struct make_signed<_T> {
     using type = typename _Light::_CopyCV<_T, short>::_T;
 };
 
 template<class _T>
-requires(is_same_v<remove_cv_t<_T>, int>) struct make_signed<_T> {
+    requires(is_same_v<remove_cv_t<_T>, int>)
+struct make_signed<_T> {
     using type = typename _Light::_CopyCV<_T, int>::_T;
 };
 
 template<class _T>
-requires(is_same_v<remove_cv_t<_T>, unsigned int>) struct make_signed<_T> {
+    requires(is_same_v<remove_cv_t<_T>, unsigned int>)
+struct make_signed<_T> {
     using type = typename _Light::_CopyCV<_T, int>::_T;
 };
 
 template<class _T>
-requires(is_same_v<remove_cv_t<_T>, long>) struct make_signed<_T> {
+    requires(is_same_v<remove_cv_t<_T>, long>)
+struct make_signed<_T> {
     using type = typename _Light::_CopyCV<_T, long>::_T;
 };
 
 template<class _T>
-requires(is_same_v<remove_cv_t<_T>, unsigned long>) struct make_signed<_T> {
+    requires(is_same_v<remove_cv_t<_T>, unsigned long>)
+struct make_signed<_T> {
     using type = typename _Light::_CopyCV<_T, long>::_T;
 };
 
 template<class _T>
-requires(is_same_v<remove_cv_t<_T>, long long>) struct make_signed<_T> {
+    requires(is_same_v<remove_cv_t<_T>, long long>)
+struct make_signed<_T> {
     using type = typename _Light::_CopyCV<_T, long long>::_T;
 };
 
 template<class _T>
-requires(is_same_v<remove_cv_t<_T>, unsigned long long>) struct make_signed<_T> {
+    requires(is_same_v<remove_cv_t<_T>, unsigned long long>)
+struct make_signed<_T> {
     using type = typename _Light::_CopyCV<_T, long long>::_T;
 };
 
@@ -2101,57 +2135,68 @@ struct make_unsigned {
 };
 
 template<class _T>
-requires(is_same_v<remove_cv_t<_T>, char>) struct make_unsigned<_T> {
+    requires(is_same_v<remove_cv_t<_T>, char>)
+struct make_unsigned<_T> {
     using type = typename _Light::_CopyCV<_T, unsigned char>::_T;
 };
 
 template<class _T>
-requires(is_same_v<remove_cv_t<_T>, unsigned char>) struct make_unsigned<_T> {
+    requires(is_same_v<remove_cv_t<_T>, unsigned char>)
+struct make_unsigned<_T> {
     using type = typename _Light::_CopyCV<_T, unsigned char>::_T;
 };
 
 template<class _T>
-requires(is_same_v<remove_cv_t<_T>, signed char>) struct make_unsigned<_T> {
+    requires(is_same_v<remove_cv_t<_T>, signed char>)
+struct make_unsigned<_T> {
     using type = typename _Light::_CopyCV<_T, unsigned char>::_T;
 };
 
 template<class _T>
-requires(is_same_v<remove_cv_t<_T>, short>) struct make_unsigned<_T> {
+    requires(is_same_v<remove_cv_t<_T>, short>)
+struct make_unsigned<_T> {
     using type = typename _Light::_CopyCV<_T, unsigned short>::_T;
 };
 
 template<class _T>
-requires(is_same_v<remove_cv_t<_T>, unsigned short>) struct make_unsigned<_T> {
+    requires(is_same_v<remove_cv_t<_T>, unsigned short>)
+struct make_unsigned<_T> {
     using type = typename _Light::_CopyCV<_T, unsigned short>::_T;
 };
 
 template<class _T>
-requires(is_same_v<remove_cv_t<_T>, int>) struct make_unsigned<_T> {
+    requires(is_same_v<remove_cv_t<_T>, int>)
+struct make_unsigned<_T> {
     using type = typename _Light::_CopyCV<_T, unsigned int>::_T;
 };
 
 template<class _T>
-requires(is_same_v<remove_cv_t<_T>, unsigned int>) struct make_unsigned<_T> {
+    requires(is_same_v<remove_cv_t<_T>, unsigned int>)
+struct make_unsigned<_T> {
     using type = typename _Light::_CopyCV<_T, unsigned int>::_T;
 };
 
 template<class _T>
-requires(is_same_v<remove_cv_t<_T>, long>) struct make_unsigned<_T> {
+    requires(is_same_v<remove_cv_t<_T>, long>)
+struct make_unsigned<_T> {
     using type = typename _Light::_CopyCV<_T, unsigned long>::_T;
 };
 
 template<class _T>
-requires(is_same_v<remove_cv_t<_T>, unsigned long>) struct make_unsigned<_T> {
+    requires(is_same_v<remove_cv_t<_T>, unsigned long>)
+struct make_unsigned<_T> {
     using type = typename _Light::_CopyCV<_T, unsigned long>::_T;
 };
 
 template<class _T>
-requires(is_same_v<remove_cv_t<_T>, long long>) struct make_unsigned<_T> {
+    requires(is_same_v<remove_cv_t<_T>, long long>)
+struct make_unsigned<_T> {
     using type = typename _Light::_CopyCV<_T, unsigned long long>::_T;
 };
 
 template<class _T>
-requires(is_same_v<remove_cv_t<_T>, unsigned long long>) struct make_unsigned<_T> {
+    requires(is_same_v<remove_cv_t<_T>, unsigned long long>)
+struct make_unsigned<_T> {
     using type = typename _Light::_CopyCV<_T, unsigned long long>::_T;
 };
 
@@ -2244,7 +2289,7 @@ struct add_pointer {
 };
 
 template<class _T>
-requires _Light::_Referenceable<_T> || is_void_v<_T>
+    requires _Light::_Referenceable<_T> || is_void_v<_T>
 struct add_pointer<_T> {
     using type = remove_reference_t<_T>*;
 };
@@ -2279,12 +2324,14 @@ template<size_t _N, class _T>
 struct _BestAlignImpl;
 
 template<size_t _N, class _Head, class _Tail1, class... _Tail>
-requires(_N < alignof(_Tail1)) struct _BestAlignImpl<_N, _TypeList<_Head, _Tail1, _Tail...>> {
+    requires(_N < alignof(_Tail1))
+struct _BestAlignImpl<_N, _TypeList<_Head, _Tail1, _Tail...>> {
     using _T = _Head;
 };
 
 template<size_t _N, class _Head, class _Tail1, class... _Tail>
-requires(_N >= alignof(_Tail1)) struct _BestAlignImpl<_N, _TypeList<_Head, _Tail1, _Tail...>> {
+    requires(_N >= alignof(_Tail1))
+struct _BestAlignImpl<_N, _TypeList<_Head, _Tail1, _Tail...>> {
     using _T = typename _BestAlignImpl<_N, _TypeList<_Tail1, _Tail...>>::_T;
 };
 
@@ -2294,7 +2341,8 @@ struct _BestAlignImpl<_N, _TypeList<_Head>> {
 };
 
 template<size_t _N, class _Head, class... _Tail>
-requires(_N <= alignof(_Head)) struct _BestAlignImpl<_N, _TypeList<_Head, _Tail...>> {
+    requires(_N <= alignof(_Head))
+struct _BestAlignImpl<_N, _TypeList<_Head, _Tail...>> {
     using _T = _Head;
 };
 

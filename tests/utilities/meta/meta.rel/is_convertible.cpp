@@ -265,17 +265,17 @@ TEST(function) {
     expect_is_convertible<int(), int (&)(), true>();
     expect_is_convertible<int (&)(), int(), false>();
 
-    expect_is_convertible<int(), int(&&)(), true>();
-    expect_is_convertible<int(&&)(), int(), false>();
+    expect_is_convertible<int(), int (&&)(), true>();
+    expect_is_convertible<int (&&)(), int(), false>();
 
     expect_is_convertible<int (&)(), int (*)(), true>();
     expect_is_convertible<int (*)(), int (&)(), false>();
 
-    expect_is_convertible<int (&)(), int(&&)(), true>();
-    expect_is_convertible<int(&&)(), int (&)(), true>();
+    expect_is_convertible<int (&)(), int (&&)(), true>();
+    expect_is_convertible<int (&&)(), int (&)(), true>();
 
-    expect_is_convertible<int(&&)(), int (*)(), true>();
-    expect_is_convertible<int (*)(), int(&&)(), false>();
+    expect_is_convertible<int (&&)(), int (*)(), true>();
+    expect_is_convertible<int (*)(), int (&&)(), false>();
 }
 
 TEST(array) {

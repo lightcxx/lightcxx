@@ -21,7 +21,9 @@ TEST(throwing_CountedException_helper) {
     try {
         expect(num_exception_instances == 0);
         throw CountedException();
-    } catch (...) { expect(num_exception_instances == 1); }
+    } catch (...) {
+        expect(num_exception_instances == 1);
+    }
     expect(num_exception_instances == 0);
 }
 
@@ -34,7 +36,9 @@ TEST(rethrowing_CountedException_helper) {
         try {
             expect(num_exception_instances == 1);
             throw;
-        } catch (...) { expect(num_exception_instances == 1); }
+        } catch (...) {
+            expect(num_exception_instances == 1);
+        }
         expect(num_exception_instances == 1);
     }
     expect(num_exception_instances == 0);
@@ -119,7 +123,9 @@ TEST(inside_try_clause_nested_in_rethrow_catch_clause) {
             expect(num_exception_instances == 1);
             expect(p != nullptr);
             throw;
-        } catch (...) { expect(num_exception_instances == 1); }
+        } catch (...) {
+            expect(num_exception_instances == 1);
+        }
         expect(num_exception_instances == 1);
     }
     expect(num_exception_instances == 0);
@@ -166,7 +172,9 @@ TEST(inside_catch_clause_after_nested_rethrow) {
     } catch (...) {
         try {
             throw;
-        } catch (...) { expect(num_exception_instances == 1); }
+        } catch (...) {
+            expect(num_exception_instances == 1);
+        }
         std::exception_ptr p = std::current_exception();
         expect(num_exception_instances == 1);
         expect(p != nullptr);

@@ -12,7 +12,8 @@ struct source_location {
         return __ret;
     }
 
-    constexpr source_location(): source_location(0, 0, "", "") {}
+    constexpr source_location()
+            : source_location(0, 0, "", "") {}
     constexpr source_location(const source_location&) noexcept = default;
     constexpr source_location(source_location&&) noexcept = default;
     constexpr source_location& operator=(const source_location&) noexcept = default;

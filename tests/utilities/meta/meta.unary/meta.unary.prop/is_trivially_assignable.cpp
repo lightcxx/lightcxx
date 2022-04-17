@@ -277,8 +277,8 @@ static_assert(test_is_trivially_assignable<false, int (&)(), int()>());
 static_assert(test_is_trivially_assignable<false, int (&)(), int(int)>());
 static_assert(test_is_trivially_assignable<false, int (&)(), int (&)()>());
 static_assert(test_is_trivially_assignable<false, int (&)(), int (&)(int)>());
-static_assert(test_is_trivially_assignable<false, int (&)(), int(&&)()>());
-static_assert(test_is_trivially_assignable<false, int (&)(), int(&&)(int)>());
+static_assert(test_is_trivially_assignable<false, int (&)(), int (&&)()>());
+static_assert(test_is_trivially_assignable<false, int (&)(), int (&&)(int)>());
 
 static_assert(test_is_trivially_assignable<true, Class&, Derived&>());
 static_assert(test_is_trivially_assignable<true, Class&, const Derived&>());
@@ -390,13 +390,13 @@ static_assert(test_is_trivially_assignable<false, const volatile int&&, const in
 static_assert(test_is_trivially_assignable<false, const volatile int&&, volatile int>());
 static_assert(test_is_trivially_assignable<false, const volatile int&&, const volatile int>());
 
-static_assert(test_is_trivially_assignable<false, int(&&)()>());
-static_assert(test_is_trivially_assignable<false, int(&&)(), int()>());
-static_assert(test_is_trivially_assignable<false, int(&&)(), int(int)>());
-static_assert(test_is_trivially_assignable<false, int(&&)(), int (&)()>());
-static_assert(test_is_trivially_assignable<false, int(&&)(), int (&)(int)>());
-static_assert(test_is_trivially_assignable<false, int(&&)(), int(&&)()>());
-static_assert(test_is_trivially_assignable<false, int(&&)(), int(&&)(int)>());
+static_assert(test_is_trivially_assignable<false, int (&&)()>());
+static_assert(test_is_trivially_assignable<false, int (&&)(), int()>());
+static_assert(test_is_trivially_assignable<false, int (&&)(), int(int)>());
+static_assert(test_is_trivially_assignable<false, int (&&)(), int (&)()>());
+static_assert(test_is_trivially_assignable<false, int (&&)(), int (&)(int)>());
+static_assert(test_is_trivially_assignable<false, int (&&)(), int (&&)()>());
+static_assert(test_is_trivially_assignable<false, int (&&)(), int (&&)(int)>());
 
 static_assert(test_is_trivially_assignable<true, Class&&, Derived&>());
 static_assert(test_is_trivially_assignable<true, Class&&, const Derived&>());
@@ -486,8 +486,8 @@ static_assert(test_is_trivially_assignable<false, Abstract, const Abstract&>());
 // region function
 static_assert(test_is_trivially_assignable<false, int(), int()>());
 static_assert(test_is_trivially_assignable<false, int(), int (&)()>());
-static_assert(test_is_trivially_assignable<false, int(), int(&&)()>());
+static_assert(test_is_trivially_assignable<false, int(), int (&&)()>());
 static_assert(test_is_trivially_assignable<false, int(), int(int, int)>());
 static_assert(test_is_trivially_assignable<false, int(), int (&)(int, int)>());
-static_assert(test_is_trivially_assignable<false, int(), int(&&)(int, int)>());
+static_assert(test_is_trivially_assignable<false, int(), int (&&)(int, int)>());
 // endregion

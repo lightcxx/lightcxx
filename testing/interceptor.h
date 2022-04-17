@@ -20,7 +20,8 @@ class CFunctionInterceptor<R(Args...)> {
     Replacement* replacement = nullptr;
 
   public:
-    [[maybe_unused]] CFunctionInterceptor(const char* symbol): symbol(symbol) {}
+    [[maybe_unused]] CFunctionInterceptor(const char* symbol)
+            : symbol(symbol) {}
 
     void reset() {
         raw_replacement = nullptr;

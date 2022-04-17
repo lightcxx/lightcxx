@@ -36,7 +36,7 @@ TEST_UNARY_TRAIT_AGAINST_TYPES(true, is_nothrow_swappable, NO_CV, int&, volatile
 TEST_UNARY_TRAIT_AGAINST_TYPES(false, is_nothrow_swappable, NO_CV, const int&, const volatile int&, int* const&, int* const volatile&, int (&)(int));
 
 TEST_UNARY_TRAIT_AGAINST_TYPES(true, is_nothrow_swappable, NO_CV, int&&, volatile int&&, int*&&, int* volatile&&);
-TEST_UNARY_TRAIT_AGAINST_TYPES(false, is_nothrow_swappable, NO_CV, const int&&, const volatile int&&, int* const&&, int* const volatile&&, int(&&)(int));
+TEST_UNARY_TRAIT_AGAINST_TYPES(false, is_nothrow_swappable, NO_CV, const int&&, const volatile int&&, int* const&&, int* const volatile&&, int (&&)(int));
 
 TEST_UNARY_TRAIT_AGAINST_MEMBER_OBJECT_POINTER(true, is_nothrow_swappable, NO_CV);
 TEST_UNARY_TRAIT_AGAINST_MEMBER_OBJECT_POINTER(true, is_nothrow_swappable, VOLATILE);

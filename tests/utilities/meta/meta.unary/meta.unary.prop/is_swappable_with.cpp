@@ -317,8 +317,8 @@ static_assert(test_is_swappable_with<false, int (&)(), int()>());
 static_assert(test_is_swappable_with<false, int (&)(), int(int)>());
 static_assert(test_is_swappable_with<false, int (&)(), int (&)()>());
 static_assert(test_is_swappable_with<false, int (&)(), int (&)(int)>());
-static_assert(test_is_swappable_with<false, int (&)(), int(&&)()>());
-static_assert(test_is_swappable_with<false, int (&)(), int(&&)(int)>());
+static_assert(test_is_swappable_with<false, int (&)(), int (&&)()>());
+static_assert(test_is_swappable_with<false, int (&)(), int (&&)(int)>());
 // endregion
 
 // region rvalue reference
@@ -378,13 +378,13 @@ static_assert(test_is_swappable_with<false, const volatile int&&, const int>());
 static_assert(test_is_swappable_with<false, const volatile int&&, volatile int>());
 static_assert(test_is_swappable_with<false, const volatile int&&, const volatile int>());
 
-static_assert(test_is_swappable_with<false, int(&&)()>());
-static_assert(test_is_swappable_with<false, int(&&)(), int()>());
-static_assert(test_is_swappable_with<false, int(&&)(), int(int)>());
-static_assert(test_is_swappable_with<false, int(&&)(), int (&)()>());
-static_assert(test_is_swappable_with<false, int(&&)(), int (&)(int)>());
-static_assert(test_is_swappable_with<false, int(&&)(), int(&&)()>());
-static_assert(test_is_swappable_with<false, int(&&)(), int(&&)(int)>());
+static_assert(test_is_swappable_with<false, int (&&)()>());
+static_assert(test_is_swappable_with<false, int (&&)(), int()>());
+static_assert(test_is_swappable_with<false, int (&&)(), int(int)>());
+static_assert(test_is_swappable_with<false, int (&&)(), int (&)()>());
+static_assert(test_is_swappable_with<false, int (&&)(), int (&)(int)>());
+static_assert(test_is_swappable_with<false, int (&&)(), int (&&)()>());
+static_assert(test_is_swappable_with<false, int (&&)(), int (&&)(int)>());
 // endregion
 
 // region union
@@ -398,8 +398,8 @@ static_assert(test_is_swappable_with<false, Class, Class>());
 // region function
 static_assert(test_is_swappable_with<false, int(), int()>());
 static_assert(test_is_swappable_with<false, int(), int (&)()>());
-static_assert(test_is_swappable_with<false, int(), int(&&)()>());
+static_assert(test_is_swappable_with<false, int(), int (&&)()>());
 static_assert(test_is_swappable_with<false, int(), int(int, int)>());
 static_assert(test_is_swappable_with<false, int(), int (&)(int, int)>());
-static_assert(test_is_swappable_with<false, int(), int(&&)(int, int)>());
+static_assert(test_is_swappable_with<false, int(), int (&&)(int, int)>());
 // endregion

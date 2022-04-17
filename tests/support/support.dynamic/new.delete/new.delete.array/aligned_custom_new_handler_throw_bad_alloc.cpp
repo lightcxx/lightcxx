@@ -22,7 +22,9 @@ TEST() {
     try {
         [[maybe_unused]] const auto const_ptr = ::operator new[](256, std::align_val_t{128});
         fail();
-    } catch (std::bad_alloc& exception) { step("throw"); } catch (...) {
+    } catch (std::bad_alloc& exception) {
+        step("throw");
+    } catch (...) {
         fail();
     }
 }

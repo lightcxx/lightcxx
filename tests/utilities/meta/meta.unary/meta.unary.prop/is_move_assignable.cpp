@@ -33,7 +33,7 @@ TEST_UNARY_TRAIT_AGAINST_TYPES(false, is_move_assignable, NO_CV, const int&, con
 TEST_UNARY_TRAIT_AGAINST_TYPES(true, is_move_assignable, NO_CV, int&, volatile int&, int*&, int* volatile&);
 
 TEST_UNARY_TRAIT_AGAINST_TYPES(false, is_move_assignable, NO_CV, const int&&, const volatile int&&, int* const&&, int* const volatile&&, incomplete_type&&,
-                               const incomplete_type&&, volatile incomplete_type&&, const volatile incomplete_type&&, int(&&)(int));
+                               const incomplete_type&&, volatile incomplete_type&&, const volatile incomplete_type&&, int (&&)(int));
 TEST_UNARY_TRAIT_AGAINST_TYPES(true, is_move_assignable, NO_CV, int&&, volatile int&&, int*&&, int* volatile&&);
 
 TEST_UNARY_TRAIT_AGAINST_MEMBER_OBJECT_POINTER(true, is_move_assignable, NO_CV);

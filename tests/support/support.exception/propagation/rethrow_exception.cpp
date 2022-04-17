@@ -10,7 +10,8 @@ struct CountedException {
         ++num_exception_instances;
     }
 
-    explicit CountedException(int data): data(data) {
+    explicit CountedException(int data)
+            : data(data) {
         ++num_exception_instances;
     }
 
@@ -27,7 +28,9 @@ TEST(common_case) {
     std::exception_ptr p;
     try {
         throw CountedException(3);
-    } catch (...) { p = std::current_exception(); }
+    } catch (...) {
+        p = std::current_exception();
+    }
 
     expect(num_exception_instances == 1);
 
@@ -48,7 +51,9 @@ TEST(keep_exception_ptr_instance) {
     std::exception_ptr p;
     try {
         throw CountedException(3);
-    } catch (const CountedException&) { p = std::current_exception(); } catch (...) {
+    } catch (const CountedException&) {
+        p = std::current_exception();
+    } catch (...) {
         fail();
     }
 
@@ -61,7 +66,9 @@ TEST(keep_exception_ptr_instance) {
         expect(p != nullptr);
         expect(a.data == 3);
         expect(num_exception_instances == 1);
-    } catch (...) { fail(); }
+    } catch (...) {
+        fail();
+    }
 
     expect(num_exception_instances == 1);
     p = nullptr;

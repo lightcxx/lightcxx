@@ -79,7 +79,9 @@ template<class _E>
 exception_ptr make_exception_ptr(_E __e) noexcept {
     try {
         throw __e;
-    } catch (...) { return current_exception(); }
+    } catch (...) {
+        return current_exception();
+    }
 }
 
 class nested_exception {
@@ -100,7 +102,8 @@ namespace _Light {
 
 template<class _T>
 struct _WithNested : public _T, public nested_exception {
-    explicit _WithNested(const _T& __t): _T(__t) {}
+    explicit _WithNested(const _T& __t)
+            : _T(__t) {}
 };
 
 }  // namespace _Light

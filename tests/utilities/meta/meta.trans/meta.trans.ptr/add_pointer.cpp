@@ -16,7 +16,7 @@ template<class T>
 struct TEST : bool_constant<test_add_pointer<T, T*>()> {};
 
 template<class T>
-requires is_reference_v<T>
+    requires is_reference_v<T>
 struct TEST<T> : bool_constant<test_add_pointer<T, std::remove_reference_t<T>*>()> {
 };
 

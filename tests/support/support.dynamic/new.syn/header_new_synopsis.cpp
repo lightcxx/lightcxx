@@ -73,7 +73,7 @@ TEST() {
     delete[] arr1_natural;
 
     const auto arr2_explicit = ::operator new[](sizeof(Tp), ::std::align_val_t{alignof(Tp)});
-    ::operator delete[](arr2_explicit, ::std::align_val_t{alignof(Tp)});
+    ::operator delete[] (arr2_explicit, ::std::align_val_t{alignof(Tp)});
 
     const auto arr2_natural = new (::std::align_val_t{alignof(Tp)}) Tp[1];
     // Since there is no natural way to call operator delete[] (void*, align_val_t), and since there
@@ -88,10 +88,10 @@ TEST() {
     // Since there is no natural way to call operator delete[] (void*, nothrow_t), and since there
     // are 6 delete[] variants and only 4 new[] variants, delete arr3_natural using
     // (void*, size_t, align_val_t) instead.
-    ::operator delete[](arr3_natural, sizeof(Tp), ::std::align_val_t{alignof(Tp)});
+    ::operator delete[] (arr3_natural, sizeof(Tp), ::std::align_val_t{alignof(Tp)});
 
     const auto arr4_explicit = ::operator new[](sizeof(Tp), ::std::align_val_t{alignof(Tp)}, ::std::nothrow);
-    ::operator delete[](arr4_explicit, ::std::align_val_t{alignof(Tp)}, ::std::nothrow);
+    ::operator delete[] (arr4_explicit, ::std::align_val_t{alignof(Tp)}, ::std::nothrow);
 
     const auto arr4_natural = new (::std::align_val_t{alignof(Tp)}, ::std::nothrow) Tp[1];
     delete[] arr4_natural;

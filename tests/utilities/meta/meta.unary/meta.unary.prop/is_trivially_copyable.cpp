@@ -2,51 +2,55 @@
 
 #include "meta/test_unary_trait.h"
 
-// clang-format off
-#define DECLARE_CLASS(NAME, DFLT_CTOR, CP_CTOR, MV_CTOR, CP_ASSIGN, MV_ASSIGN, DTOR)               \
-    struct NAME {                                                                                  \
-        NAME() DFLT_CTOR                                                                           \
-        NAME(const NAME&) CP_CTOR                                                                  \
-        NAME(NAME&&) MV_CTOR                                                                       \
-        NAME& operator=(const NAME&) CP_ASSIGN                                                     \
-        NAME& operator=(NAME&&) MV_ASSIGN                                                          \
-        ~NAME() DTOR                                                                               \
+#define DECLARE_CLASS(NAME, DFLT_CTOR, CP_CTOR, MV_CTOR, CP_ASSIGN, MV_ASSIGN, DTOR) \
+    struct NAME {                                                                    \
+        NAME()                                                                       \
+        DFLT_CTOR                                                                    \
+        NAME(const NAME&)                                                            \
+        CP_CTOR                                                                      \
+          NAME(NAME&&) MV_CTOR                                                       \
+          NAME&                                                                      \
+          operator=(const NAME&) CP_ASSIGN                                           \
+          NAME&                                                                      \
+          operator=(NAME&&) MV_ASSIGN                                                \
+          ~NAME() DTOR                                                               \
     }
 
 #define DEFAULT = default;
 #define DELETE = delete;
-#define EMPTY {}
-#define EMPTY_ASSIGN { return *this; }
-// clang-format on
+#define EMPTY \
+    {}
+#define EMPTY_ASSIGN \
+    { return *this; }
 
-#define DECLARE_DTOR_CLASSES(PREFIX, DFLT_CTOR, CP_CTOR, MV_CTOR, CP_ASSIGN, MV_ASSIGN)                                                                        \
-    DECLARE_CLASS(PREFIX##_DefaultDtor, DFLT_CTOR, CP_CTOR, MV_CTOR, CP_ASSIGN, MV_ASSIGN, DEFAULT);                                                           \
-    DECLARE_CLASS(PREFIX##_DeleteDtor, DFLT_CTOR, CP_CTOR, MV_CTOR, CP_ASSIGN, MV_ASSIGN, DELETE);                                                             \
+#define DECLARE_DTOR_CLASSES(PREFIX, DFLT_CTOR, CP_CTOR, MV_CTOR, CP_ASSIGN, MV_ASSIGN)              \
+    DECLARE_CLASS(PREFIX##_DefaultDtor, DFLT_CTOR, CP_CTOR, MV_CTOR, CP_ASSIGN, MV_ASSIGN, DEFAULT); \
+    DECLARE_CLASS(PREFIX##_DeleteDtor, DFLT_CTOR, CP_CTOR, MV_CTOR, CP_ASSIGN, MV_ASSIGN, DELETE);   \
     DECLARE_CLASS(PREFIX##_EmptyDtor, DFLT_CTOR, CP_CTOR, MV_CTOR, CP_ASSIGN, MV_ASSIGN, EMPTY)
 
-#define DECLARE_MV_ASSIGN_CLASSES(PREFIX, DFLT_CTOR, CP_CTOR, MV_CTOR, CP_ASSIGN)                                                                              \
-    DECLARE_DTOR_CLASSES(PREFIX##_DefaultMvAssign, DFLT_CTOR, CP_CTOR, MV_CTOR, CP_ASSIGN, DEFAULT);                                                           \
-    DECLARE_DTOR_CLASSES(PREFIX##_DeleteMvAssign, DFLT_CTOR, CP_CTOR, MV_CTOR, CP_ASSIGN, DELETE);                                                             \
+#define DECLARE_MV_ASSIGN_CLASSES(PREFIX, DFLT_CTOR, CP_CTOR, MV_CTOR, CP_ASSIGN)                    \
+    DECLARE_DTOR_CLASSES(PREFIX##_DefaultMvAssign, DFLT_CTOR, CP_CTOR, MV_CTOR, CP_ASSIGN, DEFAULT); \
+    DECLARE_DTOR_CLASSES(PREFIX##_DeleteMvAssign, DFLT_CTOR, CP_CTOR, MV_CTOR, CP_ASSIGN, DELETE);   \
     DECLARE_DTOR_CLASSES(PREFIX##_EmptyMvAssign, DFLT_CTOR, CP_CTOR, MV_CTOR, CP_ASSIGN, EMPTY_ASSIGN)
 
-#define DECLARE_CP_ASSIGN_CLASSES(PREFIX, DFLT_CTOR, CP_CTOR, MV_CTOR)                                                                                         \
-    DECLARE_MV_ASSIGN_CLASSES(PREFIX##_DefaultCpAssign, DFLT_CTOR, CP_CTOR, MV_CTOR, DEFAULT);                                                                 \
-    DECLARE_MV_ASSIGN_CLASSES(PREFIX##_DeleteCpAssign, DFLT_CTOR, CP_CTOR, MV_CTOR, DELETE);                                                                   \
+#define DECLARE_CP_ASSIGN_CLASSES(PREFIX, DFLT_CTOR, CP_CTOR, MV_CTOR)                         \
+    DECLARE_MV_ASSIGN_CLASSES(PREFIX##_DefaultCpAssign, DFLT_CTOR, CP_CTOR, MV_CTOR, DEFAULT); \
+    DECLARE_MV_ASSIGN_CLASSES(PREFIX##_DeleteCpAssign, DFLT_CTOR, CP_CTOR, MV_CTOR, DELETE);   \
     DECLARE_MV_ASSIGN_CLASSES(PREFIX##_EmptyCpAssign, DFLT_CTOR, CP_CTOR, MV_CTOR, EMPTY_ASSIGN)
 
-#define DECLARE_MV_CTOR_CLASSES(PREFIX, DFLT_CTOR, CP_CTOR)                                                                                                    \
-    DECLARE_CP_ASSIGN_CLASSES(PREFIX##_DefaultMvCtor, DFLT_CTOR, CP_CTOR, DEFAULT);                                                                            \
-    DECLARE_CP_ASSIGN_CLASSES(PREFIX##_DeleteMvCtor, DFLT_CTOR, CP_CTOR, DELETE);                                                                              \
+#define DECLARE_MV_CTOR_CLASSES(PREFIX, DFLT_CTOR, CP_CTOR)                         \
+    DECLARE_CP_ASSIGN_CLASSES(PREFIX##_DefaultMvCtor, DFLT_CTOR, CP_CTOR, DEFAULT); \
+    DECLARE_CP_ASSIGN_CLASSES(PREFIX##_DeleteMvCtor, DFLT_CTOR, CP_CTOR, DELETE);   \
     DECLARE_CP_ASSIGN_CLASSES(PREFIX##_EmptyMvCtor, DFLT_CTOR, CP_CTOR, EMPTY)
 
-#define DECLARE_CP_CTOR_CLASSES(PREFIX, DFLT_CTOR)                                                                                                             \
-    DECLARE_MV_CTOR_CLASSES(PREFIX##_DefaultCpCtor, DFLT_CTOR, DEFAULT);                                                                                       \
-    DECLARE_MV_CTOR_CLASSES(PREFIX##_DeleteCpCtor, DFLT_CTOR, DELETE);                                                                                         \
+#define DECLARE_CP_CTOR_CLASSES(PREFIX, DFLT_CTOR)                       \
+    DECLARE_MV_CTOR_CLASSES(PREFIX##_DefaultCpCtor, DFLT_CTOR, DEFAULT); \
+    DECLARE_MV_CTOR_CLASSES(PREFIX##_DeleteCpCtor, DFLT_CTOR, DELETE);   \
     DECLARE_MV_CTOR_CLASSES(PREFIX##_EmptyCpCtor, DFLT_CTOR, EMPTY)
 
-#define DECLARE_DFLT_CTOR_CLASSES(PREFIX)                                                                                                                      \
-    DECLARE_CP_CTOR_CLASSES(PREFIX##_DefaultDfltCtor, DEFAULT);                                                                                                \
-    DECLARE_CP_CTOR_CLASSES(PREFIX##_DeleteDfltCtor, DELETE);                                                                                                  \
+#define DECLARE_DFLT_CTOR_CLASSES(PREFIX)                       \
+    DECLARE_CP_CTOR_CLASSES(PREFIX##_DefaultDfltCtor, DEFAULT); \
+    DECLARE_CP_CTOR_CLASSES(PREFIX##_DeleteDfltCtor, DELETE);   \
     DECLARE_CP_CTOR_CLASSES(PREFIX##_EmptyDfltCtor, EMPTY)
 
 #define DECLARE_CLASSES() DECLARE_DFLT_CTOR_CLASSES(C)
@@ -71,10 +75,9 @@ TEST_UNARY_TRAIT_AGAINST_UNION(false, is_trivially_copyable, EVERY_CV);
 TEST_UNARY_TRAIT_AGAINST_FUNCTION(false, is_trivially_copyable);
 
 // Classes and array of classes.
-#define TEST_IS_TRIVIALLY_COPYABLE(EXPECTED, CLASS)                                                                                                            \
+#define TEST_IS_TRIVIALLY_COPYABLE(EXPECTED, CLASS) \
     TEST_UNARY_TRAIT_AGAINST_TYPES(EXPECTED, is_trivially_copyable, EVERY_CV, CLASS, CLASS[10], CLASS[10][10], CLASS[], CLASS[][10])
 
-// clang-format off
 TEST_IS_TRIVIALLY_COPYABLE(true, C_DefaultDfltCtor_DefaultCpCtor_DefaultMvCtor_DefaultCpAssign_DefaultMvAssign_DefaultDtor);
 TEST_IS_TRIVIALLY_COPYABLE(false, C_DefaultDfltCtor_DefaultCpCtor_DefaultMvCtor_DefaultCpAssign_DefaultMvAssign_DeleteDtor);
 TEST_IS_TRIVIALLY_COPYABLE(false, C_DefaultDfltCtor_DefaultCpCtor_DefaultMvCtor_DefaultCpAssign_DefaultMvAssign_EmptyDtor);
@@ -809,4 +812,3 @@ TEST_IS_TRIVIALLY_COPYABLE(false, C_EmptyDfltCtor_EmptyCpCtor_EmptyMvCtor_EmptyC
 TEST_IS_TRIVIALLY_COPYABLE(false, C_EmptyDfltCtor_EmptyCpCtor_EmptyMvCtor_EmptyCpAssign_EmptyMvAssign_DefaultDtor);
 TEST_IS_TRIVIALLY_COPYABLE(false, C_EmptyDfltCtor_EmptyCpCtor_EmptyMvCtor_EmptyCpAssign_EmptyMvAssign_DeleteDtor);
 TEST_IS_TRIVIALLY_COPYABLE(false, C_EmptyDfltCtor_EmptyCpCtor_EmptyMvCtor_EmptyCpAssign_EmptyMvAssign_EmptyDtor);
-// clang-format on

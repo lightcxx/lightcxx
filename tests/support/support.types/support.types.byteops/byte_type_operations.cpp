@@ -3,25 +3,25 @@
 #include "testing.h"
 
 TEST() {
-#define TEST_BYTE_OPS_WITH_VALID_INT_TYPE(T)                                                                                                                   \
-    expect_ct_and_rt(::std::byte{8} == ::std::byte{4} << (T)1);                                                                                                \
-    expect_ct_and_rt(::std::byte{8} == [] {                                                                                                                    \
-        ::std::byte b{4};                                                                                                                                      \
-        b <<= (T)1;                                                                                                                                            \
-        return b;                                                                                                                                              \
-    }());                                                                                                                                                      \
-    expect_ct_and_rt(::std::byte{8} == ::std::byte{16} >> (T)1);                                                                                               \
-    expect_ct_and_rt(::std::byte{8} == [] {                                                                                                                    \
-        ::std::byte b{16};                                                                                                                                     \
-        b >>= (T)1;                                                                                                                                            \
-        return b;                                                                                                                                              \
+#define TEST_BYTE_OPS_WITH_VALID_INT_TYPE(T)                     \
+    expect_ct_and_rt(::std::byte{8} == ::std::byte{4} << (T)1);  \
+    expect_ct_and_rt(::std::byte{8} == [] {                      \
+        ::std::byte b{4};                                        \
+        b <<= (T)1;                                              \
+        return b;                                                \
+    }());                                                        \
+    expect_ct_and_rt(::std::byte{8} == ::std::byte{16} >> (T)1); \
+    expect_ct_and_rt(::std::byte{8} == [] {                      \
+        ::std::byte b{16};                                       \
+        b >>= (T)1;                                              \
+        return b;                                                \
     }());
 
-#define TEST_BYTE_OPS_AND_TO_INTEGER_WITH_VALID_INT_TYPE_ALL_CV_VARIANTS(T)                                                                                    \
-    TEST_BYTE_OPS_WITH_VALID_INT_TYPE(T);                                                                                                                      \
-    TEST_BYTE_OPS_WITH_VALID_INT_TYPE(T const);                                                                                                                \
-    TEST_BYTE_OPS_WITH_VALID_INT_TYPE(T volatile);                                                                                                             \
-    TEST_BYTE_OPS_WITH_VALID_INT_TYPE(T const volatile);                                                                                                       \
+#define TEST_BYTE_OPS_AND_TO_INTEGER_WITH_VALID_INT_TYPE_ALL_CV_VARIANTS(T) \
+    TEST_BYTE_OPS_WITH_VALID_INT_TYPE(T);                                   \
+    TEST_BYTE_OPS_WITH_VALID_INT_TYPE(T const);                             \
+    TEST_BYTE_OPS_WITH_VALID_INT_TYPE(T volatile);                          \
+    TEST_BYTE_OPS_WITH_VALID_INT_TYPE(T const volatile);                    \
     expect_ct_and_rt(::std::to_integer<T>(::std::byte{8}) == (T)8)
 
     TEST_BYTE_OPS_AND_TO_INTEGER_WITH_VALID_INT_TYPE_ALL_CV_VARIANTS(bool);

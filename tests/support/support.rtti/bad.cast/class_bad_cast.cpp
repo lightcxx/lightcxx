@@ -24,7 +24,9 @@ TEST() {
 
     try {
         throw default_constructed;
-    } catch (std::bad_cast& thrown) { expect(default_constructed.what() == thrown.what()); } catch (...) {
+    } catch (std::bad_cast& thrown) {
+        expect(default_constructed.what() == thrown.what());
+    } catch (...) {
         fail();
     }
 

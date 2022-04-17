@@ -9,7 +9,9 @@ TEST(int_) {
 
     try {
         std::rethrow_exception(exc);
-    } catch (int& v) { expect(v == 4); } catch (...) {
+    } catch (int& v) {
+        expect(v == 4);
+    } catch (...) {
         fail();
     }
 }
@@ -22,7 +24,9 @@ TEST(exception_) {
     try {
         std::rethrow_exception(exc);
     } catch (std::exception&) {
-    } catch (...) { fail(); }
+    } catch (...) {
+        fail();
+    }
 }
 
 TEST(catch_by_base_class) {
@@ -33,7 +37,9 @@ TEST(catch_by_base_class) {
     try {
         std::rethrow_exception(exc);
     } catch (std::exception&) {
-    } catch (...) { fail(); }
+    } catch (...) {
+        fail();
+    }
 }
 
 TEST(current_exception_is_equal_to_initial) {
@@ -43,5 +49,7 @@ TEST(current_exception_is_equal_to_initial) {
 
     try {
         std::rethrow_exception(exc);
-    } catch (...) { expect(std::current_exception() == exc); }
+    } catch (...) {
+        expect(std::current_exception() == exc);
+    }
 }

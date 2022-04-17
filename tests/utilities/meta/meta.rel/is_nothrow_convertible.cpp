@@ -265,17 +265,17 @@ TEST(function) {
     expect_is_nothrow_convertible<int(), int (&)(), true>();
     expect_is_nothrow_convertible<int (&)(), int(), false>();
 
-    expect_is_nothrow_convertible<int(), int(&&)(), true>();
-    expect_is_nothrow_convertible<int(&&)(), int(), false>();
+    expect_is_nothrow_convertible<int(), int (&&)(), true>();
+    expect_is_nothrow_convertible<int (&&)(), int(), false>();
 
     expect_is_nothrow_convertible<int (&)(), int (*)(), true>();
     expect_is_nothrow_convertible<int (*)(), int (&)(), false>();
 
-    expect_is_nothrow_convertible<int (&)(), int(&&)(), true>();
-    expect_is_nothrow_convertible<int(&&)(), int (&)(), true>();
+    expect_is_nothrow_convertible<int (&)(), int (&&)(), true>();
+    expect_is_nothrow_convertible<int (&&)(), int (&)(), true>();
 
-    expect_is_nothrow_convertible<int(&&)(), int (*)(), true>();
-    expect_is_nothrow_convertible<int (*)(), int(&&)(), false>();
+    expect_is_nothrow_convertible<int (&&)(), int (*)(), true>();
+    expect_is_nothrow_convertible<int (*)(), int (&&)(), false>();
 }
 
 TEST(array) {
@@ -316,7 +316,8 @@ struct E {
 };
 
 struct A2 {
-    A2(const char*) noexcept {}
+    A2(const char*)
+    noexcept {}
 };
 
 struct B2 {

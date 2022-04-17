@@ -48,7 +48,9 @@ int at_quick_exit(_Light::_AtExitHandler* func) noexcept {
 [[noreturn]] void exit(int status) {
     try {
         ::exit(status);
-    } catch (...) { std::terminate(); }
+    } catch (...) {
+        std::terminate();
+    }
 }
 
 [[noreturn]] void _Exit(int status) noexcept {
@@ -62,7 +64,9 @@ int at_quick_exit(_Light::_AtExitHandler* func) noexcept {
     for (; index > 0; --index) {
         try {
             _Light::quick_exit_handlers[index - 1].get()();
-        } catch (...) { std::terminate(); }
+        } catch (...) {
+            std::terminate();
+        }
     }
     std::_Exit(status);
 }

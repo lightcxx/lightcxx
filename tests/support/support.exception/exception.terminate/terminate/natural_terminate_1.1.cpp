@@ -30,5 +30,7 @@ TEST() {
 
     try {
         throw NonCompliantException();
-    } catch ([[maybe_unused]] NonCompliantException copy) { fail(); }
+    } catch ([[maybe_unused]] NonCompliantException copy) {
+        fail();
+    }
 }

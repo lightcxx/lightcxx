@@ -67,7 +67,9 @@ TEST(manual_rethrow_nested_ptr) {
 
         try {
             std::rethrow_exception(exc.nested_ptr());
-        } catch (int& v) { expect(v == 5); } catch (...) {
+        } catch (int& v) {
+            expect(v == 5);
+        } catch (...) {
             fail();
         }
     }
@@ -82,7 +84,9 @@ TEST(rethrow_nested_from_default_constructed) {
 
         try {
             exc.rethrow_nested();
-        } catch (int& v) { expect(v == 5); } catch (...) {
+        } catch (int& v) {
+            expect(v == 5);
+        } catch (...) {
             fail();
         }
     }
@@ -100,7 +104,9 @@ TEST(rethrow_nested_from_copy_assigned) {
 
         try {
             exc_copy.rethrow_nested();
-        } catch (int& v) { expect(v == 5); } catch (...) {
+        } catch (int& v) {
+            expect(v == 5);
+        } catch (...) {
             fail();
         }
     }
@@ -117,7 +123,9 @@ TEST(rethrow_nested_from_copy_constructed) {
 
         try {
             exc_copy.rethrow_nested();
-        } catch (int& v) { expect(v == 5); } catch (...) {
+        } catch (int& v) {
+            expect(v == 5);
+        } catch (...) {
             fail();
         }
     }

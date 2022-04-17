@@ -49,8 +49,10 @@ struct NonTrivialNoexcept {
     int x;
     int y;
 
-    NonTrivialNoexcept(int x, int y): x(x), y(y) {}
-    NonTrivialNoexcept(NonTrivialNoexcept&& other) noexcept: x(other.x), y(other.y) {
+    NonTrivialNoexcept(int x, int y)
+            : x(x), y(y) {}
+    NonTrivialNoexcept(NonTrivialNoexcept&& other) noexcept
+            : x(other.x), y(other.y) {
         num_move_ops += 1;
     }
     NonTrivialNoexcept& operator=(NonTrivialNoexcept&& other) noexcept {
@@ -122,8 +124,10 @@ struct CopyOnly {
     int x;
     int y;
 
-    CopyOnly(int x, int y): x(x), y(y) {}
-    CopyOnly(const CopyOnly& other) noexcept: x(other.x), y(other.y) {
+    CopyOnly(int x, int y)
+            : x(x), y(y) {}
+    CopyOnly(const CopyOnly& other) noexcept
+            : x(other.x), y(other.y) {
         num_copy_ops += 1;
     }
 

@@ -18,7 +18,7 @@ template<class T>
 struct TEST : bool_constant<test_add_rvalue_reference<T, T&&>()> {};
 
 template<class T>
-requires std::is_void_v<T>
+    requires std::is_void_v<T>
 struct TEST<T> : bool_constant<test_add_rvalue_reference<T, T>()> {
 };
 

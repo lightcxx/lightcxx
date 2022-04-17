@@ -77,9 +77,11 @@ exception_ptr current_exception() noexcept {
 
 exception_ptr::exception_ptr() noexcept = default;
 
-exception_ptr::exception_ptr(nullptr_t) noexcept: exception_ptr() {}
+exception_ptr::exception_ptr(nullptr_t) noexcept
+        : exception_ptr() {}
 
-exception_ptr::exception_ptr(const exception_ptr& __other) noexcept: __ptr(__other.__ptr) {
+exception_ptr::exception_ptr(const exception_ptr& __other) noexcept
+        : __ptr(__other.__ptr) {
     __cxa_increment_exception_refcount(__ptr);
 }
 
@@ -96,9 +98,11 @@ exception_ptr::~exception_ptr() noexcept {
     __cxa_decrement_exception_refcount(__ptr);
 }
 
-exception_ptr::exception_ptr(void* __ptr): __ptr(__ptr) {}
+exception_ptr::exception_ptr(void* __ptr)
+        : __ptr(__ptr) {}
 
-nested_exception::nested_exception() noexcept: __nested_ptr(current_exception()) {}
+nested_exception::nested_exception() noexcept
+        : __nested_ptr(current_exception()) {}
 
 nested_exception::nested_exception(const nested_exception&) noexcept = default;
 

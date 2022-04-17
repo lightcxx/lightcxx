@@ -70,11 +70,13 @@ class partial_ordering {
     }
 
     friend constexpr partial_ordering operator<=>(_Light::_LZero, partial_ordering __v) noexcept {
-        return __v < 0 ? greater : __v > 0 ? less : __v;
+        return __v < 0 ? greater : __v > 0 ? less
+                                           : __v;
     }
 
   private:
-    constexpr explicit partial_ordering(signed char __v) noexcept: __value(__v) {}
+    constexpr explicit partial_ordering(signed char __v) noexcept
+            : __value(__v) {}
 
     constexpr bool __is_ordered() const noexcept {
         return __value != -127;
@@ -95,7 +97,8 @@ class weak_ordering {
     static const weak_ordering greater;
 
     constexpr explicit(false) operator partial_ordering() const noexcept {
-        return __value == 0 ? partial_ordering::equivalent : __value < 0 ? partial_ordering::less : partial_ordering::greater;
+        return __value == 0 ? partial_ordering::equivalent : __value < 0 ? partial_ordering::less
+                                                                         : partial_ordering::greater;
     }
 
     friend constexpr bool operator==(weak_ordering __v, weak_ordering __w) noexcept = default;
@@ -141,11 +144,13 @@ class weak_ordering {
     }
 
     friend constexpr weak_ordering operator<=>(_Light::_LZero, weak_ordering __v) noexcept {
-        return __v < 0 ? greater : __v > 0 ? less : __v;
+        return __v < 0 ? greater : __v > 0 ? less
+                                           : __v;
     }
 
   private:
-    constexpr explicit weak_ordering(signed char __v) noexcept: __value(__v) {}
+    constexpr explicit weak_ordering(signed char __v) noexcept
+            : __value(__v) {}
 
     signed char __value;
 };
@@ -162,11 +167,13 @@ class strong_ordering {
     static const strong_ordering greater;
 
     constexpr explicit(false) operator partial_ordering() const noexcept {
-        return __value == 0 ? partial_ordering::equivalent : __value < 0 ? partial_ordering::less : partial_ordering::greater;
+        return __value == 0 ? partial_ordering::equivalent : __value < 0 ? partial_ordering::less
+                                                                         : partial_ordering::greater;
     }
 
     constexpr explicit(false) operator weak_ordering() const noexcept {
-        return __value == 0 ? weak_ordering::equivalent : __value < 0 ? weak_ordering::less : weak_ordering::greater;
+        return __value == 0 ? weak_ordering::equivalent : __value < 0 ? weak_ordering::less
+                                                                      : weak_ordering::greater;
     }
 
     friend constexpr bool operator==(strong_ordering __v, strong_ordering __w) noexcept = default;
@@ -212,11 +219,13 @@ class strong_ordering {
     }
 
     friend constexpr strong_ordering operator<=>(_Light::_LZero, strong_ordering __v) noexcept {
-        return __v < 0 ? greater : __v > 0 ? less : __v;
+        return __v < 0 ? greater : __v > 0 ? less
+                                           : __v;
     }
 
   private:
-    constexpr explicit strong_ordering(signed char __v) noexcept: __value(__v) {}
+    constexpr explicit strong_ordering(signed char __v) noexcept
+            : __value(__v) {}
 
     signed char __value;
 };
@@ -250,53 +259,56 @@ constexpr bool is_gteq(partial_ordering __po) noexcept {
     return __po >= 0;
 }
 
+namespace _Light {
+
+template<class _C>
+struct _CmpToNum {
+    static constexpr int __value = 0;
+};
+
+template<>
+struct _CmpToNum<partial_ordering> {
+    static constexpr int __value = 1;
+};
+
+template<>
+struct _CmpToNum<weak_ordering> {
+    static constexpr int __value = 2;
+};
+
+template<>
+struct _CmpToNum<strong_ordering> {
+    static constexpr int __value = 3;
+};
+
+template<class... _Ts>
+static constexpr auto _CommonComparisonCategoryImpl() noexcept {
+    constexpr int __mapped_Ts[] = {_CmpToNum<_Ts>::__value...};
+    constexpr auto __count_occurrences = [__mapped_Ts](int __counted) {
+        unsigned long __counter = 0;
+        for (int __i = 0; __i < sizeof...(_Ts); ++__i) {
+            if (__mapped_Ts[__i] == __counted) {
+                ++__counter;
+            }
+        }
+        return __counter;
+    };
+    if constexpr (__count_occurrences(0) > 0) {
+        return;
+    } else if constexpr (__count_occurrences(1) > 0) {
+        return partial_ordering::less;
+    } else if constexpr (__count_occurrences(2) > 0) {
+        return weak_ordering::less;
+    } else {
+        return strong_ordering::less;
+    }
+}
+
+}  // namespace _Light
+
 template<class... _Ts>
 struct common_comparison_category {
-  private:
-    template<class _C>
-    struct _CmpToNum {
-        static constexpr int __value = 0;
-    };
-
-    template<>
-    struct _CmpToNum<partial_ordering> {
-        static constexpr int __value = 1;
-    };
-
-    template<>
-    struct _CmpToNum<weak_ordering> {
-        static constexpr int __value = 2;
-    };
-
-    template<>
-    struct _CmpToNum<strong_ordering> {
-        static constexpr int __value = 3;
-    };
-
-    static constexpr auto __impl() noexcept {
-        constexpr int __mapped_Ts[] = {_CmpToNum<_Ts>::__value...};
-        constexpr auto __count_occurrences = [__mapped_Ts](int __counted) {
-            unsigned long __counter = 0;
-            for (int __i = 0; __i < sizeof...(_Ts); ++__i) {
-                if (__mapped_Ts[__i] == __counted) {
-                    ++__counter;
-                }
-            }
-            return __counter;
-        };
-        if constexpr (__count_occurrences(0) > 0) {
-            return;
-        } else if constexpr (__count_occurrences(1) > 0) {
-            return partial_ordering::less;
-        } else if constexpr (__count_occurrences(2) > 0) {
-            return weak_ordering::less;
-        } else {
-            return strong_ordering::less;
-        }
-    }
-
-  public:
-    using type = decltype(__impl());
+    using type = decltype(_Light::_CommonComparisonCategoryImpl<_Ts...>());
 };
 
 template<class... _Ts>

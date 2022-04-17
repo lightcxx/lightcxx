@@ -14,7 +14,8 @@ class initializer_list {
     using iterator = const _T*;
     using const_iterator = const _T*;
 
-    constexpr initializer_list() noexcept: __begin(nullptr), __size(0) {}
+    constexpr initializer_list() noexcept
+            : __begin(nullptr), __size(0) {}
 
     constexpr size_type size() const noexcept {
         return __size;

@@ -15,7 +15,9 @@ void* operator new(std::size_t size, const std::nothrow_t&) noexcept {
     step("new_nothrow");
     try {
         return ::operator new(size);
-    } catch (...) { return nullptr; }
+    } catch (...) {
+        return nullptr;
+    }
 }
 
 void operator delete(void* ptr) noexcept {

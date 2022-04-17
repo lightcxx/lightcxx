@@ -58,7 +58,7 @@ static_assert(test_remove_cvref<int&&, int>());
 static_assert(test_remove_cvref<const int&&, int>());
 static_assert(test_remove_cvref<volatile int&&, int>());
 static_assert(test_remove_cvref<const volatile int&&, int>());
-static_assert(test_remove_cvref<int(&&)(int), int(int)>());
+static_assert(test_remove_cvref<int (&&)(int), int(int)>());
 static_assert(test_remove_cvref<int*&&, int*>());
 static_assert(test_remove_cvref<int* const&&, int*>());
 static_assert(test_remove_cvref<int* volatile&&, int*>());

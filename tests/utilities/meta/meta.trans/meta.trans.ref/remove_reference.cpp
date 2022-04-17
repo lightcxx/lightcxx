@@ -52,7 +52,7 @@ static_assert(test_remove_reference<int&&, int>());
 static_assert(test_remove_reference<const int&&, const int>());
 static_assert(test_remove_reference<volatile int&&, volatile int>());
 static_assert(test_remove_reference<const volatile int&&, const volatile int>());
-static_assert(test_remove_reference<int(&&)(int), int(int)>());
+static_assert(test_remove_reference<int (&&)(int), int(int)>());
 static_assert(test_remove_reference<int*&&, int*>());
 static_assert(test_remove_reference<int* const&&, int* const>());
 static_assert(test_remove_reference<int* volatile&&, int* volatile>());

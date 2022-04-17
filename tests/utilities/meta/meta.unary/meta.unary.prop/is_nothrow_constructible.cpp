@@ -289,8 +289,8 @@ static_assert(test_is_nothrow_constructible<true, int (&)(), int()>());
 static_assert(test_is_nothrow_constructible<false, int (&)(), int(int)>());
 static_assert(test_is_nothrow_constructible<true, int (&)(), int (&)()>());
 static_assert(test_is_nothrow_constructible<false, int (&)(), int (&)(int)>());
-static_assert(test_is_nothrow_constructible<true, int (&)(), int(&&)()>());
-static_assert(test_is_nothrow_constructible<false, int (&)(), int(&&)(int)>());
+static_assert(test_is_nothrow_constructible<true, int (&)(), int (&&)()>());
+static_assert(test_is_nothrow_constructible<false, int (&)(), int (&&)(int)>());
 
 static_assert(test_is_nothrow_constructible<true, Class&, Derived&>());
 static_assert(test_is_nothrow_constructible<false, Class&, const Derived&>());
@@ -384,13 +384,13 @@ static_assert(test_is_nothrow_constructible<true, const volatile int&&, const in
 static_assert(test_is_nothrow_constructible<true, const volatile int&&, volatile int>());
 static_assert(test_is_nothrow_constructible<true, const volatile int&&, const volatile int>());
 
-static_assert(test_is_nothrow_constructible<false, int(&&)()>());
-static_assert(test_is_nothrow_constructible<true, int(&&)(), int()>());
-static_assert(test_is_nothrow_constructible<false, int(&&)(), int(int)>());
-static_assert(test_is_nothrow_constructible<true, int(&&)(), int (&)()>());
-static_assert(test_is_nothrow_constructible<false, int(&&)(), int (&)(int)>());
-static_assert(test_is_nothrow_constructible<true, int(&&)(), int(&&)()>());
-static_assert(test_is_nothrow_constructible<false, int(&&)(), int(&&)(int)>());
+static_assert(test_is_nothrow_constructible<false, int (&&)()>());
+static_assert(test_is_nothrow_constructible<true, int (&&)(), int()>());
+static_assert(test_is_nothrow_constructible<false, int (&&)(), int(int)>());
+static_assert(test_is_nothrow_constructible<true, int (&&)(), int (&)()>());
+static_assert(test_is_nothrow_constructible<false, int (&&)(), int (&)(int)>());
+static_assert(test_is_nothrow_constructible<true, int (&&)(), int (&&)()>());
+static_assert(test_is_nothrow_constructible<false, int (&&)(), int (&&)(int)>());
 
 static_assert(test_is_nothrow_constructible<false, Class&&, Derived&>());
 static_assert(test_is_nothrow_constructible<false, Class&&, const Derived&>());
@@ -475,8 +475,8 @@ static_assert(test_is_nothrow_constructible<true, Class, const Derived&>());
 // region function
 static_assert(test_is_nothrow_constructible<false, int(), int()>());
 static_assert(test_is_nothrow_constructible<false, int(), int (&)()>());
-static_assert(test_is_nothrow_constructible<false, int(), int(&&)()>());
+static_assert(test_is_nothrow_constructible<false, int(), int (&&)()>());
 static_assert(test_is_nothrow_constructible<false, int(), int(int, int)>());
 static_assert(test_is_nothrow_constructible<false, int(), int (&)(int, int)>());
-static_assert(test_is_nothrow_constructible<false, int(), int(&&)(int, int)>());
+static_assert(test_is_nothrow_constructible<false, int(), int (&&)(int, int)>());
 // endregion

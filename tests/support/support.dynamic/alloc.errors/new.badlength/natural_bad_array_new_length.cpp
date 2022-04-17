@@ -29,7 +29,11 @@ TEST() {
         new int[minus_one];     // negative size: bad_array_new_length
         new int[one]{1, 2, 3};  // too many initializers: bad_array_new_length
         fail();
-    } catch (const std::bad_array_new_length& e) { expect(default_constructed.what() == e.what()); } catch (std::bad_alloc& e) {
+    } catch (const std::bad_array_new_length& e) {
+        expect(default_constructed.what() == e.what());
+    } catch (std::bad_alloc& e) {
         fail();
-    } catch (...) { fail(); }
+    } catch (...) {
+        fail();
+    }
 }
