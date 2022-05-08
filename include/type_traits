@@ -1395,6 +1395,30 @@ struct is_nothrow_destructible : bool_constant<is_nothrow_destructible_v<_T>> {}
 
 // endregion
 
+// region _IsImplicitlyConstructible
+
+namespace _Light {
+
+template<class _T>
+void _TestIsImplicitlyConstructible(_T);
+
+template<class _T, class... _Args>
+struct _ImplIsImplicitlyConstructible : false_type {};
+
+template<class _T, class... _Args>
+requires is_void_v<decltype(_TestIsImplicitlyConstructible<_T>({declval<_Args>()...}))>
+struct _ImplIsImplicitlyConstructible<_T, _Args...> : true_type {
+};
+
+template<class _T, class... _Args>
+inline constexpr bool _IsImplicitlyConstructible = _ImplIsImplicitlyConstructible<_T, _Args...>::value;
+
+template<class _T>
+inline constexpr bool _HasImplicitDfltCtor = _ImplIsImplicitlyConstructible<const _T&>::value;
+}  // namespace _Light
+
+// endregion
+
 // region swap, is_swappable_with, is_swappable, is_nothrow_swappable_with, is_nothrow_swappable
 
 template<class _T>
@@ -2485,11 +2509,28 @@ using conditional_t = typename conditional<_B, _T, _F>::type;
 // endregion
 
 // region unwrap_reference
-// TODO: Implement unwrap_reference
+template<class _T>
+struct unwrap_reference {
+    using type = _T;
+};
+
+template<class _T>
+struct unwrap_reference<reference_wrapper<_T>> {
+    using type = _T&;
+};
+
+template<class _T>
+using unwrap_reference_t = typename unwrap_reference<_T>::type;
 // endregion
 
 // region unwrap_ref_decay
-// TODO: Implement unwrap_ref_decay
+template<class _T>
+struct unwrap_ref_decay {
+    using type = typename unwrap_reference<decay_t<_T>>::type;
+};
+
+template<class _T>
+using unwrap_ref_decay_t = typename unwrap_reference<decay_t<_T>>::type;
 // endregion
 
 // endregion
