@@ -13,10 +13,9 @@ TEST() {
     expect_type(void, std::longjmp(jb, 0));
 }
 
-TEST(using_longjmp) {
-    bool jumped = false;
-    std::jmp_buf jb;
-    auto&& ret = setjmp(jb);
+bool jumped = false;
+
+void func(std::jmp_buf& jb, int ret) {
     if (jumped) {
         expect(ret == 1);
         return;
@@ -24,4 +23,10 @@ TEST(using_longjmp) {
     expect(ret == 0);
     jumped = true;
     std::longjmp(jb, 1);
+}
+
+TEST(using_longjmp) {
+    std::jmp_buf jb;
+    auto&& ret = setjmp(jb);
+    func(jb, ret);
 }

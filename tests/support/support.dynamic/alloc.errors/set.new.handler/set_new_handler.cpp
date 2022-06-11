@@ -1,5 +1,6 @@
 // EXPECT:STEPS "before_new;malloc;new_handler;after_new;before_second_new;second_malloc;catch"
 // REQUEST:INTERCEPTORS "libc"
+// REQUEST:COMPILE_OPTIONS "-fno-builtin"
 
 #include <new>
 
