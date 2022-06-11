@@ -30,6 +30,9 @@ else ()
     target_link_libraries(lightcxx PUBLIC c PUBLIC pthread)
 endif ()
 
+install(DIRECTORY include DESTINATION .)
+install(TARGETS lightcxx DESTINATION lib)
+
 if (LIGHTCXX_ENABLE_TESTS)
     enable_testing()
     add_subdirectory(testing)
