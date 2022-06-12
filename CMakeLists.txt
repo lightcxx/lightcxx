@@ -1,12 +1,11 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.22)
 project(lightcxx)
-
-cmake_policy(SET CMP0110 OLD)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-set(LIGHTCXX_ENABLE_TESTS ON)
+
+option(LIGHTCXX_ENABLE_TESTS "Build lightcxx tests" OFF)
 
 add_subdirectory(third_party)
 
@@ -35,6 +34,19 @@ install(TARGETS lightcxx DESTINATION lib)
 
 if (LIGHTCXX_ENABLE_TESTS)
     enable_testing()
-    add_subdirectory(testing)
-    add_subdirectory(tests)
+    include(cmake/Tests.cmake)
+
+    add_library(lightcxx_testing STATIC testing/interceptor.c testing/testing.c)
+    target_include_directories(lightcxx_testing PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/testing)
+    target_link_libraries(lightcxx_testing PUBLIC lightcxx)
+    if (NOT APPLE)
+        target_link_libraries(lightcxx_testing PRIVATE dl)
+    endif ()
+
+    add_executable(process_safe_wrapper testing/process_safe_wrapper.c)
+
+    add_library(lightcxx_testing_interceptors_libc testing/interceptors/libc.cpp)
+    target_link_libraries(lightcxx_testing_interceptors_libc PUBLIC lightcxx_testing)
+
+    scan_for_lightcxx_tests(${CMAKE_CURRENT_SOURCE_DIR}/tests)
 endif ()
