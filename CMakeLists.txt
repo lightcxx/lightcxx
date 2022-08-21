@@ -33,7 +33,7 @@ set_target_properties(lightcxx_static PROPERTIES OUTPUT_NAME lightcxx)
 
 add_library(lightcxx SHARED ${LIGHTCXX_SRCS} $<TARGET_OBJECTS:third_party_libcxxabi_object>)
 AddLightCxxCommonOptions(lightcxx)
-target_compile_options(lightcxx PRIVATE -fvisibility=hidden)
+target_compile_options(lightcxx PRIVATE -fvisibility=hidden -fPIC)
 set_target_properties(lightcxx PROPERTIES VERSION ${PROJECT_VERSION} SOVERSION ${PROJECT_VERSION})
 
 install(DIRECTORY include DESTINATION .)
