@@ -1,9 +1,8 @@
 // EXPECT:STEPS "malloc;throw"
-// REQUEST:INTERCEPTORS "libc"
 
 #include <new>
 
-#include "interceptors/libc.h"
+#include "intercept_libc.h"
 #include "testing.h"
 
 TEST() {

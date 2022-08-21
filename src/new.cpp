@@ -1,54 +1,53 @@
 #include "new"
 
 #include "handler.h"
+#include "export.h"
 
 #include <stdlib.h>
 
 namespace std {
 
-bad_alloc::bad_alloc() noexcept = default;
+_EXPORT bad_alloc::bad_alloc() noexcept = default;
 
-bad_alloc::bad_alloc(const bad_alloc&) noexcept = default;
+_EXPORT bad_alloc::bad_alloc(const bad_alloc&) noexcept = default;
 
-bad_alloc& bad_alloc::operator=(const bad_alloc&) noexcept = default;
+_EXPORT bad_alloc& bad_alloc::operator=(const bad_alloc&) noexcept = default;
 
-bad_alloc::~bad_alloc() noexcept = default;
+_EXPORT bad_alloc::~bad_alloc() noexcept = default;
 
-const char* bad_alloc::what() const noexcept {
+_EXPORT const char* bad_alloc::what() const noexcept {
     return "bad_alloc";
 }
 
-bad_array_new_length::bad_array_new_length() noexcept = default;
+_EXPORT bad_array_new_length::bad_array_new_length() noexcept = default;
 
-bad_array_new_length::bad_array_new_length(const bad_array_new_length&) noexcept = default;
+_EXPORT bad_array_new_length::bad_array_new_length(const bad_array_new_length&) noexcept = default;
 
-bad_array_new_length& bad_array_new_length::operator=(const bad_array_new_length&) noexcept = default;
+_EXPORT bad_array_new_length& bad_array_new_length::operator=(const bad_array_new_length&) noexcept = default;
 
-bad_array_new_length::~bad_array_new_length() noexcept = default;
+_EXPORT bad_array_new_length::~bad_array_new_length() noexcept = default;
 
-const char* bad_array_new_length::what() const noexcept {
+_EXPORT const char* bad_array_new_length::what() const noexcept {
     return "bad_array_new_length";
 }
 
-const nothrow_t nothrow;
+_EXPORT const nothrow_t nothrow;
 
-namespace {
-_Light::Handler<new_handler> global_new_handler;
+static _Light::Handler<new_handler> __global_new_handler;
+
+_EXPORT new_handler get_new_handler() noexcept {
+    return __global_new_handler.get();
 }
 
-new_handler get_new_handler() noexcept {
-    return global_new_handler.get();
-}
-
-new_handler set_new_handler(new_handler handler) noexcept {
-    return global_new_handler.set(handler);
+_EXPORT new_handler set_new_handler(new_handler handler) noexcept {
+    return __global_new_handler.set(handler);
 }
 
 }  // namespace std
 
 // Single-object forms
 
-[[gnu::weak]] void* operator new(std::size_t size) {
+_EXPORT_WEAK void* operator new(std::size_t size) {
     if (size == 0) {
         size = 1;
     }
@@ -64,7 +63,7 @@ new_handler set_new_handler(new_handler handler) noexcept {
     return ptr;
 }
 
-[[gnu::weak]] void* operator new(std::size_t size, std::align_val_t given_alignment) {
+_EXPORT_WEAK void* operator new(std::size_t size, std::align_val_t given_alignment) {
     if (size == 0) {
         size = 1;
     }
@@ -81,7 +80,7 @@ new_handler set_new_handler(new_handler handler) noexcept {
     return ptr;
 }
 
-[[gnu::weak]] void* operator new(std::size_t size, const std::nothrow_t&) noexcept {
+_EXPORT_WEAK void* operator new(std::size_t size, const std::nothrow_t&) noexcept {
     void* ptr = nullptr;
     try {
         ptr = ::operator new(size);
@@ -89,7 +88,7 @@ new_handler set_new_handler(new_handler handler) noexcept {
     return ptr;
 }
 
-[[gnu::weak]] void* operator new(size_t size, std::align_val_t align, const std::nothrow_t&) noexcept {
+_EXPORT_WEAK void* operator new(size_t size, std::align_val_t align, const std::nothrow_t&) noexcept {
     void* p = nullptr;
     try {
         p = ::operator new(size, align);
@@ -97,41 +96,41 @@ new_handler set_new_handler(new_handler handler) noexcept {
     return p;
 }
 
-[[gnu::weak]] void operator delete(void* ptr) noexcept {
+_EXPORT_WEAK void operator delete(void* ptr) noexcept {
     ::free(ptr);
 }
 
-[[gnu::weak]] void operator delete(void* ptr, size_t) noexcept {
+_EXPORT_WEAK void operator delete(void* ptr, size_t) noexcept {
     ::operator delete(ptr);
 }
 
-[[gnu::weak]] void operator delete(void* ptr, std::align_val_t) noexcept {
+_EXPORT_WEAK void operator delete(void* ptr, std::align_val_t) noexcept {
     ::operator delete(ptr);
 }
 
-[[gnu::weak]] void operator delete(void* ptr, size_t, std::align_val_t align) noexcept {
+_EXPORT_WEAK void operator delete(void* ptr, size_t, std::align_val_t align) noexcept {
     ::operator delete(ptr, align);
 }
 
-[[gnu::weak]] void operator delete(void* ptr, const std::nothrow_t&) noexcept {
+_EXPORT_WEAK void operator delete(void* ptr, const std::nothrow_t&) noexcept {
     ::operator delete(ptr);
 }
 
-[[gnu::weak]] void operator delete(void* ptr, std::align_val_t align, const std::nothrow_t&) noexcept {
+_EXPORT_WEAK void operator delete(void* ptr, std::align_val_t align, const std::nothrow_t&) noexcept {
     ::operator delete(ptr, align);
 }
 
 // Array forms
 
-[[gnu::weak]] void* operator new[](std::size_t size) {
+_EXPORT_WEAK void* operator new[](std::size_t size) {
     return ::operator new(size);
 }
 
-[[gnu::weak]] void* operator new[](size_t size, std::align_val_t align) {
+_EXPORT_WEAK void* operator new[](size_t size, std::align_val_t align) {
     return ::operator new(size, align);
 }
 
-[[gnu::weak]] void* operator new[](std::size_t size, const std::nothrow_t&) noexcept {
+_EXPORT_WEAK void* operator new[](std::size_t size, const std::nothrow_t&) noexcept {
     void* ptr = nullptr;
     try {
         ptr = ::operator new[](size);
@@ -139,7 +138,7 @@ new_handler set_new_handler(new_handler handler) noexcept {
     return ptr;
 }
 
-[[gnu::weak]] void* operator new[](size_t size, std::align_val_t align, const std::nothrow_t&) noexcept {
+_EXPORT_WEAK void* operator new[](size_t size, std::align_val_t align, const std::nothrow_t&) noexcept {
     void* p = nullptr;
     try {
         p = ::operator new[](size, align);
@@ -147,40 +146,40 @@ new_handler set_new_handler(new_handler handler) noexcept {
     return p;
 }
 
-[[gnu::weak]] void operator delete[](void* ptr) noexcept {
+_EXPORT_WEAK void operator delete[](void* ptr) noexcept {
     ::operator delete(ptr);
 }
 
-[[gnu::weak]] void operator delete[](void* ptr, size_t) noexcept {
+_EXPORT_WEAK void operator delete[](void* ptr, size_t) noexcept {
     ::operator delete[](ptr);
 }
 
-[[gnu::weak]] void operator delete[](void* ptr, std::align_val_t align) noexcept {
+_EXPORT_WEAK void operator delete[](void* ptr, std::align_val_t align) noexcept {
     ::operator delete(ptr, align);
 }
 
-[[gnu::weak]] void operator delete[](void* ptr, size_t, std::align_val_t align) noexcept {
+_EXPORT_WEAK void operator delete[](void* ptr, size_t, std::align_val_t align) noexcept {
     ::operator delete[](ptr, align);
 }
 
-[[gnu::weak]] void operator delete[](void* ptr, const std::nothrow_t&) noexcept {
+_EXPORT_WEAK void operator delete[](void* ptr, const std::nothrow_t&) noexcept {
     ::operator delete[](ptr);
 }
 
-[[gnu::weak]] void operator delete[](void* ptr, std::align_val_t align, const std::nothrow_t&) noexcept {
+_EXPORT_WEAK void operator delete[](void* ptr, std::align_val_t align, const std::nothrow_t&) noexcept {
     ::operator delete[](ptr, align);
 }
 
 // Non-allocating forms
 
-void* operator new(std::size_t, void* ptr) noexcept {
+_EXPORT_WEAK void* operator new(std::size_t, void* ptr) noexcept {
     return ptr;
 }
 
-void* operator new[](std::size_t, void* ptr) noexcept {
+_EXPORT_WEAK void* operator new[](std::size_t, void* ptr) noexcept {
     return ptr;
 }
 
-void operator delete(void*, void*) noexcept {}
+_EXPORT_WEAK void operator delete(void*, void*) noexcept {}
 
-void operator delete[](void*, void*) noexcept {}
+_EXPORT_WEAK void operator delete[](void*, void*) noexcept {}

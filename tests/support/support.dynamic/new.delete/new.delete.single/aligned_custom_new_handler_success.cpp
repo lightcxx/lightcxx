@@ -1,9 +1,8 @@
 // EXPECT:STEPS "alloc 1;new_handler 1;alloc 2;new_handler 2;alloc 3;new_handler 3"
-// REQUEST:INTERCEPTORS "libc"
 
 #include <new>
 
-#include "interceptors/libc.h"
+#include "intercept_libc.h"
 #include "testing.h"
 
 int times_aligned_alloc_called = 0;

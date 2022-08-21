@@ -19,10 +19,10 @@ cmake -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_DIR} \
 cd ${CMAKE_BUILD_DIR}
 
 echo "\nBuild\n"
-make -j8
+make -C ${CMAKE_BUILD_DIR} -j$(nproc)
 
 echo "\nRun tests\n"
-ctest
+ctest --test-dir ${CMAKE_BUILD_DIR} -j$(nproc)
 
 echo "\nInstall locally\n"
-make install
+make -C ${CMAKE_BUILD_DIR} install

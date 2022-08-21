@@ -52,6 +52,7 @@ class WithOverrideForAddressOfOperator : public std::exception {
 
     WithOverrideForAddressOfOperator* operator&() {
         fail();
+        return nullptr;
     }
 };
 TEST(polymorphic_class_with_override_for_address_of_operator) {

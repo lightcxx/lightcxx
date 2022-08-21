@@ -1,9 +1,11 @@
 #ifndef TESTING_TESTING_H
 #define TESTING_TESTING_H
 
+#include "new"
+
 extern "C" void testing_step_impl(const char* msg, ...);
 
-extern "C" [[noreturn]] void testing_fail_impl(const char* func, const char* file, int line);
+extern "C" void testing_fail_impl(const char* func, const char* file, int line);
 
 extern "C" void testing_expect_impl(int cnd, const char* func, const char* file, int line);
 
@@ -12,6 +14,8 @@ extern "C" int testing_get_argc();
 extern "C" char** testing_get_argv();
 
 extern "C" void testing_register_test(void (*test)(), const char* name);
+
+extern "C" void testing_register_global(void* obj, void (*ctor)(void*), void (*dtor)(void*));
 
 namespace Testing {
 
@@ -26,6 +30,24 @@ inline constexpr bool same_type = false;
 
 template<class T>
 inline constexpr bool same_type<T, T> = true;
+
+template<class T>
+struct ForkSafeGlobal {
+    alignas(T) char storage[sizeof(T)];
+
+    ForkSafeGlobal() {
+        testing_register_global(
+          this, [](void* self) { reinterpret_cast<ForkSafeGlobal*>(self)->construct(); }, [](void* self) { reinterpret_cast<ForkSafeGlobal*>(self)->destruct(); });
+    }
+
+    void construct() {
+        new (storage) T();
+    }
+
+    void destruct() {
+        reinterpret_cast<T*>(storage)->~T();
+    }
+};
 
 }  // namespace Testing
 

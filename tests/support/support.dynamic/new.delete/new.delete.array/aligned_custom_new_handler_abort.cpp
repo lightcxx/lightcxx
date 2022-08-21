@@ -1,10 +1,9 @@
 // EXPECT:EXIT KILLED BY SIGNAL SIGABRT
 // EXPECT:STEPS "aligned_alloc;new_handler"
-// REQUEST:INTERCEPTORS "libc"
 
 #include <new>
 
-#include "interceptors/libc.h"
+#include "intercept_libc.h"
 #include "testing.h"
 #include <stdlib.h>
 

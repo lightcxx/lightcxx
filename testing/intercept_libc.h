@@ -1,7 +1,9 @@
-#ifndef TESTING_INTERCEPTOR_H
-#define TESTING_INTERCEPTOR_H
+#ifndef TESTING_INTERCEPTORS_LIBC_H
+#define TESTING_INTERCEPTORS_LIBC_H
 
-extern "C" void* testing_find_next_symbol(const char* name);
+#define _GNU_SOURCE
+#include <dlfcn.h>
+#include <stdlib.h>
 
 namespace Testing {
 
@@ -51,13 +53,31 @@ class CFunctionInterceptor<R(Args...)> {
             return replacement(raw_replacement, raw_replacement_state, args...);
         } else {
             if (!original) {
-                original = reinterpret_cast<F*>(testing_find_next_symbol(symbol));
+                original = reinterpret_cast<F*>(dlsym(RTLD_NEXT, symbol));
             }
             return original(args...);
         }
     }
 };
 
+struct LibCInterceptors {
+    CFunctionInterceptor<void*(::size_t)> malloc{"malloc"};
+    CFunctionInterceptor<void(void*)> free{"free"};
+    CFunctionInterceptor<void*(::size_t, ::size_t)> aligned_alloc{"aligned_alloc"};
+} libc;
+
 }  // namespace Testing
+
+extern "C" void* malloc(size_t size) {
+    return Testing::libc.malloc.invoke(size);
+}
+
+extern "C" void free(void* ptr) {
+    return Testing::libc.free.invoke(ptr);
+}
+
+extern "C" void* aligned_alloc(size_t align, size_t size) {
+    return Testing::libc.aligned_alloc.invoke(align, size);
+}
 
 #endif
