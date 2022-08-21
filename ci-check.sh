@@ -16,7 +16,6 @@ cmake -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_DIR} \
       -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} \
       -DLIGHTCXX_ENABLE_TESTS=ON \
       -G "Unix Makefiles" -B${CMAKE_BUILD_DIR} -H.
-cd ${CMAKE_BUILD_DIR}
 
 echo "\nBuild\n"
 make -C ${CMAKE_BUILD_DIR} -j12
