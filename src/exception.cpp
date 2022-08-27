@@ -38,19 +38,19 @@ _EXPORT const char* bad_exception::what() const noexcept {
     return "bad_exception";
 }
 
-static _Light::Handler<terminate_handler> __global_terminate_handler;
+static constinit _Light::handler<terminate_handler> global_terminate_handler;
 
 _EXPORT terminate_handler set_terminate(terminate_handler f) noexcept {
-    return __global_terminate_handler.set(f);
+    return global_terminate_handler.set(f);
 }
 
 _EXPORT terminate_handler get_terminate() noexcept {
-    return __global_terminate_handler.get();
+    return global_terminate_handler.get();
 }
 
 [[noreturn]] _EXPORT void terminate() noexcept {
     const auto handler = get_terminate();
-    if (handler) {
+    if (handler != nullptr) {
         try {
             handler();
         } catch (...) {}

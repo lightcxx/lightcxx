@@ -1,9 +1,15 @@
 #include "new"
 
-#include "handler.h"
 #include "export.h"
+#include "handler.h"
 
 #include <stdlib.h>
+
+namespace {
+
+constinit std::_Light::handler<std::new_handler> global_new_handler;
+
+}  // namespace
 
 namespace std {
 
@@ -31,16 +37,12 @@ _EXPORT const char* bad_array_new_length::what() const noexcept {
     return "bad_array_new_length";
 }
 
-_EXPORT const nothrow_t nothrow;
-
-static _Light::Handler<new_handler> __global_new_handler;
-
 _EXPORT new_handler get_new_handler() noexcept {
-    return __global_new_handler.get();
+    return global_new_handler.get();
 }
 
-_EXPORT new_handler set_new_handler(new_handler handler) noexcept {
-    return __global_new_handler.set(handler);
+_EXPORT new_handler set_new_handler(new_handler __h) noexcept {
+    return global_new_handler.set(__h);
 }
 
 }  // namespace std

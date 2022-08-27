@@ -6,18 +6,19 @@
 // Un-define this so we can get it from the LibC implementation.
 #undef MB_CUR_MAX
 
-#include <math.h>
-// TODO: Remove dependency on C's <stdatomic.h> once <atomic> is implemented.
-#include <stdatomic.h>
-#include <stdlib.h>
 #include "export.h"
+#include <math.h>
+#include <stdlib.h>
+
+namespace {
+
+static constinit std::_Light::handler_array<std::_Light::_AtExitHandler*, 32> quick_exit_handlers{};
+
+}  // namespace
 
 namespace std {
 
 namespace _Light {
-
-static atomic_size_t __num_quick_exit_handlers = 0;
-static Handler<_AtExitHandler*> __quick_exit_handlers[32]{};
 
 _EXPORT int _MBCurMax() {
     return MB_CUR_MAX;
@@ -34,12 +35,7 @@ _EXPORT int atexit(_Light::_AtExitHandler* func) noexcept {
 }
 
 _EXPORT int at_quick_exit(_Light::_AtExitHandler* func) noexcept {
-    const auto index = atomic_fetch_add(&_Light::__num_quick_exit_handlers, 1);
-    if (index >= 32) {
-        return 1;
-    }
-    _Light::__quick_exit_handlers[index].set(func);
-    return 0;
+    return quick_exit_handlers.add(func);
 }
 
 [[noreturn]] _EXPORT void exit(int status) {
@@ -55,16 +51,7 @@ _EXPORT int at_quick_exit(_Light::_AtExitHandler* func) noexcept {
 }
 
 [[noreturn]] _EXPORT void quick_exit(int status) noexcept {
-    auto index = atomic_load_explicit(&_Light::__num_quick_exit_handlers, memory_order_acquire);
-    if (index > 32)
-        index = 32;
-    for (; index > 0; --index) {
-        try {
-            _Light::__quick_exit_handlers[index - 1].get()();
-        } catch (...) {
-            std::terminate();
-        }
-    }
+    quick_exit_handlers.run();
     std::_Exit(status);
 }
 

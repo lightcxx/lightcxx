@@ -32,18 +32,18 @@ class bad_array_new_length : public bad_alloc {
 struct destroying_delete_t {
     explicit destroying_delete_t() = default;
 };
-constexpr destroying_delete_t destroying_delete{};
+inline constexpr destroying_delete_t destroying_delete{};
 
 enum class align_val_t : size_t {};
 
 struct nothrow_t {
     explicit nothrow_t() = default;
 };
-extern const nothrow_t nothrow;
+inline constexpr nothrow_t nothrow{};
 
 using new_handler = void (*)();
 new_handler get_new_handler() noexcept;
-new_handler set_new_handler(new_handler __handler) noexcept;
+new_handler set_new_handler(new_handler __h) noexcept;
 
 template<class _T>
 [[nodiscard]] constexpr _T* launder(_T* __ptr) noexcept {
@@ -57,8 +57,8 @@ template<class _T>
 #endif
 }
 
-constexpr size_t hardware_destructive_interference_size = 64;
-constexpr size_t hardware_constructive_interference_size = 64;
+inline constexpr size_t hardware_destructive_interference_size = 64;
+inline constexpr size_t hardware_constructive_interference_size = 64;
 
 }  // namespace std
 

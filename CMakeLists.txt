@@ -24,6 +24,7 @@ endfunction()
 set(LIGHTCXX_SRCS
         ${CMAKE_CURRENT_SOURCE_DIR}/src/cstdlib.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/exception.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/handler.c
         ${CMAKE_CURRENT_SOURCE_DIR}/src/new.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/typeinfo.cpp)
 
