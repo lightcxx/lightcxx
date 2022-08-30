@@ -3,8 +3,8 @@
 #include "testing.h"
 
 struct S {
-    [[maybe_unused]] int a;
-    [[maybe_unused]] int b;
+    int a;
+    int b;
 };
 
 TEST() {

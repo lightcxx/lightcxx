@@ -3,6 +3,14 @@
 
 #include <cstdint>
 
+#if !__has_builtin(__builtin_LINE)
+#define __builtin_LINE() 0
+#endif
+
+#if !__has_builtin(__builtin_COLUMN)
+#define __builtin_COLUMN() 0
+#endif
+
 namespace std {
 
 struct source_location {
