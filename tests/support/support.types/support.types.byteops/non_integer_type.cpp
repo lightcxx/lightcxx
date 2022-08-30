@@ -5,7 +5,7 @@
 #include "testing.h"
 
 struct Aggregate {
-    [[maybe_unused]] int x;
+    int x;
 };
 
 TEST() {

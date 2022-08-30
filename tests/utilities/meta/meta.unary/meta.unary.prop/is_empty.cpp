@@ -33,15 +33,15 @@ class ZeroBits {
 
 class NoUniqueAddrEmptyMember {
   public:
-    [[maybe_unused, no_unique_address]] Empty e;
+    [[no_unique_address]] Empty e;
 };
 
 class FinalBoss : public DoubleEmptyDerived, private NoUniqueAddrEmptyMember {
   public:
-    [[maybe_unused, no_unique_address]] Empty e;
-    [[maybe_unused, no_unique_address]] EmptyDerived ed;
-    [[maybe_unused, no_unique_address]] ZeroBits z;
-    [[maybe_unused, no_unique_address]] NoUniqueAddrEmptyMember nua_mem;
+    [[no_unique_address]] Empty e;
+    [[no_unique_address]] EmptyDerived ed;
+    [[no_unique_address]] ZeroBits z;
+    [[no_unique_address]] NoUniqueAddrEmptyMember nua_mem;
 };
 
 TEST_UNARY_TRAIT_AGAINST_TYPES(true, is_empty, EVERY_CV, Empty, EmptyDerived, EmptyDerivedTwo, EmptyDerivedTwice, DoubleEmptyDerived, ZeroBits,
@@ -49,7 +49,7 @@ TEST_UNARY_TRAIT_AGAINST_TYPES(true, is_empty, EVERY_CV, Empty, EmptyDerived, Em
 
 class NonEmpty {
   public:
-    [[maybe_unused]] int x, y;
+    int x, y;
 };
 
 // TODO: Clang returns true that this is_empty, investigate.
@@ -65,12 +65,12 @@ class VirtualDtor {
 
 class VirtualMethod {
   public:
-    [[maybe_unused]] virtual void f();
+    virtual void f();
 };
 
 class PureVirtualMethod {
   public:
-    [[maybe_unused]] virtual void f() = 0;
+    virtual void f() = 0;
 };
 
 class VirtualBase : virtual Empty {};

@@ -27,7 +27,7 @@ class VirtualDtor {
 
 class VirtualMethod {
   public:
-    [[maybe_unused]] virtual void f();
+    virtual void f();
 };
 
 class PublicPolymorphicBase : public VirtualMethod {};
@@ -45,7 +45,7 @@ class PureVirtualDtor {
 
 class PureVirtualMethod {
   public:
-    [[maybe_unused]] virtual void f() = 0;
+    virtual void f() = 0;
 };
 
 class PublicAbstractBase : public PureVirtualMethod {};

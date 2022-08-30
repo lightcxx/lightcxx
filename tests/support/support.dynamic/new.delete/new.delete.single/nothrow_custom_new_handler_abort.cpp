@@ -17,6 +17,6 @@ TEST() {
         ::abort();
     });
 
-    [[maybe_unused]] const auto const_ptr = ::operator new(256, std::nothrow);
+    const auto const_ptr = ::operator new(256, std::nothrow);
     fail();
 }

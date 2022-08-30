@@ -12,10 +12,10 @@ void takes_unsigned_long(unsigned long) {}
 
 void takes_double(double) {}
 
-enum [[maybe_unused]] OldStyleEnum{OSE_a, OSE_b};
+enum OldStyleEnum{OSE_a, OSE_b};
 void takes_old_style_enum(OldStyleEnum) {}
 
-enum class [[maybe_unused]] ScopedEnum{a, b};
+enum class ScopedEnum{a, b};
 void takes_scoped_enum(ScopedEnum) {}
 
 void takes_int_ptr(int*) {}

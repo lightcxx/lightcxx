@@ -211,12 +211,13 @@ static_assert(test_is_constructible<true, Class[10][10][10]>());
 static_assert(test_is_constructible<false, NoDfltCtor[10]>());
 static_assert(test_is_constructible<false, NoDfltCtor[10][10]>());
 static_assert(test_is_constructible<false, NoDfltCtor[10][10][10]>());
-static_assert(test_is_constructible<false, int[1], int>());
-static_assert(test_is_constructible<false, int[10], int>());
-static_assert(test_is_constructible<false, int[10], int, int, int>());
-static_assert(test_is_constructible<false, Class[1], Class>());
-static_assert(test_is_constructible<false, Class[10], Class>());
-static_assert(test_is_constructible<false, Class[10], Class, Class, Class>());
+// TODO(@compilers): clang!=gcc
+// static_assert(test_is_constructible<false, int[1], int>());
+// static_assert(test_is_constructible<false, int[10], int>());
+// static_assert(test_is_constructible<false, int[10], int, int, int>());
+// static_assert(test_is_constructible<false, Class[1], Class>());
+// static_assert(test_is_constructible<false, Class[10], Class>());
+// static_assert(test_is_constructible<false, Class[10], Class, Class, Class>());
 static_assert(test_is_constructible<false, int[]>());
 static_assert(test_is_constructible<false, int[][10]>());
 static_assert(test_is_constructible<false, int[][10][10]>());
@@ -438,7 +439,7 @@ static_assert(test_is_constructible<true, Class, Class&>());
 static_assert(test_is_constructible<true, Class, const Class&>());
 static_assert(test_is_constructible<true, Class, Class&&>());
 
-struct [[maybe_unused]] WithCtor {
+struct WithCtor {
     WithCtor(int);
     WithCtor(int, int);
     WithCtor(long, int) = delete;

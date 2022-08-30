@@ -8,7 +8,7 @@ namespace std {
 namespace _Light {
 
 struct _LZero {
-    [[maybe_unused]] consteval explicit(false) _LZero(int __v) noexcept {
+    consteval explicit(false) _LZero(int __v) noexcept {
         if (__v != 0) {
             try {
                 throw "Cannot compare results of operator<=> with non-zero values. Compare with "

@@ -319,7 +319,7 @@ TEST(member_function_pointer) {
     expect_is_invocable_r<false, int, NothrowConstMemFPtr, B, MemFPtr, MemFPtr>();
 }
 
-#ifndef _LIGHTCXX_DONT_USE_BUILTINS
+#ifndef _LIGHTCXX_BUILTINS_DONT_USE_ANY
 TEST(member_data_pointer) {
     struct A {
         int f;

@@ -7,9 +7,9 @@ namespace std::_Light {
 
 extern "C" void* light_handler_load(void** ptr);
 extern "C" void* light_handler_exchange(void** ptr, void* new_ptr);
-extern "C" int light_handler_count_load(int* ptr);
-extern "C" int light_handler_count_inc(int* ptr);
-extern "C" int light_handler_count_dec(int* ptr);
+extern "C" unsigned int light_handler_count_load(unsigned int* ptr);
+extern "C" unsigned int light_handler_count_inc(unsigned int* ptr);
+extern "C" unsigned int light_handler_count_dec(unsigned int* ptr);
 
 template<class H>
 class handler {
@@ -27,9 +27,9 @@ class handler {
     }
 };
 
-template<class H, int N>
+template<class H, unsigned int N>
 class handler_array {
-    int num_hs = 0;
+    unsigned int num_hs = 0;
     handler<H> hs[N]{};
 
   public:

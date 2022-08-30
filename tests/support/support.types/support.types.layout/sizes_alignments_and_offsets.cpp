@@ -4,9 +4,9 @@
 #include <type_traits>
 
 struct StandardLayoutStructure {
-    [[maybe_unused]] int a;
+    int a;
     int b;
-    [[maybe_unused]] float c;
+    float c;
 };
 
 TEST() {

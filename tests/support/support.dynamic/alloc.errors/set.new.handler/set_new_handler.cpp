@@ -34,7 +34,7 @@ TEST() {
     });
     step("before_second_new");
     try {
-        [[maybe_unused]] auto failed_ptr = ::operator new(4);
+        auto failed_ptr = ::operator new(4);
         fail();
     } catch (std::bad_alloc&) {
         step("catch");

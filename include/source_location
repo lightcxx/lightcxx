@@ -4,11 +4,11 @@
 #include <cstdint>
 
 #if !__has_builtin(__builtin_LINE)
-#define __builtin_LINE() 0
+#define __builtin_LINE() 1
 #endif
 
 #if !__has_builtin(__builtin_COLUMN)
-#define __builtin_COLUMN() 0
+#define __builtin_COLUMN() 1
 #endif
 
 namespace std {

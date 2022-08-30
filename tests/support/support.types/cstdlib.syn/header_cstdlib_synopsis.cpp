@@ -21,27 +21,27 @@ bool operator==(const lldiv_t& d1, const lldiv_t& d2) {
 TEST() {
     constexpr void* n = NULL;
     expect_ct_and_rt(n == nullptr);
-    [[maybe_unused]] const auto cur_max = MB_CUR_MAX;
-    [[maybe_unused]] constexpr auto rand_max = RAND_MAX;
-    [[maybe_unused]] constexpr auto exit_success = EXIT_SUCCESS;
-    [[maybe_unused]] constexpr auto exit_failure = EXIT_FAILURE;
+    const auto cur_max = MB_CUR_MAX;
+    constexpr auto rand_max = RAND_MAX;
+    constexpr auto exit_success = EXIT_SUCCESS;
+    constexpr auto exit_failure = EXIT_FAILURE;
     expect(EXIT_SUCCESS != EXIT_FAILURE);
     expect_ct_and_rt((::std::size_t)5 == 5);
 
-    [[maybe_unused]] const auto env_var = ::std::getenv("ENV_VAR");
-    [[maybe_unused]] const auto system_lambda = []() { return ::std::system("echo ::std::system"); };
+    const auto env_var = ::std::getenv("ENV_VAR");
+    const auto system_lambda = []() { return ::std::system("echo ::std::system"); };
 
     // We don't actually want to call these, just see that they compile.
-    [[maybe_unused]] auto abort_lambda = []() { ::std::abort(); };
-    [[maybe_unused]] auto exit_lambda = []() {
+    auto abort_lambda = []() { ::std::abort(); };
+    auto exit_lambda = []() {
         ::std::atexit([]() { ::std::system("echo exited"); });
         ::std::exit(10);
     };
-    [[maybe_unused]] auto quick_exit_lambda = []() {
+    auto quick_exit_lambda = []() {
         ::std::at_quick_exit([]() { ::std::system("echo exited"); });
         ::std::quick_exit(10);
     };
-    [[maybe_unused]] auto Exit_lambda = []() { ::std::_Exit(10); };
+    auto Exit_lambda = []() { ::std::_Exit(10); };
 
     const auto malloc_ptr = ::std::malloc(16);
     expect_type(void* const&, malloc_ptr);

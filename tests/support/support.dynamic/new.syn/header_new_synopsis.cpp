@@ -13,15 +13,15 @@ consteval ::std::destroying_delete_t delete_f(::std::destroying_delete_t) {
 }
 
 TEST() {
-    [[maybe_unused]] ::std::bad_alloc b_alloc;
-    [[maybe_unused]] ::std::bad_array_new_length b_array_new_length;
+    ::std::bad_alloc b_alloc;
+    ::std::bad_array_new_length b_array_new_length;
 
-    [[maybe_unused]] constexpr auto delete_v = delete_f(::std::destroying_delete);
+    constexpr auto delete_v = delete_f(::std::destroying_delete);
 
-    [[maybe_unused]] constexpr ::std::align_val_t align_v{10};
+    constexpr ::std::align_val_t align_v{10};
     expect_ct_and_rt(static_cast<::std::size_t>(align_v) == 10);
 
-    [[maybe_unused]] ::std::nothrow_t nt_v = nothrow_f(::std::nothrow);
+    ::std::nothrow_t nt_v = nothrow_f(::std::nothrow);
 
     ::std::new_handler h = []() { printf("Failed to allocate."); };
     const auto old_handler = ::std::set_new_handler(h);

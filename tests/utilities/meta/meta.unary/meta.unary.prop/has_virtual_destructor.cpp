@@ -22,7 +22,7 @@ class VirtualBase : virtual Class {};
 
 class VirtualMethod {
   public:
-    [[maybe_unused]] virtual void f();
+    virtual void f();
 };
 
 class PublicPolymorphicBase : public VirtualMethod {};
@@ -35,7 +35,7 @@ class VirtualPolymorphicBase : virtual VirtualMethod {};
 
 class PureVirtualMethod {
   public:
-    [[maybe_unused]] virtual void f() = 0;
+    virtual void f() = 0;
 };
 
 class PublicAbstractBase : public PureVirtualMethod {};

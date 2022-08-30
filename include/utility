@@ -114,11 +114,11 @@ struct integer_sequence {
 template<size_t... _I>
 using index_sequence = integer_sequence<size_t, _I...>;
 
-#if _LIGHTCXX_USE_BUILTIN(__integer_pack)
+#if _LIGHTCXX_BUILTINS_USE(__integer_pack)
 template<integral _T, _T _N>
     requires(_N >= 0)
 using make_integer_sequence = integer_sequence<_T, __integer_pack(_N)...>;
-#elif _LIGHTCXX_USE_BUILTIN(__make_integer_seq)
+#elif _LIGHTCXX_BUILTINS_USE(__make_integer_seq)
 template<integral _T, _T _N>
     requires(_N >= 0)
 using make_integer_sequence = __make_integer_seq<integer_sequence, _T, _N>;

@@ -39,9 +39,9 @@
 #endif
 
 TEST() {
-    [[maybe_unused]] std::sig_atomic_t i;
+    std::sig_atomic_t i;
 
-    [[maybe_unused]] const auto signal_lambda = []() { std::signal(SIGABRT, [](int sig) {}); };
+    const auto signal_lambda = []() { std::signal(SIGABRT, [](int sig) {}); };
 
-    [[maybe_unused]] const auto raise_lambda = []() { std::raise(SIGABRT); };
+    const auto raise_lambda = []() { std::raise(SIGABRT); };
 }

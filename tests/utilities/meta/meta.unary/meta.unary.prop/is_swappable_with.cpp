@@ -20,7 +20,7 @@ constexpr bool test_is_swappable_with() {
 }
 
 struct MoveCtorAndAssign {
-    [[maybe_unused]] int x, y;
+    int x, y;
 };
 static_assert(test_is_swappable_with<true, MoveCtorAndAssign&>());
 
@@ -59,7 +59,7 @@ static_assert(test_is_swappable_with<true, const int&&, HiddenFriendSwap&>());
 namespace ns {
 
 struct ByADL {
-    [[maybe_unused]] int x, y;
+    int x, y;
 
     ByADL(const ByADL&) = delete;
     ByADL(ByADL&&) = delete;

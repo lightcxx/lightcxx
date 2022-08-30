@@ -20,7 +20,7 @@ constexpr bool test_is_nothrow_swappable_with() {
 }
 
 struct MoveCtorAndAssign {
-    [[maybe_unused]] int x, y;
+    int x, y;
 };
 static_assert(test_is_nothrow_swappable_with<true, MoveCtorAndAssign&>());
 
@@ -59,7 +59,7 @@ static_assert(test_is_nothrow_swappable_with<false, const int&&, HiddenFriendSwa
 namespace ns {
 
 struct ByADL {
-    [[maybe_unused]] int x, y;
+    int x, y;
 
     ByADL(const ByADL&) = delete;
     ByADL(ByADL&&) = delete;
@@ -119,7 +119,7 @@ static_assert(test_is_nothrow_swappable_with<true, const int&&, HiddenFriendNoth
 namespace ns {
 
 struct ByADLNothrow {
-    [[maybe_unused]] int x, y;
+    int x, y;
 
     ByADLNothrow(const ByADLNothrow&) = delete;
     ByADLNothrow(ByADLNothrow&&) = delete;

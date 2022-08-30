@@ -28,7 +28,7 @@ struct ConvertsTo {
 
 struct Derived : public Class {};
 
-struct [[maybe_unused]] WithAssignOp {
+struct WithAssignOp {
     WithAssignOp& operator=(int);
     void operator=(double);
     WithAssignOp& operator=(long) = delete;

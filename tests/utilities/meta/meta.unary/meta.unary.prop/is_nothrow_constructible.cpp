@@ -438,7 +438,7 @@ static_assert(test_is_nothrow_constructible<true, Class, Class&>());
 static_assert(test_is_nothrow_constructible<true, Class, const Class&>());
 static_assert(test_is_nothrow_constructible<true, Class, Class&&>());
 
-struct [[maybe_unused]] WithCtor {
+struct WithCtor {
     WithCtor(int);
     WithCtor(int, int) noexcept;
     WithCtor(long, int) = delete;

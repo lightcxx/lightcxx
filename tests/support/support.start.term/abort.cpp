@@ -10,13 +10,13 @@ struct FailPrinter {
     }
 };
 
-[[maybe_unused]] FailPrinter global{};
-[[maybe_unused]] thread_local FailPrinter t_local{};
+FailPrinter global{};
+thread_local FailPrinter t_local{};
 
 TEST() {
-    [[maybe_unused]] static FailPrinter inline_static{};
-    [[maybe_unused]] thread_local FailPrinter inline_t_local{};
-    [[maybe_unused]] FailPrinter local;
+    static FailPrinter inline_static{};
+    thread_local FailPrinter inline_t_local{};
+    FailPrinter local;
 
     ::std::atexit([] { fail(); });
 

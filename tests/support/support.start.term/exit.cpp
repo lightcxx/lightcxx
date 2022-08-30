@@ -21,13 +21,13 @@ struct SuccessPrinter {
     }
 };
 
-[[maybe_unused]] SuccessPrinter global{.name = "global"};
-[[maybe_unused]] thread_local FailPrinter t_local{.name = "thread_local"};
+SuccessPrinter global{.name = "global"};
+thread_local FailPrinter t_local{.name = "thread_local"};
 
 TEST() {
-    [[maybe_unused]] static SuccessPrinter inline_static{.name = "inline_static"};
-    [[maybe_unused]] thread_local SuccessPrinter inline_t_local{.name = "inline_thread_local"};
-    [[maybe_unused]] FailPrinter local;
+    static SuccessPrinter inline_static{.name = "inline_static"};
+    thread_local SuccessPrinter inline_t_local{.name = "inline_thread_local"};
+    FailPrinter local;
 
     ::std::atexit([] { step("atexit"); });
 

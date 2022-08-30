@@ -35,7 +35,7 @@ struct ConvertsToNoThrow {
 
 struct Derived : public Class {};
 
-struct [[maybe_unused]] WithAssignOp {
+struct WithAssignOp {
     WithAssignOp& operator=(int);
     void operator=(double) noexcept;
     WithAssignOp& operator=(long) = delete;

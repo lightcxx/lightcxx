@@ -7,9 +7,12 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 option(LIGHTCXX_ENABLE_TESTS "Build lightcxx tests" OFF)
 
+include(cmake/Warnings.cmake)
+
 add_subdirectory(third_party)
 
 function(AddLightCxxCommonOptions lightcxx_target)
+    AddTargetCompileWarnings(${lightcxx_target})
     target_include_directories(${lightcxx_target} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
     target_include_directories(${lightcxx_target} SYSTEM INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
     target_compile_options(${lightcxx_target} PUBLIC -nostdinc++)
@@ -49,6 +52,7 @@ if (LIGHTCXX_ENABLE_TESTS)
     include(cmake/Tests.cmake)
 
     add_library(lightcxx_testing STATIC testing/testing.c)
+    AddTargetCompileWarnings(lightcxx_testing)
     target_include_directories(lightcxx_testing PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/testing)
     target_link_libraries(lightcxx_testing PUBLIC lightcxx_static)
     if (NOT APPLE)

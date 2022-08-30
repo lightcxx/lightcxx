@@ -8,9 +8,9 @@ struct S {
 
 TEST() {
     std::bad_typeid default_constructed;
-    [[maybe_unused]] S* p{};
+    S* p{};
     try {
-        [[maybe_unused]] const char* name = typeid(*p).name();
+        const char* name = typeid(*p).name();
         fail();
     } catch (const std::bad_typeid& e) {
         expect(default_constructed.what() == e.what());

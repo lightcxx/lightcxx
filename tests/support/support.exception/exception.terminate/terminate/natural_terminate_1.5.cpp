@@ -23,7 +23,7 @@ struct ThrowGlobal {
     }
 };
 
-[[maybe_unused]] Testing::ForkSafeGlobal<SetTerminateGlobal> set_terminate_;
-[[maybe_unused]] Testing::ForkSafeGlobal<ThrowGlobal> throw_;
+Testing::ForkSafeGlobal<SetTerminateGlobal> set_terminate_;
+Testing::ForkSafeGlobal<ThrowGlobal> throw_;
 
 TEST() {}

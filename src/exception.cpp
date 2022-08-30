@@ -1,8 +1,8 @@
 #include "exception"
 
 #include "cstdlib"
-#include "handler.h"
 #include "export.h"
+#include "handler.h"
 
 extern "C" {
 unsigned int __cxa_uncaught_exceptions() throw();
@@ -59,7 +59,7 @@ _EXPORT terminate_handler get_terminate() noexcept {
 }
 
 _EXPORT int uncaught_exceptions() noexcept {
-    return __cxa_uncaught_exceptions();
+    return int(__cxa_uncaught_exceptions());
 }
 
 _EXPORT exception_ptr current_exception() noexcept {
@@ -143,7 +143,7 @@ namespace std {
     abort();
 }
 
-[[maybe_unused]] _EXPORT terminate_handler get_unexpected() noexcept {
+_EXPORT terminate_handler get_unexpected() noexcept {
     return abort;
 }
 

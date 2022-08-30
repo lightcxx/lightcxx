@@ -6,7 +6,7 @@
 
 struct A {
     int x;
-    [[maybe_unused]] int y;
+    int y;
 
     auto operator<=>(const A& a) const noexcept {
         return x <=> a.x;
@@ -15,7 +15,7 @@ struct A {
 
 struct B {
     int x;
-    [[maybe_unused]] int y;
+    int y;
 
     std::weak_ordering operator<=>(const A& a) const {
         return x <=> a.x;

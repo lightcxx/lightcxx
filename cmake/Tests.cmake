@@ -1,4 +1,5 @@
 macro(add_lightcxx_test_common_options target)
+    AddTargetCompileWarnings(${target})
     target_link_libraries(${target} PUBLIC lightcxx_testing)
     set_target_properties(${target} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/tests)
     if (COMPILE_OPTIONS)

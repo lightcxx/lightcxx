@@ -34,12 +34,12 @@ class PureVirtualDtor {
 
 class VirtualMethod {
   public:
-    [[maybe_unused]] virtual void f();
+    virtual void f();
 };
 
 class PureVirtualMethod {
   public:
-    [[maybe_unused]] virtual void f() = 0;
+    virtual void f() = 0;
 };
 
 class PublicPolymorphicBase : public VirtualMethod {};

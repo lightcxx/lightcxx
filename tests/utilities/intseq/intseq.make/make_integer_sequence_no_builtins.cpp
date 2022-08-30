@@ -1,6 +1,6 @@
 // EXPECT:NO_COMPILE "std::make_integer_sequence is not supported on this compiler."
 
-#define _LIGHTCXX_DONT_USE_BUILTINS
+#define _LIGHTCXX_BUILTINS_DONT_USE_ANY
 
 #include <utility>
 

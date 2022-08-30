@@ -9,7 +9,7 @@ constexpr _Tp* addressof(_Tp& __x) noexcept {
 }
 
 template<class _Tp>
-[[maybe_unused]] constexpr _Tp* addressof(const _Tp&&) noexcept = delete;
+constexpr _Tp* addressof(const _Tp&&) noexcept = delete;
 
 }  // namespace std
 

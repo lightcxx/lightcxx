@@ -29,21 +29,21 @@ struct V {
     V(std::initializer_list<int>) {
         ++V_init_list_ctor_num_calls;
     }
-    [[maybe_unused]] V(int, int, int, int) {}
+    V(int, int, int, int) {}
 };
 
 TEST(construct_structure_via_initializer_list) {
     V_init_list_ctor_num_calls = 0;
 
-    [[maybe_unused]] const V v = {1, 2, 3, 4};
+    const V v = {1, 2, 3, 4};
     expect(V_init_list_ctor_num_calls == 1);
 
-    [[maybe_unused]] const V v2{1, 2, 3, 4};
+    const V v2{1, 2, 3, 4};
     expect(V_init_list_ctor_num_calls == 2);
 
-    [[maybe_unused]] const V v3({1, 2, 3, 4});
+    const V v3({1, 2, 3, 4});
     expect(V_init_list_ctor_num_calls == 3);
 
-    [[maybe_unused]] const V v4{{1, 2, 3, 4}};
+    const V v4{{1, 2, 3, 4}};
     expect(V_init_list_ctor_num_calls == 4);
 }

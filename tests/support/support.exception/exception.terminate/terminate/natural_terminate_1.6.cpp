@@ -14,7 +14,7 @@ struct ThrowInDtor {
     }
 };
 
-[[maybe_unused]] Testing::ForkSafeGlobal<ThrowInDtor> throw_;
+Testing::ForkSafeGlobal<ThrowInDtor> throw_;
 
 TEST() {
     std::set_terminate([]() {

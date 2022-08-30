@@ -4,7 +4,7 @@
 #include <string.h>
 
 struct Type {
-    [[maybe_unused]] int x;
+    int x;
 };
 
 TEST() {

@@ -14,7 +14,7 @@ TEST(int_) {
     expect_ct_and_rt(std::is_same_v<decltype(i)::iterator, const int*>);
     expect_ct_and_rt(std::is_same_v<decltype(i)::const_iterator, const int*>);
 
-    [[maybe_unused]] std::initializer_list<int> default_ctor;
+    std::initializer_list<int> default_ctor;
 
     expect(i.size() == 4);
 
@@ -40,7 +40,7 @@ TEST(const_char_ptr) {
     expect_ct_and_rt(std::is_same_v<decltype(i)::iterator, const char* const*>);
     expect_ct_and_rt(std::is_same_v<decltype(i)::const_iterator, const char* const*>);
 
-    [[maybe_unused]] constexpr std::initializer_list<const char*> default_ctor;
+    constexpr std::initializer_list<const char*> default_ctor;
 
     expect(i.size() == 5);
 

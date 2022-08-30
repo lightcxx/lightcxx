@@ -44,23 +44,23 @@ class ClassWithPrivateDtorBase : public ClassWithPrivateDtor {};
 class IncompleteClass;
 
 union UnionWithDeletedDtor {
-    [[maybe_unused]] int x;
-    [[maybe_unused]] char c[4];
+    int x;
+    char c[4];
 
     ~UnionWithDeletedDtor() = delete;
 };
 
 union UnionWithProtectedDtor {
-    [[maybe_unused]] int x;
-    [[maybe_unused]] char c[4];
+    int x;
+    char c[4];
 
   protected:
     ~UnionWithProtectedDtor() {}
 };
 
 union UnionWithPrivateDtor {
-    [[maybe_unused]] int x;
-    [[maybe_unused]] char c[4];
+    int x;
+    char c[4];
 
   protected:
     ~UnionWithPrivateDtor() {}
@@ -78,30 +78,30 @@ TEST_UNARY_TRAIT_AGAINST_TYPES(false, is_destructible, EVERY_CV, ClassWithDelete
 
 class ClassWithDefinedDtor {
   public:
-    [[maybe_unused]] int x;
-    [[maybe_unused]] int y;
+    int x;
+    int y;
 
     ~ClassWithDefinedDtor() {}
 };
 
 class ClassWithDefaultedDtor {
   public:
-    [[maybe_unused]] int x;
-    [[maybe_unused]] int y;
+    int x;
+    int y;
 
     ClassWithDefaultedDtor() = default;
 };
 
 union UnionWithDefinedDtor {
-    [[maybe_unused]] int x;
-    [[maybe_unused]] char c[4];
+    int x;
+    char c[4];
 
     ~UnionWithDefinedDtor() {}
 };
 
 union UnionWithDefaultedDtor {
-    [[maybe_unused]] int x;
-    [[maybe_unused]] char c[4];
+    int x;
+    char c[4];
 
     ~UnionWithDefaultedDtor() = default;
 };
