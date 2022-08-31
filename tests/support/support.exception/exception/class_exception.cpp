@@ -11,7 +11,7 @@ TEST() {
 
     // Copy constructor
     std::exception copy_constructed(default_constructed);
-    expect_is_noexcept(std::exception(default_constructed));
+    expect_is_noexcept(std::exception{default_constructed});
     expect(strcmp(copy_constructed.what(), default_constructed.what()) == 0);
     expect(copy_constructed.what() == default_constructed.what());
     expect(strcmp(copy_constructed.what(), "exception") == 0);

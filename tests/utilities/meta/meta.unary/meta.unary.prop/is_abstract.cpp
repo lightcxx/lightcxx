@@ -1,3 +1,5 @@
+// REQUEST:COMPILE_OPTIONS "-Wno-non-virtual-dtor"
+
 #include <type_traits>
 
 #include "meta/test_unary_trait.h"

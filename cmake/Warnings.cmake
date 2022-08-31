@@ -4,12 +4,11 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
 
 include_directories(${CMAKE_SOURCE_DIR}/src/)
 
-set(CLANG_WARNINGS
+set(COMMON_CLANG_GCC_WARNINGS
         -Werror
         -Wall
         -Wextra # reasonable and standard
-        -Wnon-virtual-dtor # warn the user if a class with virtual functions has a non-virtual destructor. This helps
-        # catch hard to track down memory errors
+        -Wnon-virtual-dtor # warn the user if a class with virtual functions has a non-virtual destructor.
         -Wold-style-cast # warn for c-style casts
         -Wcast-align # warn for potential performance problem casts
         -Wunused # warn on anything being unused
@@ -24,12 +23,20 @@ set(CLANG_WARNINGS
         -Wimplicit-fallthrough # warn on statements that fallthrough without an explicit annotation
         )
 set(GCC_WARNINGS
-        ${CLANG_WARNINGS}
+        ${COMMON_CLANG_GCC_WARNINGS}
         -Wmisleading-indentation # warn if indentation implies blocks where blocks do not exist
         -Wduplicated-cond # warn if if / else chain has duplicated conditions
         -Wduplicated-branches # warn if if / else branches have duplicated code
         -Wlogical-op # warn about logical operations being used where bitwise were probably wanted
         -Wuseless-cast # warn if you perform a cast to the same type
+
+        -Wno-unknown-pragmas
+        -Wno-attributes
+        )
+set(CLANG_WARNINGS
+        ${COMMON_CLANG_GCC_WARNINGS}
+
+        -Wno-unknown-warning-option
         )
 
 if (CMAKE_CXX_COMPILER_ID MATCHES ".*Clang")
@@ -45,6 +52,7 @@ endif ()
 function(AddTargetCompileWarnings TARGET)
     get_property(warnings GLOBAL PROPERTY PROJECT_WARNINGS)
     if (warnings)
-#        target_compile_options(${TARGET} PRIVATE ${warnings})
+        target_compile_options(${TARGET} PRIVATE
+                $<$<COMPILE_LANGUAGE:CXX>:${warnings}>)
     endif ()
 endfunction()

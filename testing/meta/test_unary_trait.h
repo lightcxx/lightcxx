@@ -5,7 +5,7 @@
 
 using NullptrT = decltype(nullptr);
 
-class Class {
+struct Class {
     int x[2];
     char y[4];
 };
@@ -40,8 +40,8 @@ constexpr bool test_unary_trait_against_type_NO_CV() {
     static_assert(std::is_base_of_v<std::bool_constant<e>, Trait<T>>);
     static_assert(std::is_same_v<typename Trait<T>::value_type, bool>);
     static_assert(Trait<T>{} == e);
-    static_assert((bool)Trait<T>{} == e);
-    static_assert(noexcept((bool)Trait<T>{}));
+    static_assert(static_cast<bool>(Trait<T>{}) == e);
+    static_assert(noexcept(static_cast<bool>(Trait<T>{})));
     static_assert(Trait<T>{}() == e);
     static_assert(noexcept(Trait<T>{}()));
     static_assert(std::is_same_v<bool, decltype(Trait<T>{}())>);
@@ -112,8 +112,8 @@ constexpr bool test_unary_prop_query() {
     static_assert(std::is_base_of_v<std::integral_constant<std::size_t, e>, Trait<T>>);
     static_assert(std::is_same_v<typename Trait<T>::value_type, std::size_t>);
     static_assert(Trait<T>{} == e);
-    static_assert((std::size_t)Trait<T>{} == e);
-    static_assert(noexcept((std::size_t)Trait<T>{}));
+    static_assert(static_cast<std::size_t>(Trait<T>{}) == e);
+    static_assert(noexcept(static_cast<std::size_t>(Trait<T>{})));
     static_assert(Trait<T>{}() == e);
     static_assert(noexcept(Trait<T>{}()));
     static_assert(std::is_same_v<std::size_t, decltype(Trait<T>{}())>);

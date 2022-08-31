@@ -35,15 +35,15 @@ struct V {
 TEST(construct_structure_via_initializer_list) {
     V_init_list_ctor_num_calls = 0;
 
-    const V v = {1, 2, 3, 4};
+    [[maybe_unused]] const V v = {1, 2, 3, 4};
     expect(V_init_list_ctor_num_calls == 1);
 
-    const V v2{1, 2, 3, 4};
+    [[maybe_unused]] const V v2{1, 2, 3, 4};
     expect(V_init_list_ctor_num_calls == 2);
 
-    const V v3({1, 2, 3, 4});
+    [[maybe_unused]] const V v3({1, 2, 3, 4});
     expect(V_init_list_ctor_num_calls == 3);
 
-    const V v4{{1, 2, 3, 4}};
+    [[maybe_unused]] const V v4{{1, 2, 3, 4}};
     expect(V_init_list_ctor_num_calls == 4);
 }

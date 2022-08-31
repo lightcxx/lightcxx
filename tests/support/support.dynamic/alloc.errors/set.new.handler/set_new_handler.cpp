@@ -13,7 +13,7 @@ TEST() {
     expect(std::set_new_handler(g) == nullptr);
 
     // return nullptr once from malloc.
-    libc.malloc.replace([](std::size_t size) -> void* {
+    libc.malloc.replace([](std::size_t) -> void* {
         step("malloc");
         libc.malloc.reset();
         return nullptr;
@@ -27,14 +27,14 @@ TEST() {
     expect(std::set_new_handler(nullptr) == h);
 
     // return nullptr once from malloc.
-    libc.malloc.replace([](std::size_t size) -> void* {
+    libc.malloc.replace([](std::size_t) -> void* {
         step("second_malloc");
         libc.malloc.reset();
         return nullptr;
     });
     step("before_second_new");
     try {
-        auto failed_ptr = ::operator new(4);
+        [[maybe_unused]] auto failed_ptr = ::operator new(4);
         fail();
     } catch (std::bad_alloc&) {
         step("catch");

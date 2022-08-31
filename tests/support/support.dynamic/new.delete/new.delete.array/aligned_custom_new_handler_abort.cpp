@@ -8,7 +8,7 @@
 #include <stdlib.h>
 
 TEST() {
-    libc.aligned_alloc.replace([](std::size_t align, std::size_t size) -> void* {
+    libc.aligned_alloc.replace([](std::size_t, std::size_t) -> void* {
         step("aligned_alloc");
         return nullptr;
     });
@@ -17,6 +17,6 @@ TEST() {
         ::abort();
     });
 
-    const auto const_ptr = ::operator new[](256, std::align_val_t{128});
+    [[maybe_unused]] const auto const_ptr = ::operator new[](256, std::align_val_t{128});
     fail();
 }

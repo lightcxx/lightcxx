@@ -10,7 +10,7 @@ TEST() {
     std::bad_typeid default_constructed;
     S* p{};
     try {
-        const char* name = typeid(*p).name();
+        typeid(*p).name();
         fail();
     } catch (const std::bad_typeid& e) {
         expect(default_constructed.what() == e.what());

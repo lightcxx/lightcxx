@@ -1,3 +1,5 @@
+// REQUEST:COMPILE_OPTIONS "-Wno-non-virtual-dtor"
+
 #include <type_traits>
 
 #include "meta/test_unary_trait.h"
@@ -34,7 +36,7 @@ class AllProtected {
 };
 class AllPrivate {
   private:
-    int x, y;
+    [[maybe_unused]] int x, y;
 };
 class AllPublicDerived : public AllPublic {};
 class AllPublicDerivedTwice : public AllPublicDerived {};
@@ -74,7 +76,7 @@ class Mixed1 {
     int x;
 
   private:
-    int y;
+    [[maybe_unused]] int y;
 };
 class Mixed2 {
   public:
@@ -88,7 +90,7 @@ class Mixed3 {
     int x;
 
   private:
-    int y;
+    [[maybe_unused]] int y;
 };
 class Mixed4 {
   public:
@@ -98,7 +100,7 @@ class Mixed4 {
     int y;
 
   private:
-    int z;
+    [[maybe_unused]] int z;
 };
 
 class Virtual1 {

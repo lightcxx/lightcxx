@@ -10,8 +10,8 @@ constexpr void expect_is_invocable() {
     static_assert(std::is_base_of_v<std::bool_constant<e>, std::is_invocable<T...>>);
     static_assert(std::is_same_v<typename std::is_invocable<T...>::value_type, bool>);
     static_assert(std::is_invocable<T...>{} == e);
-    static_assert((bool)std::is_invocable<T...>{} == e);
-    static_assert(noexcept((bool)std::is_invocable<T...>{}));
+    static_assert(static_cast<bool>(std::is_invocable<T...>{}) == e);
+    static_assert(noexcept(static_cast<bool>(std::is_invocable<T...>{})));
     static_assert(std::is_invocable<T...>{}() == e);
     static_assert(noexcept(std::is_invocable<T...>{}()));
     static_assert(std::is_same_v<bool, decltype(std::is_invocable<T...>{}())>);

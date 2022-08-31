@@ -9,10 +9,10 @@ TEST() {
     };
 
     const X* p = new const X{3};
-    const int a = p->n;
+    [[maybe_unused]] const int a = p->n;
     // p does not point to new object ([basic.life]) because its type is const
     new (const_cast<X*>(p)) const X{5};
     //    const int b = p->n; // undefined behavior
-    const int c = std::launder(p)->n;  // OK
+    [[maybe_unused]] const int c = std::launder(p)->n;  // OK
     delete std::launder(p);
 }

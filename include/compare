@@ -281,7 +281,7 @@ struct _CmpToNum<strong_ordering> {
     static constexpr int __value = 3;
 };
 
-template<class... _Ts>
+template<class... _Ts> requires (sizeof...(_Ts) > 0)
 static constexpr auto _CommonComparisonCategoryImpl() noexcept {
     constexpr int __mapped_Ts[] = {_CmpToNum<_Ts>::__value...};
     constexpr auto __count_occurrences = [__mapped_Ts](int __counted) {
@@ -302,6 +302,11 @@ static constexpr auto _CommonComparisonCategoryImpl() noexcept {
     } else {
         return strong_ordering::less;
     }
+}
+
+template<class... _Ts>
+static constexpr auto _CommonComparisonCategoryImpl() noexcept {
+    return strong_ordering::less;
 }
 
 }  // namespace _Light

@@ -24,6 +24,11 @@ void operator delete(void* ptr) noexcept {
     return ::free(ptr);
 }
 
+void operator delete(void* ptr, std::size_t) noexcept {
+    step("delete");
+    return ::free(ptr);
+}
+
 TEST() {
     std::set_new_handler([]() {
         fail();

@@ -27,13 +27,13 @@ static void sum_and_product(long long* sum, long long* product, const char* form
                 break;
             }
             case 'u': {
-                *sum += va_arg(va_s, unsigned);
-                *product *= va_arg(va_p, unsigned);
+                *sum += int(va_arg(va_s, unsigned));
+                *product *= int(va_arg(va_p, unsigned));
                 break;
             }
             case 'U': {
-                *sum += va_arg(va_s, unsigned long);
-                *product *= va_arg(va_p, unsigned long);
+                *sum += long(va_arg(va_s, unsigned long));
+                *product *= long(va_arg(va_p, unsigned long));
                 break;
             }
             default: {

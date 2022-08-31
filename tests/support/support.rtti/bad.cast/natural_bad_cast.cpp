@@ -14,7 +14,7 @@ TEST() {
 
     Bar b;
     try {
-        Foo& f = dynamic_cast<Foo&>(b);
+        (void)dynamic_cast<Foo&>(b);
         fail();
     } catch (const std::bad_cast& e) {
         expect(default_constructed.what() == e.what());

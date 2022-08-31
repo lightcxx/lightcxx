@@ -10,7 +10,7 @@
 
 struct NonCompliantException : public std::exception {
     NonCompliantException() = default;
-    NonCompliantException(const NonCompliantException& other) {
+    NonCompliantException(const NonCompliantException&): std::exception() {
         step("copy_ctor");
         throw 5;
     }
@@ -22,6 +22,8 @@ struct NonCompliantException : public std::exception {
     NonCompliantException& operator=(NonCompliantException&&) = delete;
 };
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcatch-value"
 TEST() {
     std::set_terminate([]() {
         step("terminate");
@@ -34,3 +36,4 @@ TEST() {
         fail();
     }
 }
+#pragma GCC diagnostic pop

@@ -9,8 +9,8 @@ constexpr bool test_is_base_of() {
     static_assert(std::is_base_of_v<std::bool_constant<e>, std::is_base_of<Base, Derived>>);
     static_assert(std::is_same_v<typename std::is_base_of<Base, Derived>::value_type, bool>);
     static_assert(std::is_base_of<Base, Derived>{} == e);
-    static_assert((bool)std::is_base_of<Base, Derived>{} == e);
-    static_assert(noexcept((bool)std::is_base_of<Base, Derived>{}));
+    static_assert(static_cast<bool>(std::is_base_of<Base, Derived>{}) == e);
+    static_assert(noexcept(static_cast<bool>(std::is_base_of<Base, Derived>{})));
     static_assert(std::is_base_of<Base, Derived>{}() == e);
     static_assert(noexcept(std::is_base_of<Base, Derived>{}()));
     static_assert(std::is_same_v<bool, decltype(std::is_base_of<Base, Derived>{}())>);

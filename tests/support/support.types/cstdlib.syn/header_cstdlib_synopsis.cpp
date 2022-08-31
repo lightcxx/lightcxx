@@ -21,27 +21,27 @@ bool operator==(const lldiv_t& d1, const lldiv_t& d2) {
 TEST() {
     constexpr void* n = NULL;
     expect_ct_and_rt(n == nullptr);
-    const auto cur_max = MB_CUR_MAX;
-    constexpr auto rand_max = RAND_MAX;
-    constexpr auto exit_success = EXIT_SUCCESS;
-    constexpr auto exit_failure = EXIT_FAILURE;
+    [[maybe_unused]] const auto cur_max = MB_CUR_MAX;
+    [[maybe_unused]] constexpr auto rand_max = RAND_MAX;
+    [[maybe_unused]] constexpr auto exit_success = EXIT_SUCCESS;
+    [[maybe_unused]] constexpr auto exit_failure = EXIT_FAILURE;
     expect(EXIT_SUCCESS != EXIT_FAILURE);
-    expect_ct_and_rt((::std::size_t)5 == 5);
+    expect_ct_and_rt(static_cast<::std::size_t>(5) == 5);
 
-    const auto env_var = ::std::getenv("ENV_VAR");
-    const auto system_lambda = []() { return ::std::system("echo ::std::system"); };
+    [[maybe_unused]] const auto env_var = ::std::getenv("ENV_VAR");
+    [[maybe_unused]] const auto system_lambda = []() { return ::std::system("echo ::std::system"); };
 
     // We don't actually want to call these, just see that they compile.
-    auto abort_lambda = []() { ::std::abort(); };
-    auto exit_lambda = []() {
+    [[maybe_unused]] auto abort_lambda = []() { ::std::abort(); };
+    [[maybe_unused]] auto exit_lambda = []() {
         ::std::atexit([]() { ::std::system("echo exited"); });
         ::std::exit(10);
     };
-    auto quick_exit_lambda = []() {
+    [[maybe_unused]] auto quick_exit_lambda = []() {
         ::std::at_quick_exit([]() { ::std::system("echo exited"); });
         ::std::quick_exit(10);
     };
-    auto Exit_lambda = []() { ::std::_Exit(10); };
+    [[maybe_unused]] auto Exit_lambda = []() { ::std::_Exit(10); };
 
     const auto malloc_ptr = ::std::malloc(16);
     expect_type(void* const&, malloc_ptr);
@@ -53,7 +53,7 @@ TEST() {
     ::std::free(calloc_ptr);
     const auto aligned_alloc_ptr = ::std::aligned_alloc(4096, 313);
     expect_type(void* const&, aligned_alloc_ptr);
-    expect(((unsigned long long)aligned_alloc_ptr) % 4096 == 0);
+    expect(reinterpret_cast<unsigned long long>(aligned_alloc_ptr) % 4096 == 0);
     ::std::free(aligned_alloc_ptr);
 
     expect_type_and_value(::std::atof("3.14"), double, 3.14);
@@ -61,18 +61,18 @@ TEST() {
     expect_type_and_value(::std::atol("-314"), long, -314L);
     expect_type_and_value(::std::atoll("-314"), long long, -314LL);
     char* end = nullptr;
-    expect_type_and_value(::std::strtof("3.0#12", &end), float, 3.0);
+    expect_type_and_value(::std::strtof("3.0#12", &end), float, 3.0f);
     expect_type_and_value(::std::strtod("3.0#12", &end), double, 3.0);
-    expect_type_and_value(::std::strtold("3.0#12", &end), long double, 3.0);
+    expect_type_and_value(::std::strtold("3.0#12", &end), long double, 3.0L);
     expect_type_and_value(::std::strtol("-34#12", &end, 5), long, -19L);
     expect_type_and_value(::std::strtoll("-34#12", &end, 5), long long, -19LL);
     expect_type_and_value(::std::strtoul("34#12", &end, 5), unsigned long, 19UL);
     expect_type_and_value(::std::strtoull("34#12", &end, 5), unsigned long long, 19ULL);
 
     const char8_t* s = u8"z\u00df\u6c34\u0001f34c";
-    ::std::mblen((const char*)s, 11);
-    ::std::mbtowc((wchar_t*)nullptr, (const char*)s, 11);
-    char* characters = (char*)::std::malloc(MB_CUR_MAX);
+    ::std::mblen(reinterpret_cast<const char*>(s), 11);
+    ::std::mbtowc(static_cast<wchar_t*>(nullptr), reinterpret_cast<const char*>(s), 11);
+    char* characters = static_cast<char*>(::std::malloc(std::size_t(MB_CUR_MAX)));
     ::std::wctomb(characters, L'A');
     const char* multibyte_string = "\x7a\xc3\x9f\xe6\xb0\xb4\xf0\x9f\x8d\x8c";
     wchar_t wide_string[20];
@@ -81,16 +81,18 @@ TEST() {
     ::std::wcstombs(multibyte_string_copy, wide_string, 20);
     ::std::free(characters);
 
+    const auto cmp = [](const void* a, const void* b) -> int { return *(static_cast<const int*>(a)) - *(static_cast<const int*>(b)); };
+
     int a[] = {5, 2, 4, 1, 3};
-    ::std::qsort(a, 5, sizeof(int), [](const void* a, const void* b) { return *((int*)a) - *((int*)b); });
+    ::std::qsort(a, 5, sizeof(int), cmp);
     expect(a[0] == 1 && a[1] == 2 && a[2] == 3 && a[3] == 4 && a[4] == 5);
 
     int key = 2;
-    auto ptr = ::std::bsearch(&key, a, 5, sizeof(int), [](const void* a, const void* b) { return *((int*)a) - *((int*)b); });
-    expect(*((int*)ptr) == 2);
-    expect(((int*)ptr - (int*)a) == 1);
+    auto ptr = ::std::bsearch(&key, a, 5, sizeof(int), cmp);
+    expect(*(static_cast<int*>(ptr)) == 2);
+    expect(((static_cast<int*>(ptr)) - (static_cast<int*>(a))) == 1);
     key = 16;
-    ptr = ::std::bsearch(&key, a, 5, sizeof(int), [](const void* a, const void* b) { return *((int*)a) - *((int*)b); });
+    ptr = ::std::bsearch(&key, a, 5, sizeof(int), cmp);
     expect(ptr == nullptr);
 
     ::std::srand(5);

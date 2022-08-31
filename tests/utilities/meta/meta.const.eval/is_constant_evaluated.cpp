@@ -2,8 +2,6 @@
 
 #include "testing.h"
 
-#pragma clang diagnostic ignored "-Wconstant-evaluated"
-
 constexpr int f() {
     if (std::is_constant_evaluated()) {
         return 1;
@@ -12,6 +10,8 @@ constexpr int f() {
     }
 }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wconstant-evaluated"
 TEST() {
     expect(!std::is_constant_evaluated());
     static_assert(std::is_constant_evaluated());
@@ -23,3 +23,4 @@ TEST() {
     expect_is_noexcept(std::is_constant_evaluated());
     expect_type(bool, std::is_constant_evaluated());
 }
+#pragma clang diagnostic pop

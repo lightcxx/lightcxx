@@ -8,8 +8,8 @@ constexpr void test_integral_constant() {
     static_assert(std::is_same_v<T, typename std::integral_constant<T, val>::value_type>);
     static_assert(std::is_same_v<std::integral_constant<T, val>, typename std::integral_constant<T, val>::type>);
     static_assert(std::integral_constant<T, val>{} == val);
-    static_assert((T)std::integral_constant<T, val>{} == val);
-    static_assert(noexcept((T)std::integral_constant<T, val>{}));
+    static_assert(static_cast<T>(std::integral_constant<T, val>{}) == val);
+    static_assert(noexcept(static_cast<T>(std::integral_constant<T, val>{})));
     static_assert(std::integral_constant<T, val>{}() == val);
     static_assert(noexcept(std::integral_constant<T, val>{}()));
     static_assert(std::is_same_v<T, decltype(std::integral_constant<T, val>{}())>);
@@ -21,8 +21,8 @@ constexpr void test_bool_constant() {
     static_assert(std::is_same_v<bool, typename T::value_type>);
     static_assert(std::is_same_v<T, typename T::type>);
     static_assert(T{} == val);
-    static_assert((bool)T{} == val);
-    static_assert(noexcept((bool)T{}));
+    static_assert(static_cast<bool>(T{}) == val);
+    static_assert(noexcept(static_cast<bool>(T{})));
     static_assert(T{}() == val);
     static_assert(noexcept(T{}()));
     static_assert(std::is_same_v<bool, decltype(T{}())>);

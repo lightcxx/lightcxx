@@ -10,8 +10,8 @@ TEST(less) {
     expect_type(const std::weak_ordering&, std::weak_ordering::less);
     expect_ct_and_rt(implicit_conversion_to_partial_ordering(std::weak_ordering::less));
     expect_ct_and_rt(std::weak_ordering::less == std::partial_ordering::less);
-    expect_ct_and_rt((std::partial_ordering)std::weak_ordering::less == std::partial_ordering::less);
-    expect_is_noexcept((std::partial_ordering)std::weak_ordering::less);
+    expect_ct_and_rt(static_cast<std::partial_ordering>(std::weak_ordering::less) == std::partial_ordering::less);
+    expect_is_noexcept(static_cast<std::partial_ordering>(std::weak_ordering::less));
     expect_ct_and_rt(std::weak_ordering::less == std::weak_ordering::less);
     expect_is_noexcept(std::weak_ordering::less == std::weak_ordering::less);
     expect_ct_and_rt(!(std::weak_ordering::less == std::weak_ordering::equivalent));
@@ -66,8 +66,8 @@ TEST(equivalent) {
     expect_type(const std::weak_ordering&, std::weak_ordering::equivalent);
     expect_ct_and_rt(implicit_conversion_to_partial_ordering(std::weak_ordering::equivalent));
     expect_ct_and_rt(std::weak_ordering::equivalent == std::partial_ordering::equivalent);
-    expect_ct_and_rt((std::partial_ordering)std::weak_ordering::equivalent == std::partial_ordering::equivalent);
-    expect_is_noexcept((std::partial_ordering)std::weak_ordering::equivalent);
+    expect_ct_and_rt(static_cast<std::partial_ordering>(std::weak_ordering::equivalent) == std::partial_ordering::equivalent);
+    expect_is_noexcept(static_cast<std::partial_ordering>(std::weak_ordering::equivalent));
     expect_ct_and_rt(!(std::weak_ordering::equivalent == std::weak_ordering::less));
     expect_is_noexcept(std::weak_ordering::equivalent == std::weak_ordering::less);
     expect_ct_and_rt(std::weak_ordering::equivalent == std::weak_ordering::equivalent);
@@ -122,8 +122,8 @@ TEST(greater) {
     expect_type(const std::weak_ordering&, std::weak_ordering::greater);
     expect_ct_and_rt(implicit_conversion_to_partial_ordering(std::weak_ordering::greater));
     expect_ct_and_rt(std::weak_ordering::greater == std::partial_ordering::greater);
-    expect_ct_and_rt((std::partial_ordering)std::weak_ordering::greater == std::partial_ordering::greater);
-    expect_is_noexcept((std::partial_ordering)std::weak_ordering::greater);
+    expect_ct_and_rt(static_cast<std::partial_ordering>(std::weak_ordering::greater) == std::partial_ordering::greater);
+    expect_is_noexcept(static_cast<std::partial_ordering>(std::weak_ordering::greater));
     expect_ct_and_rt(!(std::weak_ordering::greater == std::weak_ordering::less));
     expect_is_noexcept(std::weak_ordering::greater == std::weak_ordering::less);
     expect_ct_and_rt(!(std::weak_ordering::greater == std::weak_ordering::equivalent));

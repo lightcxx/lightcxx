@@ -8,7 +8,7 @@
 #include <stdlib.h>
 
 TEST() {
-    libc.malloc.replace([](std::size_t size) -> void* {
+    libc.malloc.replace([](std::size_t) -> void* {
         step("malloc");
         return nullptr;
     });
@@ -17,6 +17,6 @@ TEST() {
         ::abort();
     });
 
-    const auto const_ptr = ::operator new(256);
+    [[maybe_unused]] const auto const_ptr = ::operator new(256);
     fail();
 }

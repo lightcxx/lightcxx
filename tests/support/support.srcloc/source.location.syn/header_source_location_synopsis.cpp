@@ -3,5 +3,5 @@
 #include <source_location>
 
 TEST() {
-    std::source_location location = std::source_location::current();
+    [[maybe_unused]] std::source_location location = std::source_location::current();
 }

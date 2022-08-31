@@ -13,7 +13,7 @@ TEST() {
     std::set_new_handler([]() { fail(); });
 
     try {
-        const auto const_ptr = ::operator new[](256, std::align_val_t{128});
+        [[maybe_unused]] const auto const_ptr = ::operator new[](256, std::align_val_t{128});
         fail();
     } catch (std::bad_alloc& exception) {
         step("catch");

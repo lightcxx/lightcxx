@@ -8,8 +8,8 @@ constexpr bool test_is_nothrow_assignable() {
     bool b2 = std::is_nothrow_assignable<T, U>::value == e;
     bool b3 = std::is_same_v<typename std::is_nothrow_assignable<T, U>::value_type, bool>;
     bool b4 = std::is_nothrow_assignable<T, U>{} == e;
-    bool b5 = (bool)std::is_nothrow_assignable<T, U>{} == e;
-    bool b6 = noexcept((bool)std::is_nothrow_assignable<T, U>{});
+    bool b5 = static_cast<bool>(std::is_nothrow_assignable<T, U>{}) == e;
+    bool b6 = noexcept(static_cast<bool>(std::is_nothrow_assignable<T, U>{}));
     bool b7 = std::is_nothrow_assignable<T, U>{}() == e;
     bool b8 = noexcept(std::is_nothrow_assignable<T, U>{}());
     bool b9 = std::is_same_v<bool, decltype(std::is_nothrow_assignable<T, U>{}())>;

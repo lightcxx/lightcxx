@@ -8,8 +8,8 @@ constexpr bool test_extent() {
     static_assert(std::is_base_of_v<std::integral_constant<std::size_t, e>, std::extent<T, I>>);
     static_assert(std::is_same_v<typename std::extent<T, I>::value_type, std::size_t>);
     static_assert(std::extent<T, I>{} == e);
-    static_assert((std::size_t)std::extent<T, I>{} == e);
-    static_assert(noexcept((std::size_t)std::extent<T, I>{}));
+    static_assert(static_cast<std::size_t>(std::extent<T, I>{}) == e);
+    static_assert(noexcept(static_cast<std::size_t>(std::extent<T, I>{})));
     static_assert(std::extent<T, I>{}() == e);
     static_assert(noexcept(std::extent<T, I>{}()));
     static_assert(std::is_same_v<std::size_t, decltype(std::extent<T, I>{}())>);
