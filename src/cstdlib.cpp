@@ -21,7 +21,7 @@ namespace std {
 namespace _Light {
 
 _EXPORT int _MBCurMax() {
-    return MB_CUR_MAX;
+    return static_cast<int>(MB_CUR_MAX);
 }
 
 }  // namespace _Light

@@ -1,7 +1,10 @@
 #ifndef TESTING_INTERCEPTORS_LIBC_H
 #define TESTING_INTERCEPTORS_LIBC_H
 
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif
+
 #include <dlfcn.h>
 #include <stdlib.h>
 
