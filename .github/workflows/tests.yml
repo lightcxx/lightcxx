@@ -25,7 +25,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Install Clang
-        run: apt install -y clang
+        run: sudo apt install -y clang
       - name: Check
         run: ${{github.workspace}}/tools/scripts/check_ci.sh clang clang++ ${{ matrix.build_type }}
 
@@ -37,6 +37,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Install GCC
-        run: apt install -y gcc
+        run: sudo apt install -y gcc g++
       - name: Check
         run: ${{github.workspace}}/tools/scripts/check_ci.sh gcc g++ ${{ matrix.build_type }}
