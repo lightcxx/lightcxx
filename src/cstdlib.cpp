@@ -12,16 +12,20 @@
 
 namespace {
 
-static constinit std::_Light::handler_array<std::_Light::_AtExitHandler*, 32> quick_exit_handlers{};
+constinit std::_Light::handler_array<std::_Light::_AtExitHandler*, 32> quick_exit_handlers{};
 
-}  // namespace
+}
 
 namespace std {
 
 namespace _Light {
 
 _EXPORT int _MBCurMax() {
+#ifdef __clang__
     return static_cast<int>(MB_CUR_MAX);
+#else
+    return MB_CUR_MAX;
+#endif
 }
 
 }  // namespace _Light
