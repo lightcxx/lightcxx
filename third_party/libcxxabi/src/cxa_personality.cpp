@@ -1151,6 +1151,17 @@ __gxx_personality_v0(_Unwind_State state,
 #endif
 
 
+__attribute__((noreturn))
+_LIBCXXABI_FUNC_VIS void
+__cxa_call_unexpected(void* arg)
+{
+    _Unwind_Exception* unwind_exception = static_cast<_Unwind_Exception*>(arg);
+    if (unwind_exception == 0)
+        call_terminate(false, unwind_exception);
+    __cxa_begin_catch(unwind_exception);
+    std::abort();
+}
+
 #if defined(_AIX)
 // Personality routine for EH using the range table. Make it an alias of
 // __gxx_personality_v0().

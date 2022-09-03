@@ -37,7 +37,6 @@ _LIBCXXABI_DATA_VIS extern void (*__cxa_new_handler)();
     C++11 atomic variables:
 
     extern std::atomic<std::terminate_handler>  __cxa_terminate_handler;
-    extern std::atomic<std::unexpected_handler> __cxa_unexpected_handler;
     extern std::atomic<std::new_handler>        __cxa_new_handler;
 
     This change will not impact their ABI.  But it will allow for a

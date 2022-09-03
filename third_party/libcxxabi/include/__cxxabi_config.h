@@ -37,11 +37,16 @@
   #define _LIBCXXABI_DATA_VIS
   #define _LIBCXXABI_FUNC_VIS
   #define _LIBCXXABI_TYPE_VIS
- #else
+ #elif defined(_LIBCXXABI_BUILDING_LIBRARY)
   #define _LIBCXXABI_HIDDEN
   #define _LIBCXXABI_DATA_VIS __declspec(dllexport)
   #define _LIBCXXABI_FUNC_VIS __declspec(dllexport)
   #define _LIBCXXABI_TYPE_VIS __declspec(dllexport)
+ #else
+  #define _LIBCXXABI_HIDDEN
+  #define _LIBCXXABI_DATA_VIS __declspec(dllimport)
+  #define _LIBCXXABI_FUNC_VIS __declspec(dllimport)
+  #define _LIBCXXABI_TYPE_VIS __declspec(dllimport)
  #endif
 #else
  #if !defined(_LIBCXXABI_DISABLE_VISIBILITY_ANNOTATIONS)

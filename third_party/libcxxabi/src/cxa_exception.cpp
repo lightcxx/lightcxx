@@ -258,6 +258,7 @@ __cxa_throw(void *thrown_object, std::type_info *tinfo, void (*dest)(void *)) {
     __cxa_eh_globals *globals = __cxa_get_globals();
     __cxa_exception* exception_header = cxa_exception_from_thrown_object(thrown_object);
 
+    exception_header->unexpectedHandler = nullptr;
     exception_header->terminateHandler  = std::get_terminate();
     exception_header->exceptionType = tinfo;
     exception_header->exceptionDestructor = dest;
@@ -728,6 +729,7 @@ __cxa_rethrow_primary_exception(void* thrown_object)
         dep_exception_header->primaryException = thrown_object;
         __cxa_increment_exception_refcount(thrown_object);
         dep_exception_header->exceptionType = exception_header->exceptionType;
+        dep_exception_header->unexpectedHandler = nullptr;
         dep_exception_header->terminateHandler = std::get_terminate();
         setDependentExceptionClass(&dep_exception_header->unwindHeader);
         __cxa_get_globals()->uncaughtExceptions += 1;

@@ -134,17 +134,4 @@ namespace std {
     abort();
 }
 
-[[noreturn, maybe_unused]] _EXPORT void __unexpected(terminate_handler handler) noexcept {
-    if (handler) {
-        try {
-            handler();
-        } catch (...) {}
-    }
-    abort();
-}
-
-_EXPORT terminate_handler get_unexpected() noexcept {
-    return abort;
-}
-
 }  // namespace std
