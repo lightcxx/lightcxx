@@ -49,6 +49,13 @@ struct ForkSafeGlobal {
     }
 };
 
+void compiler_forget(auto& value) {
+    asm volatile(""
+                 : "+m,r"(value)
+                 :
+                 : "memory");
+}
+
 }  // namespace Testing
 
 namespace tests_namespace {

@@ -11,6 +11,7 @@ void operator delete(void* ptr, const std::nothrow_t&) noexcept {
 }
 
 TEST() {
-    const auto ptr = ::operator new(256, std::nothrow);
+    auto ptr = ::operator new(256, std::nothrow);
+    compiler_forget(ptr);
     ::operator delete(ptr, std::nothrow);
 }

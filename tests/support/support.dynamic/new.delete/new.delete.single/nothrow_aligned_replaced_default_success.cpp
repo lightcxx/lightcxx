@@ -5,7 +5,7 @@
 #include "testing.h"
 #include <stdlib.h>
 
-void* operator new(std::size_t size, std::align_val_t align) {
+void* operator new(std::size_t size, std::align_val_t align, const std::nothrow_t&) noexcept {
     step("new");
     return ::aligned_alloc(static_cast<std::size_t>(align), size);
 }

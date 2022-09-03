@@ -35,7 +35,9 @@ TEST() {
         ::abort();
     });
 
-    auto ptr = ::operator new (256, std::align_val_t{128}, std::nothrow);
+    auto ptr = ::operator new(256, std::align_val_t{128}, std::nothrow);
     expect_type(void*&, ptr);
+
+    compiler_forget(ptr);
     ::operator delete(ptr);
 }

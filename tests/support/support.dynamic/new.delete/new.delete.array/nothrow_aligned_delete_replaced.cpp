@@ -1,16 +1,19 @@
-// EXPECT:STEPS "delete"
-
 #include <new>
 
 #include "testing.h"
 #include <stdlib.h>
 
+bool called_handler = false;
+
 void operator delete[](void* ptr, std::align_val_t, const std::nothrow_t&) noexcept {
-    step("delete");
+    called_handler = true;
     ::free(ptr);
 }
 
 TEST() {
-    const auto ptr = ::operator new[](256, std::align_val_t{128}, std::nothrow);
+    auto ptr = ::operator new[](256, std::align_val_t{128}, std::nothrow);
+    compiler_forget(ptr);
+    expect(!called_handler);
     ::operator delete[] (ptr, std::align_val_t{128}, std::nothrow);
+    expect(called_handler);
 }

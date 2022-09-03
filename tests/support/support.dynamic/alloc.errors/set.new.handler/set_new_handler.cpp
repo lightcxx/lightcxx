@@ -21,6 +21,7 @@ TEST() {
     step("before_new");
     auto ptr = new int(4);
     step("after_new");
+    compiler_forget(ptr);
     delete ptr;
 
     expect(std::set_new_handler(h) == g);

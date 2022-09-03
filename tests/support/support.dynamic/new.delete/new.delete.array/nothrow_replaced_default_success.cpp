@@ -5,7 +5,7 @@
 #include "testing.h"
 #include <stdlib.h>
 
-void* operator new[](std::size_t size) {
+void* operator new[](std::size_t size, const std::nothrow_t&) noexcept {
     step("new");
     return ::malloc(size);
 }

@@ -1,24 +1,31 @@
-// EXPECT:STEPS "delete;delete_size"
-
 #include <new>
 
 #include "testing.h"
 #include <stdlib.h>
 
+bool simple_handler_called = false;
+bool sized_handler_called = false;
+
 void operator delete(void* ptr, std::align_val_t) noexcept {
-    step("delete");
+    simple_handler_called = true;
     ::free(ptr);
 }
 
 void operator delete(void* ptr, std::size_t, std::align_val_t) noexcept {
-    step("delete_size");
+    sized_handler_called = true;
     ::free(ptr);
 }
 
 TEST() {
-    const auto ptr1 = ::operator new (256, std::align_val_t{128}, std::nothrow);
+    auto ptr1 = ::operator new (256, std::align_val_t{128}, std::nothrow);
+    compiler_forget(ptr1);
+    expect(!simple_handler_called);
     ::operator delete (ptr1, std::align_val_t{128});
+    expect(simple_handler_called);
 
-    const auto ptr2 = ::operator new (256, std::align_val_t{128}, std::nothrow);
+    auto ptr2 = ::operator new (256, std::align_val_t{128}, std::nothrow);
+    compiler_forget(ptr2);
+    expect(!sized_handler_called);
     ::operator delete (ptr2, 256, std::align_val_t{128});
+    expect(sized_handler_called);
 }

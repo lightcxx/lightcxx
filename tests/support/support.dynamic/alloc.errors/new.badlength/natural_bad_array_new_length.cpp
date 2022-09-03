@@ -4,13 +4,6 @@
 
 extern "C" void __cxa_throw_bad_array_new_length();
 
-void compiler_forget(auto& value) {
-    asm volatile(""
-                 : "+m,r"(value)
-                 :
-                 : "memory");
-}
-
 TEST() {
     int minus_one = -1;
     int one = 1;
