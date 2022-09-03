@@ -37,10 +37,7 @@ TEST() {
     const auto ptr1_explicit = static_cast<Tp*>(::operator new(sizeof(Tp)));
     ::operator delete(ptr1_explicit);
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wuse-after-free"
     expect(::std::launder(ptr1_explicit) == ptr1_explicit);
-#pragma GCC diagnostic pop
 
     const auto ptr1_natural = new Tp();
     delete ptr1_natural;

@@ -15,7 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Check
-        run: ${{github.workspace}}/ci-check.sh clang clang++ ${{ matrix.build_type }}
+        run: ${{github.workspace}}/tools/scripts/check_ci.sh clang clang++ ${{ matrix.build_type }}
 
   clang-ubuntu-22-04:
     strategy:
@@ -24,13 +24,10 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
-      - name: Install LLVM
-        uses: KyleMayes/install-llvm-action@v1
-        with:
-          version: "14.0"
-          directory: ${{github.workspace}}/llvm
+      - name: Install Clang
+        run: apt install -y clang
       - name: Check
-        run: ${{github.workspace}}/ci-check.sh clang clang++ ${{ matrix.build_type }}
+        run: ${{github.workspace}}/tools/scripts/check_ci.sh clang clang++ ${{ matrix.build_type }}
 
   gcc-ubuntu-22-04:
     strategy:
@@ -40,9 +37,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Install GCC
-        uses: egor-tensin/setup-gcc@v1
-        with:
-          version: 11
-          platform: x64
+        run: apt install -y gcc
       - name: Check
-        run: ${{github.workspace}}/ci-check.sh gcc g++ ${{ matrix.build_type }}
+        run: ${{github.workspace}}/tools/scripts/check_ci.sh gcc g++ ${{ matrix.build_type }}

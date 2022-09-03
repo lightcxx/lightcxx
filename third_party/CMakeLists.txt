@@ -21,4 +21,4 @@ target_include_directories(third_party_libcxxabi_object PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/libcxx/src
         ${CMAKE_CURRENT_SOURCE_DIR}/libcxxabi/include
         ${CMAKE_CURRENT_SOURCE_DIR}/libcxx/include)
-target_compile_options(third_party_libcxxabi_object PRIVATE -nostdinc++ -fPIC)
+target_compile_options(third_party_libcxxabi_object PRIVATE -nostdinc++ -fPIC -D_LIBCPP_BUILDING_LIBRARY)
