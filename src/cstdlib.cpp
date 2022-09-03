@@ -21,11 +21,7 @@ namespace std {
 namespace _Light {
 
 _EXPORT int _MBCurMax() {
-#ifdef __clang__
     return static_cast<int>(MB_CUR_MAX);
-#else
-    return MB_CUR_MAX;
-#endif
 }
 
 }  // namespace _Light
