@@ -1,5 +1,3 @@
-// REQUEST:COMPILE_OPTIONS "-Wno-non-virtual-dtor"
-
 #include <type_traits>
 
 #include "meta/test_unary_trait.h"
@@ -97,6 +95,8 @@ class Mixed4 {
     [[maybe_unused]] int z;
 };
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wnon-virtual-dtor"
 class Virtual1 {
     virtual void f();
 };
@@ -116,6 +116,7 @@ class Virtual4 {
 class VirtualBase1 : virtual Virtual2 {};
 
 class VirtualBase2 : virtual Empty {};
+#pragma GCC diagnostic pop
 
 class Ref1 {
   public:

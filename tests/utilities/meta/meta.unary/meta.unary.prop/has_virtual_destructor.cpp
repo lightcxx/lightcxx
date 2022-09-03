@@ -1,5 +1,3 @@
-// REQUEST:COMPILE_OPTIONS "-Wno-non-virtual-dtor"
-
 #include <type_traits>
 
 #include "meta/test_unary_trait.h"
@@ -20,6 +18,8 @@ TEST_UNARY_TRAIT_AGAINST_ENUM(false, has_virtual_destructor, EVERY_CV);
 TEST_UNARY_TRAIT_AGAINST_UNION(false, has_virtual_destructor, EVERY_CV);
 TEST_UNARY_TRAIT_AGAINST_FUNCTION(false, has_virtual_destructor);
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wnon-virtual-dtor"
 class VirtualBase : virtual Class {};
 
 class VirtualMethod {
@@ -48,10 +48,6 @@ class PrivateAbstractBase : private PureVirtualMethod {};
 
 class VirtualAbstractBase : virtual PureVirtualMethod {};
 
-TEST_UNARY_TRAIT_AGAINST_TYPES(false, has_virtual_destructor, EVERY_CV, Class, VirtualBase, VirtualMethod, PublicPolymorphicBase, ProtectedPolymorphicBase,
-                               PrivatePolymorphicBase, VirtualPolymorphicBase, PureVirtualMethod, PublicAbstractBase, ProtectedAbstractBase,
-                               PrivateAbstractBase, VirtualAbstractBase);
-
 class VirtualDtor {
   public:
     virtual ~VirtualDtor();
@@ -66,6 +62,11 @@ class PublicVirtualDtorBase : public VirtualDtor {};
 class ProtectedVirtualDtorBase : protected VirtualDtor {};
 class PrivateVirtualDtorBase : private VirtualDtor {};
 class VirtualVirtualDtorBase : virtual VirtualDtor {};
+#pragma GCC diagnostic pop
+
+TEST_UNARY_TRAIT_AGAINST_TYPES(false, has_virtual_destructor, EVERY_CV, Class, VirtualBase, VirtualMethod, PublicPolymorphicBase, ProtectedPolymorphicBase,
+                               PrivatePolymorphicBase, VirtualPolymorphicBase, PureVirtualMethod, PublicAbstractBase, ProtectedAbstractBase,
+                               PrivateAbstractBase, VirtualAbstractBase);
 
 TEST_UNARY_TRAIT_AGAINST_TYPES(true, has_virtual_destructor, EVERY_CV, PureVirtualDtor, VirtualDtor, PublicVirtualDtorBase, ProtectedVirtualDtorBase,
                                PrivateVirtualDtorBase, VirtualVirtualDtorBase);

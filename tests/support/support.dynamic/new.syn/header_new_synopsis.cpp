@@ -34,9 +34,10 @@ TEST() {
 
     using Tp = void*;
 
-    const auto ptr1_explicit = static_cast<Tp*>(::operator new(sizeof(Tp)));
+    auto ptr1_explicit = static_cast<Tp*>(::operator new(sizeof(Tp)));
     ::operator delete(ptr1_explicit);
 
+    compiler_forget(ptr1_explicit);
     expect(::std::launder(ptr1_explicit) == ptr1_explicit);
 
     const auto ptr1_natural = new Tp();

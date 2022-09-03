@@ -1,5 +1,4 @@
 // EXPECT:STEPS "before_new;malloc;new_handler;after_new;before_second_new;second_malloc;catch"
-// REQUEST:COMPILE_OPTIONS "-fno-builtin"
 
 #include <new>
 
@@ -36,6 +35,7 @@ TEST() {
     step("before_second_new");
     try {
         [[maybe_unused]] auto failed_ptr = ::operator new(4);
+        compiler_forget(failed_ptr);
         fail();
     } catch (std::bad_alloc&) {
         step("catch");

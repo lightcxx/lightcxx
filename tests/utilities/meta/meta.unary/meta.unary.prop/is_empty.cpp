@@ -1,5 +1,3 @@
-// REQUEST:COMPILE_OPTIONS "-Wno-non-virtual-dtor"
-
 #include <type_traits>
 
 #include "meta/test_unary_trait.h"
@@ -60,6 +58,8 @@ class Bits {
     char : 4;
 };
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wnon-virtual-dtor"
 class VirtualDtor {
   public:
     virtual ~VirtualDtor();
@@ -80,6 +80,7 @@ class VirtualBase : virtual Empty {};
 class VirtualPolymorphicBase : virtual PureVirtualMethod {};
 
 class PolymorphicBase : public VirtualMethod {};
+#pragma GCC diagnostic pop
 
 TEST_UNARY_TRAIT_AGAINST_TYPES(false, is_empty, EVERY_CV, NonEmpty, VirtualDtor, VirtualMethod, PureVirtualMethod, VirtualBase, VirtualPolymorphicBase,
                                PolymorphicBase);
