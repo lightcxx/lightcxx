@@ -1,4 +1,4 @@
-// EXPECT:STEPS "before_ctor;after_ctor;terminate"
+// EXPECT:STEPS before_ctor,after_ctor,terminate
 // EXPECT:EXIT KILLED BY SIGNAL SIGABRT
 
 // This is based on clause [except.terminate], situation 1.9 from the note.

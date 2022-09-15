@@ -1,5 +1,5 @@
 // EXPECT:EXIT CODE = 4
-// EXPECT:STEPS "at_quick_exit"
+// EXPECT:STEPS at_quick_exit
 
 #include <cstdlib>
 

@@ -1,4 +1,4 @@
-// EXPECT:STEPS "new_nothrow;new;delete"
+// EXPECT:STEPS new_nothrow,new,delete
 
 #include <new>
 

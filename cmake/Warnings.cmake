@@ -1,9 +1,3 @@
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_EXTENSIONS OFF)
-set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
-
-include_directories(${CMAKE_SOURCE_DIR}/src/)
-
 set(COMMON_CLANG_GCC_WARNINGS
         -Werror
         -Wall

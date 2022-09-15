@@ -1,4 +1,4 @@
-// EXPECT:NO_COMPILE 1
+// EXPECT:NO_COMPILE 2
 
 #include <compare>
 
@@ -23,9 +23,9 @@ struct B {
 };
 
 TEST() {
-#if NC_TEST_ID == 0
+#if NEGATIVE_COMPILE_ITERATION == 0
     std::compare_three_way_result<B, B>::type;
-#elif NC_TEST_ID == 1
+#elif NEGATIVE_COMPILE_ITERATION == 1
     std::compare_three_way_result_t<B, B>;
 #endif
 }

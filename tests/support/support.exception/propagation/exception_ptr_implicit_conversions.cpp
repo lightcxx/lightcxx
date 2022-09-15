@@ -1,4 +1,4 @@
-// EXPECT:NO_COMPILE 8
+// EXPECT:NO_COMPILE 9
 
 #include <exception>
 
@@ -12,10 +12,16 @@ void takes_unsigned_long(unsigned long) {}
 
 void takes_double(double) {}
 
-enum OldStyleEnum{OSE_a, OSE_b};
+enum OldStyleEnum {
+    OSE_a,
+    OSE_b,
+};
 void takes_old_style_enum(OldStyleEnum) {}
 
-enum class ScopedEnum{a, b};
+enum class ScopedEnum {
+    a,
+    b,
+};
 void takes_scoped_enum(ScopedEnum) {}
 
 void takes_int_ptr(int*) {}
@@ -26,23 +32,23 @@ void takes_void_ptr(void*) {}
 
 TEST() {
     std::exception_ptr exc;
-#if NC_TEST_ID == 0
+#if NEGATIVE_COMPILE_ITERATION == 0
     takes_bool(exc);
-#elif NC_TEST_ID == 1
+#elif NEGATIVE_COMPILE_ITERATION == 1
     takes_int(exc);
-#elif NC_TEST_ID == 2
+#elif NEGATIVE_COMPILE_ITERATION == 2
     takes_unsigned_long(exc);
-#elif NC_TEST_ID == 3
+#elif NEGATIVE_COMPILE_ITERATION == 3
     takes_double(exc);
-#elif NC_TEST_ID == 4
+#elif NEGATIVE_COMPILE_ITERATION == 4
     takes_old_style_enum(exc);
-#elif NC_TEST_ID == 5
+#elif NEGATIVE_COMPILE_ITERATION == 5
     takes_scoped_enum(exc);
-#elif NC_TEST_ID == 6
+#elif NEGATIVE_COMPILE_ITERATION == 6
     takes_int_ptr(exc);
-#elif NC_TEST_ID == 7
+#elif NEGATIVE_COMPILE_ITERATION == 7
     takes_unsigned_char_ptr(exc);
-#elif NC_TEST_ID == 8
+#elif NEGATIVE_COMPILE_ITERATION == 8
     takes_void_ptr(exc);
 #endif
 }

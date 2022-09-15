@@ -1,4 +1,4 @@
-// EXPECT:STEPS "malloc"
+// EXPECT:STEPS malloc
 
 #include <new>
 

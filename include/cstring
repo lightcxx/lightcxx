@@ -1,0 +1,35 @@
+#ifndef _LIGHTCXX_GUARD_CSTRING
+#define _LIGHTCXX_GUARD_CSTRING
+
+// TODO: Don't include C headers in the C++ headers.
+#include <string.h>
+
+namespace std {
+
+using ::strcat;
+using ::strcpy;
+using ::strncat;
+using ::strncpy;
+using ::strxfrm;
+
+using ::strchr;
+using ::strcmp;
+using ::strcoll;
+using ::strcspn;
+using ::strlen;
+using ::strncmp;
+using ::strpbrk;
+using ::strrchr;
+using ::strspn;
+using ::strstr;
+using ::strtok;
+
+using ::memchr;
+using ::memcmp;
+using ::memcpy;
+using ::memmove;
+using ::memset;
+
+}  // namespace std
+
+#endif

@@ -9,21 +9,11 @@ extern "C" void testing_fail_impl(const char* func, const char* file, int line);
 
 extern "C" void testing_expect_impl(int cnd, const char* func, const char* file, int line);
 
-extern "C" int testing_get_argc();
-
-extern "C" char** testing_get_argv();
-
 extern "C" void testing_register_test(void (*test)(), const char* name);
 
 extern "C" void testing_register_global(void* obj, void (*ctor)(void*), void (*dtor)(void*));
 
 namespace Testing {
-
-struct TestRegisterer {
-    explicit TestRegisterer(void (*test)(), const char* name) noexcept {
-        testing_register_test(test, name);
-    }
-};
 
 template<class, class>
 inline constexpr bool same_type = false;
@@ -33,19 +23,27 @@ inline constexpr bool same_type<T, T> = true;
 
 template<class T>
 struct ForkSafeGlobal {
-    alignas(T) char storage[sizeof(T)];
+    bool is_initialized = false;
+    union {
+        T value;
+    };
 
     ForkSafeGlobal() {
-        testing_register_global(
-          this, [](void* self) { reinterpret_cast<ForkSafeGlobal*>(self)->construct(); }, [](void* self) { reinterpret_cast<ForkSafeGlobal*>(self)->destruct(); });
+        const auto ctor = [](void* self) {
+            testing_expect_impl(!static_cast<ForkSafeGlobal*>(self)->is_initialized, __func__, __FILE__, __LINE__);
+            new (&static_cast<ForkSafeGlobal*>(self)->value) T();
+            static_cast<ForkSafeGlobal*>(self)->is_initialized = true;
+        };
+        const auto dtor = [](void* self) {
+            testing_expect_impl(static_cast<ForkSafeGlobal*>(self)->is_initialized, __func__, __FILE__, __LINE__);
+            static_cast<ForkSafeGlobal*>(self)->value.~T();
+            static_cast<ForkSafeGlobal*>(self)->is_initialized = false;
+        };
+        testing_register_global(this, ctor, dtor);
     }
 
-    void construct() {
-        new (storage) T();
-    }
-
-    void destruct() {
-        reinterpret_cast<T*>(storage)->~T();
+    ~ForkSafeGlobal() {
+        testing_expect_impl(!is_initialized, __func__, __FILE__, __LINE__);
     }
 };
 
@@ -85,11 +83,21 @@ using namespace ::Testing;
     expect_ct_and_rt(::Testing::same_type<type, decltype((expr))>); \
     expect((expr) == value)
 
-#define TEST(name)                                                             \
-    namespace tests_namespace {                                                \
-    static void test_##name();                                                 \
-    static ::Testing::TestRegisterer test_register_##name{test_##name, #name}; \
-    }                                                                          \
+#define TEST(name)                                                        \
+    namespace tests_namespace {                                           \
+    static void test_##name();                                            \
+    __attribute__((__constructor__)) static void test_register_##name() { \
+        testing_register_test(test_##name, #name);                        \
+    }                                                                     \
+    }                                                                     \
     static void tests_namespace::test_##name()
+
+extern "C" const char* testing_get_expected_steps() {
+    return TESTING_EXPECTED_STEPS;
+}
+
+extern "C" const char* testing_get_expected_exit() {
+    return TESTING_EXPECTED_EXIT;
+}
 
 #endif

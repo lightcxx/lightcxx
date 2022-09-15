@@ -1,4 +1,4 @@
-// EXPECT:STEPS "delete;delete_size"
+// EXPECT:STEPS delete,delete_size
 
 #include <new>
 

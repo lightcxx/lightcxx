@@ -13,13 +13,13 @@ add_subdirectory(third_party)
 
 function(AddLightCxxCommonOptions lightcxx_target)
     AddTargetCompileWarnings(${lightcxx_target})
+    target_include_directories(${lightcxx_target} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     target_include_directories(${lightcxx_target} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
     target_include_directories(${lightcxx_target} SYSTEM INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
     target_compile_options(${lightcxx_target} PUBLIC $<$<COMPILE_LANGUAGE:CXX>:-nostdinc++>)
     if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
         target_link_options(${lightcxx_target} PUBLIC -nodefaultlibs)
-        if (APPLE)
-        else ()
+        if (NOT APPLE)
             target_link_libraries(${lightcxx_target} PUBLIC gcc gcc_eh)
         endif ()
     else ()
@@ -28,7 +28,7 @@ function(AddLightCxxCommonOptions lightcxx_target)
     if (APPLE)
         target_link_libraries(${lightcxx_target} PUBLIC System)
     else ()
-        target_link_libraries(${lightcxx_target} PUBLIC c PUBLIC pthread)
+        target_link_libraries(${lightcxx_target} PUBLIC c pthread)
     endif ()
 endfunction()
 
@@ -37,6 +37,7 @@ set(LIGHTCXX_SRCS
         ${CMAKE_CURRENT_SOURCE_DIR}/src/exception.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/handler.c
         ${CMAKE_CURRENT_SOURCE_DIR}/src/new.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/stdexcept.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/typeinfo.cpp)
 
 add_library(lightcxx_static STATIC ${LIGHTCXX_SRCS} $<TARGET_OBJECTS:third_party_libcxxabi_object>)
@@ -52,16 +53,17 @@ install(DIRECTORY include DESTINATION .)
 install(TARGETS lightcxx lightcxx_static DESTINATION lib)
 
 if (LIGHTCXX_ENABLE_TESTS)
-    enable_testing()
-    include(cmake/Tests.cmake)
+    include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/Tests.cmake)
 
-    add_library(lightcxx_testing STATIC testing/testing.c)
+    add_library(lightcxx_testing STATIC ${CMAKE_CURRENT_SOURCE_DIR}/testing/testing.c)
     AddTargetCompileWarnings(lightcxx_testing)
     target_include_directories(lightcxx_testing PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/testing)
     target_link_libraries(lightcxx_testing PUBLIC lightcxx_static)
     if (NOT APPLE)
         target_link_libraries(lightcxx_testing PRIVATE dl)
     endif ()
+
+    add_executable(negative_compile_test ${CMAKE_CURRENT_SOURCE_DIR}/testing/negative_compile_test.c)
 
     scan_for_lightcxx_tests(${CMAKE_CURRENT_SOURCE_DIR}/tests)
 endif ()

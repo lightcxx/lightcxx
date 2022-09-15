@@ -1,4 +1,4 @@
-// EXPECT:NO_COMPILE 3
+// EXPECT:NO_COMPILE 4
 
 #include <utility>
 
@@ -24,13 +24,13 @@ TEST() {
     NoMoveCtor a, b, arr_a[3], arr_b[3];
     NoMoveAssign c, d, arr_c[3], arr_d[3];
 
-#if NC_TEST_ID == 0
+#if NEGATIVE_COMPILE_ITERATION == 0
     std::swap(a, b);
-#elif NC_TEST_ID == 1
+#elif NEGATIVE_COMPILE_ITERATION == 1
     std::swap(arr_a, arr_b);
-#elif NC_TEST_ID == 2
+#elif NEGATIVE_COMPILE_ITERATION == 2
     std::swap(c, d);
-#elif NC_TEST_ID == 3
+#elif NEGATIVE_COMPILE_ITERATION == 3
     std::swap(arr_c, arr_d);
 #endif
 }

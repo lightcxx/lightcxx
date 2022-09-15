@@ -1,4 +1,4 @@
-// EXPECT:STEPS "terminate"
+// EXPECT:STEPS terminate
 // EXPECT:EXIT KILLED BY SIGNAL SIGABRT
 
 // This is based on clause [except.terminate], situation 1.3 from the note.
@@ -27,5 +27,8 @@ TEST() {
         ::abort();
     });
 
-    f(testing_get_argc());
+    int x = 1;
+    compiler_forget(x);
+
+    f(x);
 }

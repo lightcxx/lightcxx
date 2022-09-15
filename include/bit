@@ -1,0 +1,21 @@
+#ifndef _LIGHTCXX_GUARD_BIT
+#define _LIGHTCXX_GUARD_BIT
+
+#include <type_traits>
+
+namespace std {
+
+template<class _T> requires (is_integral_v<_T> && is_unsigned_v<_T>)
+constexpr int popcount(_T __x) noexcept {
+    if constexpr (is_same_v<_T, unsigned long>) {
+        return __builtin_popcountl(__x);
+    } else if constexpr (is_same_v<_T, unsigned long long>) {
+        return __builtin_popcountll(__x);
+    } else {
+        return __builtin_popcount(static_cast<unsigned int>(__x));
+    }
+}
+
+}  // namespace std
+
+#endif

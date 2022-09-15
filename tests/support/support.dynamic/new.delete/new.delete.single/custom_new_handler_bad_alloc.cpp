@@ -1,4 +1,4 @@
-// EXPECT:STEPS "malloc;new_handler;throw"
+// EXPECT:STEPS malloc,new_handler,throw
 
 #include <new>
 

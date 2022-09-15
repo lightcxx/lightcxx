@@ -1,0 +1,106 @@
+#ifndef _LIGHTCXX_GUARD_STDEXCEPT
+#define _LIGHTCXX_GUARD_STDEXCEPT
+
+#include <cstdlib>
+#include <cstring>
+#include <exception>
+
+namespace std {
+
+// TODO: Rewrite everything once string is implemented!
+
+class logic_error : public exception {
+    char* __what;
+
+  public:
+    explicit logic_error(const char* __msg) {
+        auto len = strlen(__msg);
+        __what = static_cast<char*>(malloc(len + 1));
+        memcpy(__what, __msg, len);
+        __what[len] = '\0';
+    }
+
+    ~logic_error() override;
+
+    const char* what() const noexcept override {
+        return __what;
+    }
+};
+
+class domain_error : public logic_error {
+  public:
+    explicit domain_error(const char* __what)
+            : logic_error(__what) {}
+
+    ~domain_error() override;
+};
+
+class invalid_argument : public logic_error {
+  public:
+    explicit invalid_argument(const char* __what)
+            : logic_error(__what) {}
+
+    ~invalid_argument() override;
+};
+
+class length_error : public logic_error {
+  public:
+    explicit length_error(const char* __what)
+            : logic_error(__what) {}
+
+    ~length_error() override;
+};
+
+class out_of_range : public logic_error {
+  public:
+    explicit out_of_range(const char* __what)
+            : logic_error(__what) {}
+
+    ~out_of_range() override;
+};
+
+class runtime_error : public exception {
+    char* __what;
+
+  public:
+    explicit runtime_error(const char* __msg) {
+        auto len = strlen(__msg);
+        __what = static_cast<char*>(malloc(len + 1));
+        memcpy(__what, __msg, len);
+        __what[len] = '\0';
+    }
+
+    ~runtime_error() override;
+
+    const char* what() const noexcept override {
+        return __what;
+    }
+};
+
+class range_error : public runtime_error {
+  public:
+    explicit range_error(const char* __what)
+            : runtime_error(__what) {}
+
+    ~range_error() override;
+};
+
+class overflow_error : public runtime_error {
+  public:
+    explicit overflow_error(const char* __what)
+            : runtime_error(__what) {}
+
+    ~overflow_error() override;
+};
+
+class underflow_error : public runtime_error {
+  public:
+    explicit underflow_error(const char* __what)
+            : runtime_error(__what) {}
+
+    ~underflow_error() override;
+};
+
+}  // namespace std
+
+#endif

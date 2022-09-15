@@ -1,5 +1,5 @@
 // @ts-ignore
-import jsdom from "https://dev.jspm.io/jsdom";
+import { DOMParser } from "https://deno.land/x/deno_dom/deno-dom-wasm.ts";
 
 const topLevelTags = ["support", "utilities"];
 
@@ -37,11 +37,11 @@ const printSection = (section: Section, depth: number) => {
 async function main() {
     const body = await fetch("https://timsong-cpp.github.io/cppwp/n4861");
     const bodyText = await body.text();
-    const dom = new jsdom.JSDOM(bodyText);
+    const dom = new DOMParser().parseFromString(bodyText, "text/html");
     const topLevelSections: Section[] = [];
     for (const topLevelSectionTag of topLevelTags) {
         const topLevelSection = new Section(`[${topLevelSectionTag}]`);
-        findSections(dom.window.document.querySelector(`#${topLevelSectionTag}`), topLevelSection);
+        findSections(dom.querySelector(`#${topLevelSectionTag}`), topLevelSection);
         topLevelSections.push(topLevelSection);
     }
     for (const section of topLevelSections.sort((a, b) => a.tag.localeCompare(b.tag))) {

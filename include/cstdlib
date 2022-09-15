@@ -1,5 +1,5 @@
-#ifndef _LIGHTCXX_GUARD_CSTDDEF
-#define _LIGHTCXX_GUARD_CSTDDEF
+#ifndef _LIGHTCXX_GUARD_CSTDLIB
+#define _LIGHTCXX_GUARD_CSTDLIB
 
 namespace std {
 

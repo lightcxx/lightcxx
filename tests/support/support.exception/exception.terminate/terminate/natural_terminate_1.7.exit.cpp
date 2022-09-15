@@ -1,5 +1,5 @@
 // EXPECT:EXIT KILLED BY SIGNAL SIGABRT
-// EXPECT:STEPS "third atexit;second atexit;terminate"
+// EXPECT:STEPS third atexit,second atexit,terminate
 
 // This is based on clause [except.terminate], situation 1.7 from the note.
 

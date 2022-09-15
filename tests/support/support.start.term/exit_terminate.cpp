@@ -1,5 +1,5 @@
 // EXPECT:EXIT KILLED BY SIGNAL SIGABRT
-// EXPECT:STEPS "third atexit;second atexit;terminate"
+// EXPECT:STEPS third atexit,second atexit,terminate
 
 #include <cstdlib>
 #include <exception>

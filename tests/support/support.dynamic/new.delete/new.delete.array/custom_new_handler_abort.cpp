@@ -1,5 +1,5 @@
 // EXPECT:EXIT KILLED BY SIGNAL SIGABRT
-// EXPECT:STEPS "malloc;new_handler"
+// EXPECT:STEPS malloc,new_handler
 
 #include <new>
 

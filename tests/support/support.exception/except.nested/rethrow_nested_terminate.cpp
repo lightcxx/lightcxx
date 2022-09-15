@@ -1,5 +1,5 @@
 // EXPECT:EXIT KILLED BY SIGNAL SIGABRT
-// EXPECT:STEPS "terminate"
+// EXPECT:STEPS terminate
 
 #include <exception>
 

@@ -1,4 +1,4 @@
-// EXPECT:STEPS "copy_ctor;terminate"
+// EXPECT:STEPS copy_ctor,terminate
 // EXPECT:EXIT KILLED BY SIGNAL SIGABRT
 
 // This is based on clause [except.terminate], situation 1.1 from the note.

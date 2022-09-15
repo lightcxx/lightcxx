@@ -1,0 +1,1 @@
+// REQUEST:SKIP "Requires <ostream>"

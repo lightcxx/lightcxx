@@ -1,4 +1,4 @@
-// EXPECT:STEPS "aligned_alloc;new_handler"
+// EXPECT:STEPS aligned_alloc,new_handler
 
 #include <new>
 

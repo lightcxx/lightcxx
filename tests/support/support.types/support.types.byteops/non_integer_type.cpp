@@ -1,4 +1,4 @@
-// EXPECT:NO_COMPILE 9
+// EXPECT:NO_COMPILE 10
 
 #include <cstddef>
 
@@ -12,25 +12,25 @@ TEST() {
     ::std::byte b{3};
     const char* str;
     Aggregate ag;
-#if NC_TEST_ID == 0
+#if NEGATIVE_COMPILE_ITERATION == 0
     b << str;
-#elif NC_TEST_ID == 1
+#elif NEGATIVE_COMPILE_ITERATION == 1
     b <<= str;
-#elif NC_TEST_ID == 2
+#elif NEGATIVE_COMPILE_ITERATION == 2
     b >> str;
-#elif NC_TEST_ID == 3
+#elif NEGATIVE_COMPILE_ITERATION == 3
     b >>= str;
-#elif NC_TEST_ID == 4
+#elif NEGATIVE_COMPILE_ITERATION == 4
     ::std::to_integer<const char*>(b);
-#elif NC_TEST_ID == 5
+#elif NEGATIVE_COMPILE_ITERATION == 5
     b << ag;
-#elif NC_TEST_ID == 6
+#elif NEGATIVE_COMPILE_ITERATION == 6
     b <<= ag;
-#elif NC_TEST_ID == 7
+#elif NEGATIVE_COMPILE_ITERATION == 7
     b >> ag;
-#elif NC_TEST_ID == 8
+#elif NEGATIVE_COMPILE_ITERATION == 8
     b >>= ag;
-#elif NC_TEST_ID == 9
+#elif NEGATIVE_COMPILE_ITERATION == 9
     ::std::to_integer<Aggregate>(b);
 #endif
 }

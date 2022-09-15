@@ -1,5 +1,5 @@
 // REQUEST:SKIP "Requires <thread>."
-// EXPECT:STEPS "start_thread;terminate"
+// EXPECT:STEPS start_thread,terminate
 // EXPECT:EXIT KILLED BY SIGNAL SIGABRT
 
 // This is based on clause [except.terminate], situation 1.10 from the note.

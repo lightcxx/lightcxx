@@ -1,5 +1,5 @@
 // REQUEST:SKIP "Requires parallel algorithms and execution policies."
-// EXPECT:STEPS "algo_access_func;terminate"
+// EXPECT:STEPS algo_access_func,terminate
 // EXPECT:EXIT KILLED BY SIGNAL SIGABRT
 
 // This is based on clause [except.terminate], situation 1.11 from the note.

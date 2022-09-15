@@ -1,4 +1,4 @@
-// EXPECT:STEPS "new"
+// EXPECT:STEPS new
 
 #include <new>
 
