@@ -33,6 +33,7 @@ function(AddLightCxxCommonOptions lightcxx_target)
 endfunction()
 
 set(LIGHTCXX_SRCS
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/any.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/cstdlib.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/exception.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/handler.c
@@ -46,7 +47,7 @@ set_target_properties(lightcxx_static PROPERTIES OUTPUT_NAME lightcxx)
 
 add_library(lightcxx SHARED ${LIGHTCXX_SRCS} $<TARGET_OBJECTS:third_party_libcxxabi_object>)
 AddLightCxxCommonOptions(lightcxx)
-target_compile_options(lightcxx PRIVATE -fvisibility=hidden -fPIC)
+target_compile_options(lightcxx PRIVATE -fvisibility=hidden -fPIC -D_LIGHTCXX_BUILD_SHARED_LIB)
 set_target_properties(lightcxx PROPERTIES VERSION ${PROJECT_VERSION} SOVERSION ${PROJECT_VERSION})
 
 install(DIRECTORY include DESTINATION .)

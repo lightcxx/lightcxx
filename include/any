@@ -1,0 +1,219 @@
+#ifndef _LIGHTCXX_GUARD_ANY
+#define _LIGHTCXX_GUARD_ANY
+
+#include <cstddef>
+#include <cstdlib>
+#include <initializer_list>
+#include <memory>
+#include <new>
+#include <type_traits>
+#include <typeinfo>
+#include <utility>
+
+namespace std {
+
+class bad_any_cast : public bad_cast {
+  public:
+    ~bad_any_cast() override;
+
+    const char* what() const noexcept override;
+};
+
+namespace _Light {
+
+struct _AnyVTable {
+    using __copy_t = void(const void*, void*);
+    using __move_t = void(void*, void*) noexcept;
+    using __dtor_t = void(void*) noexcept;
+
+    const type_info& __type;
+    size_t __size;
+    size_t __alignment;
+    bool __is_nothrow_movable;
+    __copy_t* __copy;
+    __move_t* __move;
+    __dtor_t* __dtor;
+};
+
+template<class _T>
+inline constexpr _AnyVTable _AnyVTableForType = {
+  .__type = typeid(_T),
+  .__size = sizeof(_T),
+  .__alignment = alignof(_T),
+  .__is_nothrow_movable = is_nothrow_move_constructible_v<_T>,
+  .__copy = [](const void* __from, void* __to) { new (__to) _T(*static_cast<const _T*>(__from)); },
+  .__move = [](void* __from, void* __to) noexcept {
+      if constexpr (is_move_constructible_v<_T>) {
+        new (__to) _T(move(*static_cast<_T*>(__from)));
+      } else {
+        new (__to) _T(*static_cast<const _T*>(__from));
+      } },
+  .__dtor = [](void* __obj) noexcept { static_cast<_T*>(__obj)->~_T(); },
+};
+
+template<class _T>
+inline constexpr bool __is_in_place_type = false;
+
+template<class _T>
+inline constexpr bool __is_in_place_type<in_place_type_t<_T>> = true;
+
+void* __any_alloc(size_t __align, size_t __size);
+
+template<class _T, class... _Args>
+void __construct_any(void*& __storage, _Args&&... __args) {
+    __storage = _Light::__any_alloc(alignof(_T), sizeof(_T));
+    try {
+        new (__storage) _T(forward<_Args>(__args)...);
+    } catch (...) {
+        free(__storage);
+        throw;
+    }
+}
+
+}  // namespace _Light
+
+class any {
+    const _Light::_AnyVTable* __vtable = nullptr;
+    void* __obj = nullptr;  // no SBO for now
+                            // TODO: Implement SBO
+
+  public:
+    constexpr any() noexcept = default;
+
+    any(const any& __other);
+    any(any&& __other) noexcept;
+
+    template<class _T>
+        requires(!is_same_v<decay_t<_T>, any> && !_Light::__is_in_place_type<decay_t<_T>> && is_copy_constructible_v<decay_t<_T>>)
+    any(_T&& __value)
+            : __vtable(addressof(_Light::_AnyVTableForType<decay_t<_T>>)) {
+        _Light::__construct_any<decay_t<_T>>(__obj, forward<_T>(__value));
+    }
+
+    template<class _T, class... _Args>
+        requires(is_copy_constructible_v<decay_t<_T>> && is_constructible_v<decay_t<_T>, _Args...>)
+    explicit any(in_place_type_t<_T>, _Args&&... __args)
+            : __vtable(addressof(_Light::_AnyVTableForType<decay_t<_T>>)) {
+        _Light::__construct_any<decay_t<_T>>(__obj, forward<_Args>(__args)...);
+    }
+
+    template<class _T, class _U, class... _Args>
+        requires(is_copy_constructible_v<decay_t<_T>> && is_constructible_v<decay_t<_T>, initializer_list<_U>&, _Args...>)
+    explicit any(in_place_type_t<_T>, initializer_list<_U> __il, _Args&&... __args)
+            : __vtable(addressof(_Light::_AnyVTableForType<decay_t<_T>>)) {
+        _Light::__construct_any<decay_t<_T>>(__obj, __il, forward<_Args>(__args)...);
+    }
+
+    ~any();
+
+    any& operator=(const any& __rhs);
+    any& operator=(any&& __rhs) noexcept;
+
+    template<class _T>
+        requires(!is_same_v<decay_t<_T>, any> && is_copy_constructible_v<decay_t<_T>>)
+    any& operator=(_T&& __rhs) {
+        void* __new_obj;
+        _Light::__construct_any<decay_t<_T>>(__new_obj, forward<_T>(__rhs));
+        reset();
+        __obj = __new_obj;
+        __vtable = addressof(_Light::_AnyVTableForType<decay_t<_T>>);
+        return *this;
+    }
+
+    template<class _T, class... _Args>
+        requires(is_copy_constructible_v<decay_t<_T>> && is_constructible_v<decay_t<_T>, _Args...>)
+    decay_t<_T>& emplace(_Args&&... __args) {
+        reset();
+        _Light::__construct_any<decay_t<_T>>(__obj, forward<_Args>(__args)...);
+        __vtable = addressof(_Light::_AnyVTableForType<decay_t<_T>>);
+        return *static_cast<decay_t<_T>*>(__obj);
+    }
+
+    template<class _T, class _U, class... _Args>
+        requires(is_copy_constructible_v<decay_t<_T>> && is_constructible_v<decay_t<_T>, initializer_list<_U>&, _Args...>)
+    decay_t<_T>& emplace(initializer_list<_U> __il, _Args&&... __args) {
+        reset();
+        _Light::__construct_any<decay_t<_T>>(__obj, __il, forward<_Args>(__args)...);
+        __vtable = addressof(_Light::_AnyVTableForType<decay_t<_T>>);
+        return *static_cast<decay_t<_T>*>(__obj);
+    }
+
+    void reset() noexcept;
+
+    void swap(any& __rhs) noexcept;
+
+    bool has_value() const noexcept;
+
+    const type_info& type() const noexcept;
+
+    template<class _T>
+    friend const _T* any_cast(const any* __a) noexcept;
+
+    template<class _T>
+    friend _T* any_cast(any* __a) noexcept;
+};
+
+void swap(any& __x, any& __y) noexcept;
+
+template<class _T, class... _Args>
+any make_any(_Args&&... __args) {
+    return any(in_place_type<_T>, forward<_Args>(__args)...);
+}
+
+template<class _T, class _U, class... _Args>
+any make_any(initializer_list<_U> __il, _Args&&... __args) {
+    return any(in_place_type<_T>, __il, forward<_Args>(__args)...);
+}
+
+template<class _T>
+const _T* any_cast(const any* __a) noexcept {
+    if (__a == nullptr || __a->type() != typeid(_T)) {
+        return nullptr;
+    }
+    return static_cast<const _T*>(__a->__obj);
+}
+
+template<class _T>
+_T* any_cast(any* __a) noexcept {
+    if (__a == nullptr || __a->type() != typeid(_T)) {
+        return nullptr;
+    }
+    return static_cast<_T*>(__a->__obj);
+}
+
+template<class _T>
+    requires is_constructible_v<_T, const remove_cvref_t<_T>&>
+_T any_cast(const any& __a) {
+    using _VT = remove_cvref_t<_T>;
+    if (const _VT* __value = any_cast<_VT>(addressof(__a)); __value == nullptr) {
+        throw bad_any_cast();
+    } else {
+        return static_cast<_T>(*__value);
+    }
+}
+
+template<class _T>
+    requires is_constructible_v<_T, remove_cvref_t<_T>&>
+_T any_cast(any& __a) {
+    using _VT = remove_cvref_t<_T>;
+    if (_VT* __value = any_cast<_VT>(addressof(__a)); __value == nullptr) {
+        throw bad_any_cast();
+    } else {
+        return static_cast<_T>(*__value);
+    }
+}
+
+template<class _T>
+    requires is_constructible_v<_T, remove_cvref_t<_T>>
+_T any_cast(any&& __a) {
+    using _VT = remove_cvref_t<_T>;
+    if (_VT* __value = any_cast<_VT>(addressof(__a)); __value == nullptr) {
+        throw bad_any_cast();
+    } else {
+        return static_cast<_T>(move(*__value));
+    }
+}
+
+}  // namespace std
+
+#endif
