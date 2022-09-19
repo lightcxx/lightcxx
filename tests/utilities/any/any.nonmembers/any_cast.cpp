@@ -52,27 +52,33 @@ TEST(any_cast_const_ref_no_value) {
     expect_type(const int&, any_cast<const int&>(a));
     expect_type(const volatile int&, any_cast<const volatile int&>(a));
     try {
-        any_cast<int>(a);
+        auto result = any_cast<int>(a);
+        compiler_forget(result);
         fail();
     } catch (const std::bad_any_cast&) {}
     try {
-        any_cast<const int>(a);
+        auto result = any_cast<const int>(a);
+        compiler_forget(result);
         fail();
     } catch (const std::bad_any_cast&) {}
     try {
-        any_cast<volatile int>(a);
+        auto result = any_cast<volatile int>(a);
+        compiler_forget(result);
         fail();
     } catch (const std::bad_any_cast&) {}
     try {
-        any_cast<const volatile int>(a);
+        auto result = any_cast<const volatile int>(a);
+        compiler_forget(result);
         fail();
     } catch (const std::bad_any_cast&) {}
     try {
-        any_cast<const int&>(a);
+        auto result = any_cast<const int&>(a);
+        compiler_forget(result);
         fail();
     } catch (const std::bad_any_cast&) {}
     try {
-        any_cast<const volatile int&>(a);
+        auto result = any_cast<const volatile int&>(a);
+        compiler_forget(result);
         fail();
     } catch (const std::bad_any_cast&) {}
 }
@@ -80,27 +86,33 @@ TEST(any_cast_const_ref_no_value) {
 TEST(any_cast_const_ref_invalid_value) {
     const std::any a(1.0);
     try {
-        any_cast<int>(a);
+        auto result = any_cast<int>(a);
+        compiler_forget(result);
         fail();
     } catch (const std::bad_any_cast&) {}
     try {
-        any_cast<const int>(a);
+        auto result = any_cast<const int>(a);
+        compiler_forget(result);
         fail();
     } catch (const std::bad_any_cast&) {}
     try {
-        any_cast<volatile int>(a);
+        auto result = any_cast<volatile int>(a);
+        compiler_forget(result);
         fail();
     } catch (const std::bad_any_cast&) {}
     try {
-        any_cast<const volatile int>(a);
+        auto result = any_cast<const volatile int>(a);
+        compiler_forget(result);
         fail();
     } catch (const std::bad_any_cast&) {}
     try {
-        any_cast<const int&>(a);
+        auto result = any_cast<const int&>(a);
+        compiler_forget(result);
         fail();
     } catch (const std::bad_any_cast&) {}
     try {
-        any_cast<const volatile int&>(a);
+        auto result = any_cast<const volatile int&>(a);
+        compiler_forget(result);
         fail();
     } catch (const std::bad_any_cast&) {}
 }
@@ -126,35 +138,43 @@ TEST(any_cast_nonconst_ref_no_value) {
     expect_type(volatile int&, any_cast<volatile int&>(a));
     expect_type(const volatile int&, any_cast<const volatile int&>(a));
     try {
-        any_cast<int>(a);
+        auto result = any_cast<int>(a);
+        compiler_forget(result);
         fail();
     } catch (const std::bad_any_cast&) {}
     try {
-        any_cast<const int>(a);
+        auto result = any_cast<const int>(a);
+        compiler_forget(result);
         fail();
     } catch (const std::bad_any_cast&) {}
     try {
-        any_cast<volatile int>(a);
+        auto result = any_cast<volatile int>(a);
+        compiler_forget(result);
         fail();
     } catch (const std::bad_any_cast&) {}
     try {
-        any_cast<const volatile int>(a);
+        auto result = any_cast<const volatile int>(a);
+        compiler_forget(result);
         fail();
     } catch (const std::bad_any_cast&) {}
     try {
-        any_cast<int&>(a);
+        auto result = any_cast<int&>(a);
+        compiler_forget(result);
         fail();
     } catch (const std::bad_any_cast&) {}
     try {
-        any_cast<const int&>(a);
+        auto result = any_cast<const int&>(a);
+        compiler_forget(result);
         fail();
     } catch (const std::bad_any_cast&) {}
     try {
-        any_cast<volatile int&>(a);
+        auto result = any_cast<volatile int&>(a);
+        compiler_forget(result);
         fail();
     } catch (const std::bad_any_cast&) {}
     try {
-        any_cast<const volatile int&>(a);
+        auto result = any_cast<const volatile int&>(a);
+        compiler_forget(result);
         fail();
     } catch (const std::bad_any_cast&) {}
 }
@@ -162,35 +182,43 @@ TEST(any_cast_nonconst_ref_no_value) {
 TEST(any_cast_nonconst_ref_invalid_value) {
     std::any a(1.0);
     try {
-        any_cast<int>(a);
+        auto result = any_cast<int>(a);
+        compiler_forget(result);
         fail();
     } catch (const std::bad_any_cast&) {}
     try {
-        any_cast<const int>(a);
+        auto result = any_cast<const int>(a);
+        compiler_forget(result);
         fail();
     } catch (const std::bad_any_cast&) {}
     try {
-        any_cast<volatile int>(a);
+        auto result = any_cast<volatile int>(a);
+        compiler_forget(result);
         fail();
     } catch (const std::bad_any_cast&) {}
     try {
-        any_cast<const volatile int>(a);
+        auto result = any_cast<const volatile int>(a);
+        compiler_forget(result);
         fail();
     } catch (const std::bad_any_cast&) {}
     try {
-        any_cast<int&>(a);
+        auto result = any_cast<int&>(a);
+        compiler_forget(result);
         fail();
     } catch (const std::bad_any_cast&) {}
     try {
-        any_cast<const int&>(a);
+        auto result = any_cast<const int&>(a);
+        compiler_forget(result);
         fail();
     } catch (const std::bad_any_cast&) {}
     try {
-        any_cast<volatile int&>(a);
+        auto result = any_cast<volatile int&>(a);
+        compiler_forget(result);
         fail();
     } catch (const std::bad_any_cast&) {}
     try {
-        any_cast<const volatile int&>(a);
+        auto result = any_cast<const volatile int&>(a);
+        compiler_forget(result);
         fail();
     } catch (const std::bad_any_cast&) {}
 }
@@ -234,35 +262,43 @@ TEST(any_cast_rvalue_ref_no_value) {
     expect_type(volatile int&&, any_cast<volatile int&&>(std::move(a)));
     expect_type(const volatile int&&, any_cast<const volatile int&&>(std::move(a)));
     try {
-        any_cast<int>(std::move(a));
+        auto result = any_cast<int>(std::move(a));
+        compiler_forget(result);
         fail();
     } catch (const std::bad_any_cast&) {}
     try {
-        any_cast<const int>(std::move(a));
+        auto result = any_cast<const int>(std::move(a));
+        compiler_forget(result);
         fail();
     } catch (const std::bad_any_cast&) {}
     try {
-        any_cast<volatile int>(std::move(a));
+        auto result = any_cast<volatile int>(std::move(a));
+        compiler_forget(result);
         fail();
     } catch (const std::bad_any_cast&) {}
     try {
-        any_cast<const volatile int>(std::move(a));
+        auto result = any_cast<const volatile int>(std::move(a));
+        compiler_forget(result);
         fail();
     } catch (const std::bad_any_cast&) {}
     try {
-        any_cast<int&&>(std::move(a));
+        auto result = any_cast<int&&>(std::move(a));
+        compiler_forget(result);
         fail();
     } catch (const std::bad_any_cast&) {}
     try {
-        any_cast<const int&&>(std::move(a));
+        auto result = any_cast<const int&&>(std::move(a));
+        compiler_forget(result);
         fail();
     } catch (const std::bad_any_cast&) {}
     try {
-        any_cast<volatile int&&>(std::move(a));
+        auto result = any_cast<volatile int&&>(std::move(a));
+        compiler_forget(result);
         fail();
     } catch (const std::bad_any_cast&) {}
     try {
-        any_cast<const volatile int&&>(std::move(a));
+        auto result = any_cast<const volatile int&&>(std::move(a));
+        compiler_forget(result);
         fail();
     } catch (const std::bad_any_cast&) {}
 }
@@ -270,35 +306,43 @@ TEST(any_cast_rvalue_ref_no_value) {
 TEST(any_cast_rvalue_ref_invalid_value) {
     std::any a(1.0);
     try {
-        any_cast<int>(std::move(a));
+        auto result = any_cast<int>(std::move(a));
+        compiler_forget(result);
         fail();
     } catch (const std::bad_any_cast&) {}
     try {
-        any_cast<const int>(std::move(a));
+        auto result = any_cast<const int>(std::move(a));
+        compiler_forget(result);
         fail();
     } catch (const std::bad_any_cast&) {}
     try {
-        any_cast<volatile int>(std::move(a));
+        auto result = any_cast<volatile int>(std::move(a));
+        compiler_forget(result);
         fail();
     } catch (const std::bad_any_cast&) {}
     try {
-        any_cast<const volatile int>(std::move(a));
+        auto result = any_cast<const volatile int>(std::move(a));
+        compiler_forget(result);
         fail();
     } catch (const std::bad_any_cast&) {}
     try {
-        any_cast<int&&>(std::move(a));
+        auto result = any_cast<int&&>(std::move(a));
+        compiler_forget(result);
         fail();
     } catch (const std::bad_any_cast&) {}
     try {
-        any_cast<const int&&>(std::move(a));
+        auto result = any_cast<const int&&>(std::move(a));
+        compiler_forget(result);
         fail();
     } catch (const std::bad_any_cast&) {}
     try {
-        any_cast<volatile int&&>(std::move(a));
+        auto result = any_cast<volatile int&&>(std::move(a));
+        compiler_forget(result);
         fail();
     } catch (const std::bad_any_cast&) {}
     try {
-        any_cast<const volatile int&&>(std::move(a));
+        auto result = any_cast<const volatile int&&>(std::move(a));
+        compiler_forget(result);
         fail();
     } catch (const std::bad_any_cast&) {}
 }
