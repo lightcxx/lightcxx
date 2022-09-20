@@ -1,41 +1,43 @@
 #ifndef _LIGHTCXX_GUARD_CSTRING
 #define _LIGHTCXX_GUARD_CSTRING
 
+#ifdef NULL
+#undef NULL  // We make our own macros!
+#endif
+#define NULL nullptr
+
 namespace std {
 
 using size_t = decltype(sizeof(nullptr));
 
-void* memchr(const void* __s, int __c, size_t __n);
-int memcmp(const void* __s1, const void* __s2, size_t __n);
-void* memcpy(void* __dst, const void* __src, size_t __n);
-void* memmove(void* __dst, const void* __src, size_t __len);
-void* memset(void* __b, int __c, size_t __len);
-char* strcat(char* __s1, const char* __s2);
-char* strchr(const char* __s, int __c);
-int strcmp(const char* __s1, const char* __s2);
-int strcoll(const char* __s1, const char* __s2);
 char* strcpy(char* __dst, const char* __src);
-size_t strcspn(const char* __s, const char* __charset);
-char* strerror(int __errnum);
-size_t strlen(const char* __s);
-char* strncat(char* __s1, const char* __s2, size_t __n);
-int strncmp(const char* __s1, const char* __s2, size_t __n);
 char* strncpy(char* __dst, const char* __src, size_t __n);
-char* strpbrk(const char* __s, const char* __charset);
-char* strrchr(const char* __s, int __c);
-size_t strspn(const char* __s, const char* __charset);
-char* strstr(const char* __big, const char* __little);
-char* strtok(char* __str, const char* __sep);
-size_t strxfrm(char* __s1, const char* __s2, size_t __n);
-char* strtok_r(char* __str, const char* __sep, char** __lasts);
-int strerror_r(int __errnum, char* __strerrbuf, size_t __buflen);
-char* strdup(const char* __s1);
-void* memccpy(void* __dst, const void* __src, int __c, size_t __n);
-char* stpcpy(char* __dst, const char* __src);
-char* stpncpy(char* __dst, const char* __src, size_t __n);
-char* strndup(const char* __s1, size_t __n);
-size_t strnlen(const char* __s1, size_t __n);
-char* strsignal(int __sig);
+char* strcat(char* __dst, const char* __src);
+char* strncat(char* __dst, const char* __src, size_t __n);
+size_t strxfrm(char* __dst, const char* __src, size_t __n);
+size_t strlen(const char* __str);
+int strcmp(const char* __lhs, const char* __rhs);
+int strncmp(const char* __lhs, const char* __rhs, size_t __n);
+int strcoll(const char* __lhs, const char* __rhs);
+const char* strchr(const char* __str, int __ch);
+char* strchr(char* __str, int __ch);
+const char* strrchr(const char* __str, int __ch);
+char* strrchr(char* __str, int __ch);
+size_t strspn(const char* __dst, const char* __src);
+size_t strcspn(const char* __dst, const char* __src);
+const char* strpbrk(const char* __dst, const char* __breakset);
+char* strpbrk(char* __dst, const char* __breakset);
+const char* strstr(const char* __haystack, const char* __needle);
+char* strstr(char* __haystack, const char* __needle);
+char* strtok(char* __str, const char* __delim);
+char* strerror(int __errnum);
+
+const void* memchr(const void* __ptr, int __ch, size_t __n);
+void* memchr(void* __ptr, int __ch, size_t __n);
+int memcmp(const void* __lhs, const void* __rhs, size_t __n);
+void* memset(void* __dst, int __ch, size_t __n);
+void* memcpy(void* __dst, const void* __src, size_t __n);
+void* memmove(void* __dst, const void* __src, size_t __n);
 
 }  // namespace std
 

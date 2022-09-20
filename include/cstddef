@@ -14,7 +14,7 @@
 #ifdef NULL
 #undef NULL  // We make our own macros!
 #endif
-#define NULL 0L
+#define NULL nullptr
 
 #ifdef offsetof
 #undef offsetof  // We make our own macros!

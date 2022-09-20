@@ -59,7 +59,11 @@ using uintptr_t = __UINTPTR_TYPE__;
 #define WCHAR_MIN (-__WCHAR_MAX__ - 1)
 #define WCHAR_MAX __WCHAR_MAX__
 
-#define WINT_MIN (-__WINT_MAX__ - 1)
+#ifndef __WINT_MIN__
+#    define WINT_MIN (-__WINT_MAX__ - 1)
+#else
+#    define WINT_MIN __WINT_MIN__
+#endif
 #define WINT_MAX __WINT_MAX__
 
 #define INT8_MIN (-__INT8_MAX__ - 1)

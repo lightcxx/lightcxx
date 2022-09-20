@@ -6,128 +6,112 @@
 
 namespace std {
 
-_EXPORT void* memchr(const void* __s, int __c, size_t __n) {
-    return ::memchr(__s, __c, __n);
-}
-
-_EXPORT int memcmp(const void* __s1, const void* __s2, size_t __n) {
-    return ::memcmp(__s1, __s2, __n);
-}
-
-_EXPORT void* memcpy(void* __dst, const void* __src, size_t __n) {
-    return ::memcpy(__dst, __src, __n);
-}
-
-_EXPORT void* memmove(void* __dst, const void* __src, size_t __len) {
-    return ::memmove(__dst, __src, __len);
-}
-
-_EXPORT void* memset(void* __b, int __c, size_t __len) {
-    return ::memset(__b, __c, __len);
-}
-
-_EXPORT char* strcat(char* __s1, const char* __s2) {
-    return ::strcat(__s1, __s2);
-}
-
-_EXPORT char* strchr(const char* __s, int __c) {
-    return ::strchr(__s, __c);
-}
-
-_EXPORT int strcmp(const char* __s1, const char* __s2) {
-    return ::strcmp(__s1, __s2);
-}
-
-_EXPORT int strcoll(const char* __s1, const char* __s2) {
-    return ::strcoll(__s1, __s2);
-}
-
 _EXPORT char* strcpy(char* __dst, const char* __src) {
     return ::strcpy(__dst, __src);
-}
-
-_EXPORT size_t strcspn(const char* __s, const char* __charset) {
-    return ::strcspn(__s, __charset);
-}
-
-_EXPORT char* strerror(int __errnum) {
-    return ::strerror(__errnum);
-}
-
-_EXPORT size_t strlen(const char* __s) {
-    return ::strlen(__s);
-}
-
-_EXPORT char* strncat(char* __s1, const char* __s2, size_t __n) {
-    return ::strncat(__s1, __s2, __n);
-}
-
-_EXPORT int strncmp(const char* __s1, const char* __s2, size_t __n) {
-    return ::strncmp(__s1, __s2, __n);
 }
 
 _EXPORT char* strncpy(char* __dst, const char* __src, size_t __n) {
     return ::strncpy(__dst, __src, __n);
 }
 
-_EXPORT char* strpbrk(const char* __s, const char* __charset) {
-    return ::strpbrk(__s, __charset);
+_EXPORT char* strcat(char* __dst, const char* __src) {
+    return ::strcat(__dst, __src);
 }
 
-_EXPORT char* strrchr(const char* __s, int __c) {
-    return ::strrchr(__s, __c);
+_EXPORT char* strncat(char* __dst, const char* __src, size_t __n) {
+    return ::strncat(__dst, __src, __n);
 }
 
-_EXPORT size_t strspn(const char* __s, const char* __charset) {
-    return ::strspn(__s, __charset);
+_EXPORT size_t strxfrm(char* __dst, const char* __src, size_t __n) {
+    return ::strxfrm(__dst, __src, __n);
 }
 
-_EXPORT char* strstr(const char* __big, const char* __little) {
-    return ::strstr(__big, __little);
+_EXPORT size_t strlen(const char* __str) {
+    return ::strlen(__str);
 }
 
-_EXPORT char* strtok(char* __str, const char* __sep) {
-    return ::strtok(__str, __sep);
+_EXPORT int strcmp(const char* __lhs, const char* __rhs) {
+    return ::strcmp(__lhs, __rhs);
 }
 
-_EXPORT size_t strxfrm(char* __s1, const char* __s2, size_t __n) {
-    return ::strxfrm(__s1, __s2, __n);
+_EXPORT int strncmp(const char* __lhs, const char* __rhs, size_t __n) {
+    return ::strncmp(__lhs, __rhs, __n);
 }
 
-_EXPORT char* strtok_r(char* __str, const char* __sep, char** __lasts) {
-    return ::strtok_r(__str, __sep, __lasts);
+_EXPORT int strcoll(const char* __lhs, const char* __rhs) {
+    return ::strcoll(__lhs, __rhs);
 }
 
-_EXPORT int strerror_r(int __errnum, char* __strerrbuf, size_t __buflen) {
-    return ::strerror_r(__errnum, __strerrbuf, __buflen);
+_EXPORT const char* strchr(const char* __str, int __ch) {
+    return ::strchr(__str, __ch);
 }
 
-_EXPORT char* strdup(const char* __s1) {
-    return ::strdup(__s1);
+_EXPORT char* strchr(char* __str, int __ch) {
+    return ::strchr(__str, __ch);
 }
 
-_EXPORT void* memccpy(void* __dst, const void* __src, int __c, size_t __n) {
-    return ::memccpy(__dst, __src, __c, __n);
+_EXPORT const char* strrchr(const char* __str, int __ch) {
+    return ::strrchr(__str, __ch);
 }
 
-_EXPORT char* stpcpy(char* __dst, const char* __src) {
-    return ::stpcpy(__dst, __src);
+_EXPORT char* strrchr(char* __str, int __ch) {
+    return ::strrchr(__str, __ch);
 }
 
-_EXPORT char* stpncpy(char* __dst, const char* __src, size_t __n) {
-    return ::stpncpy(__dst, __src, __n);
+_EXPORT size_t strspn(const char* __dst, const char* __src) {
+    return ::strspn(__dst, __src);
 }
 
-_EXPORT char* strndup(const char* __s1, size_t __n) {
-    return ::strndup(__s1, __n);
+_EXPORT size_t strcspn(const char* __dst, const char* __src) {
+    return ::strcspn(__dst, __src);
 }
 
-_EXPORT size_t strnlen(const char* __s1, size_t __n) {
-    return ::strnlen(__s1, __n);
+_EXPORT const char* strpbrk(const char* __dst, const char* __breakset) {
+    return ::strpbrk(__dst, __breakset);
 }
 
-_EXPORT char* strsignal(int __sig) {
-    return ::strsignal(__sig);
+_EXPORT char* strpbrk(char* __dst, const char* __breakset) {
+    return ::strpbrk(__dst, __breakset);
+}
+
+_EXPORT const char* strstr(const char* __haystack, const char* __needle) {
+    return ::strstr(__haystack, __needle);
+}
+
+_EXPORT char* strstr(char* __haystack, const char* __needle) {
+    return ::strstr(__haystack, __needle);
+}
+
+_EXPORT char* strtok(char* __str, const char* __delim) {
+    return ::strtok(__str, __delim);
+}
+
+_EXPORT char* strerror(int __errnum) {
+    return ::strerror(__errnum);
+}
+
+_EXPORT const void* memchr(const void* __ptr, int __ch, size_t __n) {
+    return ::memchr(__ptr, __ch, __n);
+}
+
+_EXPORT void* memchr(void* __ptr, int __ch, size_t __n) {
+    return ::memchr(__ptr, __ch, __n);
+}
+
+_EXPORT int memcmp(const void* __lhs, const void* __rhs, size_t __n) {
+    return ::memcmp(__lhs, __rhs, __n);
+}
+
+_EXPORT void* memset(void* __dst, int __ch, size_t __n) {
+    return ::memset(__dst, __ch, __n);
+}
+
+_EXPORT void* memcpy(void* __dst, const void* __src, size_t __n) {
+    return ::memcpy(__dst, __src, __n);
+}
+
+_EXPORT void* memmove(void* __dst, const void* __src, size_t __n) {
+    return ::memmove(__dst, __src, __n);
 }
 
 }  // namespace std
