@@ -25,10 +25,10 @@ static_assert(test_make_signed<unsigned long, long>());
 static_assert(test_make_signed<long long, long long>());
 static_assert(test_make_signed<unsigned long long, long long>());
 
-static_assert(test_make_signed<char8_t, int_least8_t>());
-static_assert(test_make_signed<char16_t, int_least16_t>());
-static_assert(test_make_signed<char32_t, int_least32_t>());
-static_assert(test_make_signed<wchar_t, int_least32_t>());
+static_assert(test_make_signed<char8_t, std::int_least8_t>());
+static_assert(test_make_signed<char16_t, std::int_least16_t>());
+static_assert(test_make_signed<char32_t, std::int_least32_t>());
+static_assert(test_make_signed<wchar_t, std::int_least32_t>());
 
 enum E { a = 0 };
 static_assert(test_make_signed<E, int>());

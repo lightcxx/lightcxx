@@ -3,202 +3,6 @@
 #include "testing.h"
 #include <type_traits>
 
-#ifndef INT_FAST8_MIN
-#error "INT_FAST8_MIN is not defined."
-#endif
-
-#ifndef INT_FAST16_MIN
-#error "INT_FAST16_MIN is not defined."
-#endif
-
-#ifndef INT_FAST32_MIN
-#error "INT_FAST32_MIN is not defined."
-#endif
-
-#ifndef INT_FAST64_MIN
-#error "INT_FAST64_MIN is not defined."
-#endif
-
-#ifndef INT_LEAST8_MIN
-#error "INT_LEAST8_MIN is not defined."
-#endif
-
-#ifndef INT_LEAST16_MIN
-#error "INT_LEAST16_MIN is not defined."
-#endif
-
-#ifndef INT_LEAST32_MIN
-#error "INT_LEAST32_MIN is not defined."
-#endif
-
-#ifndef INT_LEAST64_MIN
-#error "INT_LEAST64_MIN is not defined."
-#endif
-
-#ifndef INT_FAST8_MAX
-#error "INT_FAST8_MAX is not defined."
-#endif
-
-#ifndef INT_FAST16_MAX
-#error "INT_FAST16_MAX is not defined."
-#endif
-
-#ifndef INT_FAST32_MAX
-#error "INT_FAST32_MAX is not defined."
-#endif
-
-#ifndef INT_FAST64_MAX
-#error "INT_FAST64_MAX is not defined."
-#endif
-
-#ifndef INT_LEAST8_MAX
-#error "INT_LEAST8_MAX is not defined."
-#endif
-
-#ifndef INT_LEAST16_MAX
-#error "INT_LEAST16_MAX is not defined."
-#endif
-
-#ifndef INT_LEAST32_MAX
-#error "INT_LEAST32_MAX is not defined."
-#endif
-
-#ifndef INT_LEAST64_MAX
-#error "INT_LEAST64_MAX is not defined."
-#endif
-
-#ifndef UINT_FAST8_MAX
-#error "UINT_FAST8_MAX is not defined."
-#endif
-
-#ifndef UINT_FAST16_MAX
-#error "UINT_FAST16_MAX is not defined."
-#endif
-
-#ifndef UINT_FAST32_MAX
-#error "UINT_FAST32_MAX is not defined."
-#endif
-
-#ifndef UINT_FAST64_MAX
-#error "UINT_FAST64_MAX is not defined."
-#endif
-
-#ifndef UINT_LEAST8_MAX
-#error "UINT_LEAST8_MAX is not defined."
-#endif
-
-#ifndef UINT_LEAST16_MAX
-#error "UINT_LEAST16_MAX is not defined."
-#endif
-
-#ifndef UINT_LEAST32_MAX
-#error "UINT_LEAST32_MAX is not defined."
-#endif
-
-#ifndef UINT_LEAST64_MAX
-#error "UINT_LEAST64_MAX is not defined."
-#endif
-
-#ifndef INTMAX_MIN
-#error "INTMAX_MIN is not defined."
-#endif
-
-#ifndef INTPTR_MIN
-#error "INTPTR_MIN is not defined."
-#endif
-
-#ifndef INTMAX_MAX
-#error "INTMAX_MAX is not defined."
-#endif
-
-#ifndef INTPTR_MAX
-#error "INTPTR_MAX is not defined."
-#endif
-
-#ifndef UINTMAX_MAX
-#error "UINTMAX_MAX is not defined."
-#endif
-
-#ifndef UINTPTR_MAX
-#error "UINTPTR_MAX is not defined."
-#endif
-
-#ifndef PTRDIFF_MIN
-#error "PTRDIFF_MIN is not defined."
-#endif
-
-#ifndef PTRDIFF_MAX
-#error "PTRDIFF_MAX is not defined."
-#endif
-
-#ifndef SIG_ATOMIC_MIN
-#error "SIG_ATOMIC_MIN is not defined."
-#endif
-
-#ifndef SIG_ATOMIC_MAX
-#error "SIG_ATOMIC_MAX is not defined."
-#endif
-
-#ifndef WCHAR_MIN
-#error "WCHAR_MIN is not defined."
-#endif
-
-#ifndef WCHAR_MAX
-#error "WCHAR_MAX is not defined."
-#endif
-
-#ifndef WINT_MIN
-#error "WINT_MIN is not defined."
-#endif
-
-#ifndef WINT_MAX
-#error "WINT_MAX is not defined."
-#endif
-
-#ifndef SIZE_MAX
-#error "SIZE_MAX is not defined."
-#endif
-
-#ifndef INT8_C
-#error "INT8_C is not defined."
-#endif
-
-#ifndef INT16_C
-#error "INT16_C is not defined."
-#endif
-
-#ifndef INT32_C
-#error "INT32_C is not defined."
-#endif
-
-#ifndef INT64_C
-#error "INT64_C is not defined."
-#endif
-
-#ifndef INTMAX_C
-#error "INTMAX_C is not defined."
-#endif
-
-#ifndef UINT8_C
-#error "UINT8_C is not defined."
-#endif
-
-#ifndef UINT16_C
-#error "UINT16_C is not defined."
-#endif
-
-#ifndef UINT32_C
-#error "UINT32_C is not defined."
-#endif
-
-#ifndef UINT64_C
-#error "UINT64_C is not defined."
-#endif
-
-#ifndef UINTMAX_C
-#error "UINTMAX_C is not defined."
-#endif
-
 TEST() {
     constexpr ::std::int8_t i8{};
     static_assert(sizeof(i8) == 1);
@@ -311,4 +115,155 @@ TEST() {
     constexpr ::std::uintmax_t uim{};
     static_assert(sizeof(uim) >= 8);
     static_assert(std::is_unsigned_v<::std::uintmax_t>);
+
+    static_assert(INTMAX_MIN < 0);
+    static_assert(std::is_integral_v<decltype(INTMAX_MIN)>);
+    static_assert(INTMAX_MAX > 0);
+    static_assert(std::is_integral_v<decltype(INTMAX_MAX)>);
+    static_assert(UINTMAX_MAX > 0);
+    static_assert(std::is_integral_v<decltype(UINTMAX_MAX)>);
+
+    static_assert(INTPTR_MIN < 0);
+    static_assert(std::is_integral_v<decltype(INTPTR_MIN)>);
+    static_assert(INTPTR_MAX > 0);
+    static_assert(std::is_integral_v<decltype(INTPTR_MAX)>);
+    static_assert(UINTPTR_MAX > 0);
+    static_assert(std::is_integral_v<decltype(UINTPTR_MAX)>);
+
+    static_assert(PTRDIFF_MIN < 0);
+    static_assert(std::is_integral_v<decltype(PTRDIFF_MIN)>);
+    static_assert(PTRDIFF_MAX > 0);
+    static_assert(std::is_integral_v<decltype(PTRDIFF_MAX)>);
+
+    static_assert(SIZE_MAX > 0);
+    static_assert(std::is_integral_v<decltype(SIZE_MAX)>);
+
+    static_assert(SIG_ATOMIC_MIN < 0);
+    static_assert(std::is_integral_v<decltype(SIG_ATOMIC_MIN)>);
+    static_assert(SIG_ATOMIC_MAX > 0);
+    static_assert(std::is_integral_v<decltype(SIG_ATOMIC_MAX)>);
+
+    static_assert(WCHAR_MIN < 0);
+    static_assert(std::is_integral_v<decltype(WCHAR_MIN)>);
+    static_assert(WCHAR_MAX > 0);
+    static_assert(std::is_integral_v<decltype(WCHAR_MAX)>);
+
+    static_assert(WINT_MIN < 0);
+    static_assert(std::is_integral_v<decltype(WINT_MIN)>);
+    static_assert(WINT_MAX > 0);
+    static_assert(std::is_integral_v<decltype(WINT_MAX)>);
+
+    static_assert(INT8_MIN < 0);
+    static_assert(std::is_integral_v<decltype(INT8_MIN)>);
+    static_assert(INT8_MAX > 0);
+    static_assert(std::is_integral_v<decltype(INT8_MAX)>);
+    static_assert(UINT8_MAX > 0);
+    static_assert(std::is_integral_v<decltype(UINT8_MAX)>);
+
+    static_assert(INT_FAST8_MIN < 0);
+    static_assert(std::is_integral_v<decltype(INT_FAST8_MIN)>);
+    static_assert(INT_FAST8_MAX > 0);
+    static_assert(std::is_integral_v<decltype(INT_FAST8_MAX)>);
+    static_assert(UINT_FAST8_MAX > 0);
+    static_assert(std::is_integral_v<decltype(UINT_FAST8_MAX)>);
+
+    static_assert(INT_LEAST8_MIN < 0);
+    static_assert(std::is_integral_v<decltype(INT_LEAST8_MIN)>);
+    static_assert(INT_LEAST8_MAX > 0);
+    static_assert(std::is_integral_v<decltype(INT_LEAST8_MAX)>);
+    static_assert(UINT_LEAST8_MAX > 0);
+    static_assert(std::is_integral_v<decltype(UINT_LEAST8_MAX)>);
+
+    static_assert(INT16_MIN < 0);
+    static_assert(std::is_integral_v<decltype(INT16_MIN)>);
+    static_assert(INT16_MAX > 0);
+    static_assert(std::is_integral_v<decltype(INT16_MAX)>);
+    static_assert(UINT16_MAX > 0);
+    static_assert(std::is_integral_v<decltype(UINT16_MAX)>);
+
+    static_assert(INT_FAST16_MIN < 0);
+    static_assert(std::is_integral_v<decltype(INT_FAST16_MIN)>);
+    static_assert(INT_FAST16_MAX > 0);
+    static_assert(std::is_integral_v<decltype(INT_FAST16_MAX)>);
+    static_assert(UINT_FAST16_MAX > 0);
+    static_assert(std::is_integral_v<decltype(UINT_FAST16_MAX)>);
+
+    static_assert(INT_LEAST16_MIN < 0);
+    static_assert(std::is_integral_v<decltype(INT_LEAST16_MIN)>);
+    static_assert(INT_LEAST16_MAX > 0);
+    static_assert(std::is_integral_v<decltype(INT_LEAST16_MAX)>);
+    static_assert(UINT_LEAST16_MAX > 0);
+    static_assert(std::is_integral_v<decltype(UINT_LEAST16_MAX)>);
+
+    static_assert(INT32_MIN < 0);
+    static_assert(std::is_integral_v<decltype(INT32_MIN)>);
+    static_assert(INT32_MAX > 0);
+    static_assert(std::is_integral_v<decltype(INT32_MAX)>);
+    static_assert(UINT32_MAX > 0);
+    static_assert(std::is_integral_v<decltype(UINT32_MAX)>);
+
+    static_assert(INT_FAST32_MIN < 0);
+    static_assert(std::is_integral_v<decltype(INT_FAST32_MIN)>);
+    static_assert(INT_FAST32_MAX > 0);
+    static_assert(std::is_integral_v<decltype(INT_FAST32_MAX)>);
+    static_assert(UINT_FAST32_MAX > 0);
+    static_assert(std::is_integral_v<decltype(UINT_FAST32_MAX)>);
+
+    static_assert(INT_LEAST32_MIN < 0);
+    static_assert(std::is_integral_v<decltype(INT_LEAST32_MIN)>);
+    static_assert(INT_LEAST32_MAX > 0);
+    static_assert(std::is_integral_v<decltype(INT_LEAST32_MAX)>);
+    static_assert(UINT_LEAST32_MAX > 0);
+    static_assert(std::is_integral_v<decltype(UINT_LEAST32_MAX)>);
+
+    static_assert(INT64_MIN < 0);
+    static_assert(std::is_integral_v<decltype(INT64_MIN)>);
+    static_assert(INT64_MAX > 0);
+    static_assert(std::is_integral_v<decltype(INT64_MAX)>);
+    static_assert(UINT64_MAX > 0);
+    static_assert(std::is_integral_v<decltype(UINT64_MAX)>);
+
+    static_assert(INT_FAST64_MIN < 0);
+    static_assert(std::is_integral_v<decltype(INT_FAST64_MIN)>);
+    static_assert(INT_FAST64_MAX > 0);
+    static_assert(std::is_integral_v<decltype(INT_FAST64_MAX)>);
+    static_assert(UINT_FAST64_MAX > 0);
+    static_assert(std::is_integral_v<decltype(UINT_FAST64_MAX)>);
+
+    static_assert(INT_LEAST64_MIN < 0);
+    static_assert(std::is_integral_v<decltype(INT_LEAST64_MIN)>);
+    static_assert(INT_LEAST64_MAX > 0);
+    static_assert(std::is_integral_v<decltype(INT_LEAST64_MAX)>);
+    static_assert(UINT_LEAST64_MAX > 0);
+    static_assert(std::is_integral_v<decltype(UINT_LEAST64_MAX)>);
+
+    static_assert(std::is_integral_v<decltype(INTMAX_C(17))>);
+    static_assert(INTMAX_C(17) == std::intmax_t(17));
+    static_assert(INTMAX_C(-17) == std::intmax_t(-17));
+    static_assert(std::is_integral_v<decltype(UINTMAX_C(17))>);
+    static_assert(UINTMAX_C(17) == std::uintmax_t(17));
+
+    static_assert(std::is_integral_v<decltype(INT8_C(17))>);
+    static_assert(INT8_C(17) == std::int8_t(17));
+    static_assert(INT8_C(-17) == std::int8_t(-17));
+    static_assert(std::is_integral_v<decltype(UINT8_C(17))>);
+    static_assert(UINT8_C(17) == std::uint8_t(17));
+
+    static_assert(std::is_integral_v<decltype(INT16_C(17))>);
+    static_assert(INT16_C(17) == std::int16_t(17));
+    static_assert(INT16_C(-17) == std::int16_t(-17));
+    static_assert(std::is_integral_v<decltype(UINT16_C(17))>);
+    static_assert(UINT16_C(17) == std::uint16_t(17));
+
+    static_assert(std::is_integral_v<decltype(INT32_C(17))>);
+    static_assert(INT32_C(17) == std::int32_t(17));
+    static_assert(INT32_C(-17) == std::int32_t(-17));
+    static_assert(std::is_integral_v<decltype(UINT32_C(17))>);
+    static_assert(UINT32_C(17) == std::uint32_t(17));
+
+    static_assert(std::is_integral_v<decltype(INT64_C(17))>);
+    static_assert(INT64_C(17) == std::int64_t(17));
+    static_assert(INT64_C(-17) == std::int64_t(-17));
+    static_assert(std::is_integral_v<decltype(UINT64_C(17))>);
+    static_assert(UINT64_C(17) == std::uint64_t(17));
 }
