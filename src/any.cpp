@@ -28,25 +28,24 @@ _EXPORT const char* bad_any_cast::what() const noexcept {
 _EXPORT any::any(const any& __other)
         : __vtable(__other.__vtable) {
     if (__vtable != nullptr) {
-        __obj = _Light::__any_alloc(__other.__vtable->__alignment, __other.__vtable->__size);
-        try {
-            __vtable->__copy(__other.__obj, __obj);
-        } catch(...) {
-            free(__obj);
-            throw;
-        }
+        __vtable->__copy(__other.__obj, __obj);
     }
 }
 
 _EXPORT any::any(any&& __other) noexcept
-        : __vtable(__other.__vtable), __obj(__other.__obj) {
+        : __vtable(__other.__vtable) {
+    if (__vtable != nullptr) {
+        __vtable->__move(__other.__obj, __obj);
+    }
     __other.__vtable = nullptr;
 }
 
 _EXPORT any::~any() {
     if (__vtable != nullptr) {
         __vtable->__dtor(__obj);
-        free(__obj);
+        if (!__vtable->__is_local) {
+            free(__obj.__remote);
+        }
     }
 }
 
@@ -55,16 +54,11 @@ _EXPORT any& any::operator=(const any& __rhs) {
         if (!__rhs.has_value()) {
             reset();
         } else {
-            void* __new_obj = _Light::__any_alloc(__rhs.__vtable->__alignment, __rhs.__vtable->__size);
-            try {
-                __rhs.__vtable->__copy(__rhs.__obj, __new_obj);
-            } catch (...) {
-                free(__new_obj);
-                throw;
-            }
+            _Light::_AnyStorage __new_obj;
+            __rhs.__vtable->__copy(__rhs.__obj, __new_obj);
             reset();
             __vtable = __rhs.__vtable;
-            __obj = __new_obj;
+            __vtable->__move(__new_obj, __obj);
         }
     }
     return *this;
@@ -74,7 +68,9 @@ _EXPORT any& any::operator=(any&& __rhs) noexcept {
     if (this != addressof(__rhs)) {
         reset();
         __vtable = __rhs.__vtable;
-        __obj = __rhs.__obj;
+        if (__vtable != nullptr) {
+            __vtable->__move(__rhs.__obj, __obj);
+        }
         __rhs.__vtable = nullptr;
     }
     return *this;
@@ -83,14 +79,40 @@ _EXPORT any& any::operator=(any&& __rhs) noexcept {
 _EXPORT void any::reset() noexcept {
     if (__vtable != nullptr) {
         __vtable->__dtor(__obj);
-        free(__obj);
+        if (!__vtable->__is_local) {
+            free(__obj.__remote);
+        }
         __vtable = nullptr;
     }
 }
 
-_EXPORT void any::swap(std::any& __rhs) noexcept {
-    std::swap(__vtable, __rhs.__vtable);
-    std::swap(__obj, __rhs.__obj);
+_EXPORT void any::swap(any& __rhs) noexcept {
+    if (__vtable == nullptr && __rhs.__vtable == nullptr) {
+    } else if (__vtable == nullptr) {
+        __rhs.__vtable->__move(__rhs.__obj, __obj);
+        std::swap(__vtable, __rhs.__vtable);
+    } else if (__rhs.__vtable == nullptr) {
+        __vtable->__move(__obj, __rhs.__obj);
+        std::swap(__vtable, __rhs.__vtable);
+    } else {
+        if (__vtable->__is_local && __rhs.__vtable->__is_local) {
+            _Light::_AnyStorage __tmp;
+            __vtable->__move(__obj, __tmp);
+            __rhs.__vtable->__move(__rhs.__obj, __obj);
+            __vtable->__move(__tmp, __rhs.__obj);
+        } else if (__vtable->__is_local) {
+            void* __tmp = __rhs.__obj.__remote;
+            __vtable->__move(__obj, __rhs.__obj);
+            __obj.__remote = __tmp;
+        } else if (__rhs.__vtable->__is_local) {
+            void* __tmp = __obj.__remote;
+            __rhs.__vtable->__move(__rhs.__obj, __obj);
+            __rhs.__obj.__remote = __tmp;
+        } else {
+            std::swap(__obj.__remote, __rhs.__obj.__remote);
+        }
+        std::swap(__vtable, __rhs.__vtable);
+    }
 }
 
 _EXPORT bool any::has_value() const noexcept {

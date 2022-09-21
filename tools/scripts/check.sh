@@ -12,4 +12,4 @@ cmake -B${CMAKE_BUILD_DIR} -H. -G "Unix Makefiles" \
       -DLIGHTCXX_ENABLE_TESTS=ON
 
 echo "Run tests"
-MAKEFLAGS="-j 12" ./${CMAKE_BUILD_DIR}/tests.sh
+./${CMAKE_BUILD_DIR}/tests.sh

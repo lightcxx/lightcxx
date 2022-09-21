@@ -310,7 +310,7 @@ TEST(move_assign_small_val_to_small_val) {
     expect(&result == &target);
     expect(cnttype::dtor_count == 1);
     expect(cnttype::copy_ctor_count == 0);
-    expect(cnttype::move_ctor_count == 0);
+    expect(cnttype::move_ctor_count <= 1);
     expect(target.has_value());
     expect(target.type() == typeid(cnttype));
     expect(any_cast<cnttype>(&target) != nullptr);
@@ -358,7 +358,7 @@ TEST(move_assign_small_val_to_large_val) {
     expect(&result == &target);
     expect(cnttype::dtor_count == 1);
     expect(cnttype::copy_ctor_count == 0);
-    expect(cnttype::move_ctor_count == 0);
+    expect(cnttype::move_ctor_count <= 1);
     expect(target.has_value());
     expect(target.type() == typeid(cnttype));
     expect(any_cast<cnttype>(&target) != nullptr);

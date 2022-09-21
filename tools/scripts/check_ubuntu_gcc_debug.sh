@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-cd /lightcxx
-
 export CC=gcc
 export CXX=g++
 export CMAKE_BUILD_TYPE=Debug
