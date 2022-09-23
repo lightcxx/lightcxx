@@ -4,12 +4,15 @@ function(init_testing_script)
             "\n"
             "set -e\n"
             "\n"
-            "${CMAKE_MAKE_PROGRAM} -C ${CMAKE_BINARY_DIR}\n"
-            "\n"
             )
     if (APPLE)
         file(APPEND ${CMAKE_BINARY_DIR}/tests.sh "export MallocNanoZone=0\n\n")
+    else ()
+        file(APPEND ${CMAKE_BINARY_DIR}/tests.sh "export GNUMAKEFLAGS=--no-print-directory\n\n")
     endif ()
+    file(APPEND ${CMAKE_BINARY_DIR}/tests.sh
+            "${CMAKE_MAKE_PROGRAM} -C ${CMAKE_BINARY_DIR}\n"
+            "\n")
 
     file(CHMOD ${CMAKE_BINARY_DIR}/tests.sh PERMISSIONS
             OWNER_READ OWNER_WRITE OWNER_EXECUTE

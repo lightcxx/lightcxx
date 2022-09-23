@@ -7,8 +7,8 @@ namespace std {
 
 namespace _Light {
 
-struct _LZero {
-    consteval explicit(false) _LZero(int __v) noexcept {
+struct _LiteralZero {
+    consteval explicit(false) _LiteralZero(int __v) noexcept {
         if (__v != 0) {
             try {
                 throw "Cannot compare results of operator<=> with non-zero values. Compare with "
@@ -29,47 +29,47 @@ class partial_ordering {
 
     friend constexpr bool operator==(partial_ordering __v, partial_ordering __w) noexcept = default;
 
-    friend constexpr bool operator==(partial_ordering __v, _Light::_LZero) noexcept {
+    friend constexpr bool operator==(partial_ordering __v, _Light::_LiteralZero) noexcept {
         return __v.__is_ordered() && __v.__value == 0;
     }
 
-    friend constexpr bool operator<(partial_ordering __v, _Light::_LZero) noexcept {
+    friend constexpr bool operator<(partial_ordering __v, _Light::_LiteralZero) noexcept {
         return __v.__is_ordered() && __v.__value < 0;
     }
 
-    friend constexpr bool operator>(partial_ordering __v, _Light::_LZero) noexcept {
+    friend constexpr bool operator>(partial_ordering __v, _Light::_LiteralZero) noexcept {
         return __v.__is_ordered() && __v.__value > 0;
     }
 
-    friend constexpr bool operator<=(partial_ordering __v, _Light::_LZero) noexcept {
+    friend constexpr bool operator<=(partial_ordering __v, _Light::_LiteralZero) noexcept {
         return __v.__is_ordered() && __v.__value <= 0;
     }
 
-    friend constexpr bool operator>=(partial_ordering __v, _Light::_LZero) noexcept {
+    friend constexpr bool operator>=(partial_ordering __v, _Light::_LiteralZero) noexcept {
         return __v.__is_ordered() && __v.__value >= 0;
     }
 
-    friend constexpr bool operator<(_Light::_LZero, partial_ordering __v) noexcept {
+    friend constexpr bool operator<(_Light::_LiteralZero, partial_ordering __v) noexcept {
         return __v.__is_ordered() && 0 < __v.__value;
     }
 
-    friend constexpr bool operator>(_Light::_LZero, partial_ordering __v) noexcept {
+    friend constexpr bool operator>(_Light::_LiteralZero, partial_ordering __v) noexcept {
         return __v.__is_ordered() && 0 > __v.__value;
     }
 
-    friend constexpr bool operator<=(_Light::_LZero, partial_ordering __v) noexcept {
+    friend constexpr bool operator<=(_Light::_LiteralZero, partial_ordering __v) noexcept {
         return __v.__is_ordered() && 0 <= __v.__value;
     }
 
-    friend constexpr bool operator>=(_Light::_LZero, partial_ordering __v) noexcept {
+    friend constexpr bool operator>=(_Light::_LiteralZero, partial_ordering __v) noexcept {
         return __v.__is_ordered() && 0 >= __v.__value;
     }
 
-    friend constexpr partial_ordering operator<=>(partial_ordering __v, _Light::_LZero) noexcept {
+    friend constexpr partial_ordering operator<=>(partial_ordering __v, _Light::_LiteralZero) noexcept {
         return __v;
     }
 
-    friend constexpr partial_ordering operator<=>(_Light::_LZero, partial_ordering __v) noexcept {
+    friend constexpr partial_ordering operator<=>(_Light::_LiteralZero, partial_ordering __v) noexcept {
         return __v < 0 ? greater : __v > 0 ? less
                                            : __v;
     }
@@ -85,10 +85,10 @@ class partial_ordering {
     signed char __value;
 };
 
-constexpr partial_ordering partial_ordering::less(-1);
-constexpr partial_ordering partial_ordering::equivalent(0);
-constexpr partial_ordering partial_ordering::greater(1);
-constexpr partial_ordering partial_ordering::unordered(-127);
+inline constexpr partial_ordering partial_ordering::less(-1);
+inline constexpr partial_ordering partial_ordering::equivalent(0);
+inline constexpr partial_ordering partial_ordering::greater(1);
+inline constexpr partial_ordering partial_ordering::unordered(-127);
 
 class weak_ordering {
   public:
@@ -103,47 +103,47 @@ class weak_ordering {
 
     friend constexpr bool operator==(weak_ordering __v, weak_ordering __w) noexcept = default;
 
-    friend constexpr bool operator==(weak_ordering __v, _Light::_LZero) noexcept {
+    friend constexpr bool operator==(weak_ordering __v, _Light::_LiteralZero) noexcept {
         return __v.__value == 0;
     }
 
-    friend constexpr bool operator<(weak_ordering __v, _Light::_LZero) noexcept {
+    friend constexpr bool operator<(weak_ordering __v, _Light::_LiteralZero) noexcept {
         return __v.__value < 0;
     }
 
-    friend constexpr bool operator>(weak_ordering __v, _Light::_LZero) noexcept {
+    friend constexpr bool operator>(weak_ordering __v, _Light::_LiteralZero) noexcept {
         return __v.__value > 0;
     }
 
-    friend constexpr bool operator<=(weak_ordering __v, _Light::_LZero) noexcept {
+    friend constexpr bool operator<=(weak_ordering __v, _Light::_LiteralZero) noexcept {
         return __v.__value <= 0;
     }
 
-    friend constexpr bool operator>=(weak_ordering __v, _Light::_LZero) noexcept {
+    friend constexpr bool operator>=(weak_ordering __v, _Light::_LiteralZero) noexcept {
         return __v.__value >= 0;
     }
 
-    friend constexpr bool operator<(_Light::_LZero, weak_ordering __v) noexcept {
+    friend constexpr bool operator<(_Light::_LiteralZero, weak_ordering __v) noexcept {
         return 0 < __v.__value;
     }
 
-    friend constexpr bool operator>(_Light::_LZero, weak_ordering __v) noexcept {
+    friend constexpr bool operator>(_Light::_LiteralZero, weak_ordering __v) noexcept {
         return 0 > __v.__value;
     }
 
-    friend constexpr bool operator<=(_Light::_LZero, weak_ordering __v) noexcept {
+    friend constexpr bool operator<=(_Light::_LiteralZero, weak_ordering __v) noexcept {
         return 0 <= __v.__value;
     }
 
-    friend constexpr bool operator>=(_Light::_LZero, weak_ordering __v) noexcept {
+    friend constexpr bool operator>=(_Light::_LiteralZero, weak_ordering __v) noexcept {
         return 0 >= __v.__value;
     }
 
-    friend constexpr weak_ordering operator<=>(weak_ordering __v, _Light::_LZero) noexcept {
+    friend constexpr weak_ordering operator<=>(weak_ordering __v, _Light::_LiteralZero) noexcept {
         return __v;
     }
 
-    friend constexpr weak_ordering operator<=>(_Light::_LZero, weak_ordering __v) noexcept {
+    friend constexpr weak_ordering operator<=>(_Light::_LiteralZero, weak_ordering __v) noexcept {
         return __v < 0 ? greater : __v > 0 ? less
                                            : __v;
     }
@@ -155,9 +155,9 @@ class weak_ordering {
     signed char __value;
 };
 
-constexpr weak_ordering weak_ordering::less(-1);
-constexpr weak_ordering weak_ordering::equivalent(0);
-constexpr weak_ordering weak_ordering::greater(1);
+inline constexpr weak_ordering weak_ordering::less(-1);
+inline constexpr weak_ordering weak_ordering::equivalent(0);
+inline constexpr weak_ordering weak_ordering::greater(1);
 
 class strong_ordering {
   public:
@@ -178,47 +178,47 @@ class strong_ordering {
 
     friend constexpr bool operator==(strong_ordering __v, strong_ordering __w) noexcept = default;
 
-    friend constexpr bool operator==(strong_ordering __v, _Light::_LZero) noexcept {
+    friend constexpr bool operator==(strong_ordering __v, _Light::_LiteralZero) noexcept {
         return __v.__value == 0;
     }
 
-    friend constexpr bool operator<(strong_ordering __v, _Light::_LZero) noexcept {
+    friend constexpr bool operator<(strong_ordering __v, _Light::_LiteralZero) noexcept {
         return __v.__value < 0;
     }
 
-    friend constexpr bool operator>(strong_ordering __v, _Light::_LZero) noexcept {
+    friend constexpr bool operator>(strong_ordering __v, _Light::_LiteralZero) noexcept {
         return __v.__value > 0;
     }
 
-    friend constexpr bool operator<=(strong_ordering __v, _Light::_LZero) noexcept {
+    friend constexpr bool operator<=(strong_ordering __v, _Light::_LiteralZero) noexcept {
         return __v.__value <= 0;
     }
 
-    friend constexpr bool operator>=(strong_ordering __v, _Light::_LZero) noexcept {
+    friend constexpr bool operator>=(strong_ordering __v, _Light::_LiteralZero) noexcept {
         return __v.__value >= 0;
     }
 
-    friend constexpr bool operator<(_Light::_LZero, strong_ordering __v) noexcept {
+    friend constexpr bool operator<(_Light::_LiteralZero, strong_ordering __v) noexcept {
         return 0 < __v.__value;
     }
 
-    friend constexpr bool operator>(_Light::_LZero, strong_ordering __v) noexcept {
+    friend constexpr bool operator>(_Light::_LiteralZero, strong_ordering __v) noexcept {
         return 0 > __v.__value;
     }
 
-    friend constexpr bool operator<=(_Light::_LZero, strong_ordering __v) noexcept {
+    friend constexpr bool operator<=(_Light::_LiteralZero, strong_ordering __v) noexcept {
         return 0 <= __v.__value;
     }
 
-    friend constexpr bool operator>=(_Light::_LZero, strong_ordering __v) noexcept {
+    friend constexpr bool operator>=(_Light::_LiteralZero, strong_ordering __v) noexcept {
         return 0 >= __v.__value;
     }
 
-    friend constexpr strong_ordering operator<=>(strong_ordering __v, _Light::_LZero) noexcept {
+    friend constexpr strong_ordering operator<=>(strong_ordering __v, _Light::_LiteralZero) noexcept {
         return __v;
     }
 
-    friend constexpr strong_ordering operator<=>(_Light::_LZero, strong_ordering __v) noexcept {
+    friend constexpr strong_ordering operator<=>(_Light::_LiteralZero, strong_ordering __v) noexcept {
         return __v < 0 ? greater : __v > 0 ? less
                                            : __v;
     }
@@ -230,10 +230,10 @@ class strong_ordering {
     signed char __value;
 };
 
-constexpr strong_ordering strong_ordering::less(-1);
-constexpr strong_ordering strong_ordering::equal(0);
-constexpr strong_ordering strong_ordering::equivalent(0);
-constexpr strong_ordering strong_ordering::greater(1);
+inline constexpr strong_ordering strong_ordering::less(-1);
+inline constexpr strong_ordering strong_ordering::equal(0);
+inline constexpr strong_ordering strong_ordering::equivalent(0);
+inline constexpr strong_ordering strong_ordering::greater(1);
 
 constexpr bool is_eq(partial_ordering __po) noexcept {
     return __po == 0;
@@ -263,25 +263,26 @@ namespace _Light {
 
 template<class _C>
 struct _CmpToNum {
-    static constexpr int __value = 0;
+    static inline constexpr int __value = 0;
 };
 
 template<>
 struct _CmpToNum<partial_ordering> {
-    static constexpr int __value = 1;
+    static inline constexpr int __value = 1;
 };
 
 template<>
 struct _CmpToNum<weak_ordering> {
-    static constexpr int __value = 2;
+    static inline constexpr int __value = 2;
 };
 
 template<>
 struct _CmpToNum<strong_ordering> {
-    static constexpr int __value = 3;
+    static inline constexpr int __value = 3;
 };
 
-template<class... _Ts> requires (sizeof...(_Ts) > 0)
+template<class... _Ts>
+    requires(sizeof...(_Ts) > 0)
 static constexpr auto _CommonComparisonCategoryImpl() noexcept {
     constexpr int __mapped_Ts[] = {_CmpToNum<_Ts>::__value...};
     constexpr auto __count_occurrences = [__mapped_Ts](int __counted) {

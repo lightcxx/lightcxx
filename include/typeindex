@@ -1,0 +1,67 @@
+#ifndef _LIGHTCXX_GUARD_TYPEINDEX
+#define _LIGHTCXX_GUARD_TYPEINDEX
+
+#include <compare>
+#include <typeinfo>
+
+namespace std {
+
+class type_index {
+  public:
+    type_index(const type_info& __rhs) noexcept
+            : __target(addressof(__rhs)) {}
+
+    bool operator==(const type_index& __rhs) const noexcept {
+        return *__target == *__rhs.__target;
+    }
+
+    bool operator<(const type_index& __rhs) const noexcept {
+        return __target->before(*__rhs.__target);
+    }
+
+    bool operator>(const type_index& __rhs) const noexcept {
+        return __rhs.__target->before(*__target);
+    }
+
+    bool operator<=(const type_index& __rhs) const noexcept {
+        return !__rhs.__target->before(*__target);
+    }
+
+    bool operator>=(const type_index& __rhs) const noexcept {
+        return !__target->before(*__rhs.__target);
+    }
+
+    strong_ordering operator<=>(const type_index& __rhs) const noexcept {
+        if (*__target == *__rhs.__target) {
+            return strong_ordering::equal;
+        }
+        if (__target->before(*__rhs.__target)) {
+            return strong_ordering::less;
+        }
+        return strong_ordering::greater;
+    }
+
+    size_t hash_code() const noexcept {
+        return __target->hash_code();
+    }
+
+    const char* name() const noexcept {
+        return __target->name();
+    }
+
+  private:
+    const type_info* __target;
+};
+
+template<class _T>
+struct hash;
+template<>
+struct hash<type_index> {
+    size_t operator()(type_index __t) const noexcept {
+        return __t.hash_code();
+    }
+};
+
+}  // namespace std
+
+#endif

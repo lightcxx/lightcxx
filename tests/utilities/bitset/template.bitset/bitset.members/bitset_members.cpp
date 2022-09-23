@@ -1,4 +1,4 @@
-#include "../bitset.members/bitset_testing.h"
+#include "bitset_testing.h"
 
 #include "testing.h"
 
