@@ -14,10 +14,10 @@ class logic_error : public exception {
 
   public:
     explicit logic_error(const char* __msg) {
-        auto len = strlen(__msg);
-        __what = static_cast<char*>(malloc(len + 1));
-        memcpy(__what, __msg, len);
-        __what[len] = '\0';
+        auto __len = strlen(__msg);
+        __what = static_cast<char*>(malloc(__len + 1));
+        memcpy(__what, __msg, __len);
+        __what[__len] = '\0';
     }
 
     ~logic_error() override;
@@ -29,32 +29,28 @@ class logic_error : public exception {
 
 class domain_error : public logic_error {
   public:
-    explicit domain_error(const char* __what)
-            : logic_error(__what) {}
+    using logic_error::logic_error;
 
     ~domain_error() override;
 };
 
 class invalid_argument : public logic_error {
   public:
-    explicit invalid_argument(const char* __what)
-            : logic_error(__what) {}
+    using logic_error::logic_error;
 
     ~invalid_argument() override;
 };
 
 class length_error : public logic_error {
   public:
-    explicit length_error(const char* __what)
-            : logic_error(__what) {}
+    using logic_error::logic_error;
 
     ~length_error() override;
 };
 
 class out_of_range : public logic_error {
   public:
-    explicit out_of_range(const char* __what)
-            : logic_error(__what) {}
+    using logic_error::logic_error;
 
     ~out_of_range() override;
 };
@@ -64,10 +60,10 @@ class runtime_error : public exception {
 
   public:
     explicit runtime_error(const char* __msg) {
-        auto len = strlen(__msg);
-        __what = static_cast<char*>(malloc(len + 1));
-        memcpy(__what, __msg, len);
-        __what[len] = '\0';
+        auto __len = strlen(__msg);
+        __what = static_cast<char*>(malloc(__len + 1));
+        memcpy(__what, __msg, __len);
+        __what[__len] = '\0';
     }
 
     ~runtime_error() override;
@@ -79,24 +75,21 @@ class runtime_error : public exception {
 
 class range_error : public runtime_error {
   public:
-    explicit range_error(const char* __what)
-            : runtime_error(__what) {}
+    using runtime_error::runtime_error;
 
     ~range_error() override;
 };
 
 class overflow_error : public runtime_error {
   public:
-    explicit overflow_error(const char* __what)
-            : runtime_error(__what) {}
+    using runtime_error::runtime_error;
 
     ~overflow_error() override;
 };
 
 class underflow_error : public runtime_error {
   public:
-    explicit underflow_error(const char* __what)
-            : runtime_error(__what) {}
+    using runtime_error::runtime_error;
 
     ~underflow_error() override;
 };

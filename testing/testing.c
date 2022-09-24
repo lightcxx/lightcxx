@@ -232,7 +232,8 @@ int main(int argc, char** argv) {
             printf("dup2 failed: errno=%d message=%s\n", errno, strerror(errno));
             // Still inform the parent we failed.
             const char* msg = "EXPECTATION FAILED: dup2 didn't work, check stdout for details.\n";
-            write(pipe_fd[1], msg, strlen(msg));  // If this fails, tough luck, nothing to do.
+            ssize_t result = write(pipe_fd[1], msg, strlen(msg));
+            (void)result;  // If this call to write fails, tough luck, nothing to do.
             return 1;
         }
         close(pipe_fd[1]);  // close pipe write end after dup
