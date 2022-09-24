@@ -66,6 +66,7 @@ if (LIGHTCXX_ENABLE_TESTS)
     endif ()
 
     add_executable(negative_compile_test ${CMAKE_CURRENT_SOURCE_DIR}/testing/negative_compile_test.c)
+    AddTargetCompileWarnings(negative_compile_test)
 
     scan_for_lightcxx_tests(${CMAKE_CURRENT_SOURCE_DIR}/tests)
 endif ()

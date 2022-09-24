@@ -11,12 +11,11 @@ extern char* const* environ;
 #define MAX_NUM_RUNS 999
 #define MAX_NUM_RUNS_STR "999"
 
-static const char* usage = "Usage: %s <num-runs> <msg-pattern> <source-file> <compiler> [<compiler-flags>...]\n";
-#define PRINT_ERROR_USAGE_AND_EXIT(...) \
-    do {                                \
-        printf(__VA_ARGS__);            \
-        printf(usage, argv[0]);         \
-        return EXIT_FAILURE;            \
+#define PRINT_ERROR_USAGE_AND_EXIT(...)                                                                         \
+    do {                                                                                                        \
+        printf(__VA_ARGS__);                                                                                    \
+        printf("Usage: %s <num-runs> <msg-pattern> <source-file> <compiler> [<compiler-flags>...]\n", argv[0]); \
+        return EXIT_FAILURE;                                                                                    \
     } while (0)
 
 int main(int argc, char** argv) {
@@ -117,7 +116,7 @@ int main(int argc, char** argv) {
             execve(cmd[0], cmd, environ);
             printf("execve failed: errno=%d message=%s\n", errno, strerror(errno));
             printf("Command line:\n ");
-            for (int cmd_index = 0; cmd_index < cmd_size; cmd_index++) {
+            for (size_t cmd_index = 0; cmd_index < cmd_size; cmd_index++) {
                 printf(" %s", cmd[cmd_index]);
             }
             printf("\n");
@@ -148,22 +147,22 @@ int main(int argc, char** argv) {
             if (num_bytes == 0) {
                 break;
             }
-            ADD_COMPILER_OUTPUT(pipe_buffer, num_bytes);
+            ADD_COMPILER_OUTPUT(pipe_buffer, (size_t)num_bytes);
         }
         close(pipe_fd[0]);  // close read end in parent after the run.
         char eos[1] = "";
         ADD_COMPILER_OUTPUT(eos, 1);  // null terminator
-#define PRINT_COMPILER_CMD_AND_OUTPUT()                              \
-    do {                                                             \
-        printf("command:");                                          \
-        for (int cmd_index = 0; cmd_index < cmd_size; cmd_index++) { \
-            printf(" %s", cmd[cmd_index]);                           \
-        }                                                            \
-        printf("\n"                                                  \
-               "------ BEGIN COMPILER OUTPUT ------\n"               \
-               "%s\n"                                                \
-               "------  END  COMPILER OUTPUT ------\n",              \
-               compiler_output);                                     \
+#define PRINT_COMPILER_CMD_AND_OUTPUT()                                 \
+    do {                                                                \
+        printf("command:");                                             \
+        for (size_t cmd_index = 0; cmd_index < cmd_size; cmd_index++) { \
+            printf(" %s", cmd[cmd_index]);                              \
+        }                                                               \
+        printf("\n"                                                     \
+               "------ BEGIN COMPILER OUTPUT ------\n"                  \
+               "%s\n"                                                   \
+               "------  END  COMPILER OUTPUT ------\n",                 \
+               compiler_output);                                        \
     } while (0)
         int compiler_status;
         int child_pid = wait(&compiler_status);

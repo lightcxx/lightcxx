@@ -1,13 +1,9 @@
-set(COMMON_CLANG_GCC_WARNINGS
+set(COMMON_CLANG_GCC_C_CXX_WARNINGS
         -Werror
         -Wall
         -Wextra # reasonable and standard
-        -Wnon-virtual-dtor # warn the user if a class with virtual functions has a non-virtual destructor.
-        -Wold-style-cast # warn for c-style casts
-        -Wcast-align # warn for potential performance problem casts
         -Wunused # warn on anything being unused
-        -Woverloaded-virtual # warn if you overload (not override) a virtual function
-        -Wpedantic # warn if non-standard C++ is used
+        -Wpedantic # warn if non-standard C/C++ is used
         -Wconversion # warn on type conversions that may lose data
         -Wsign-conversion # warn on sign conversions
         -Wsign-compare
@@ -16,8 +12,16 @@ set(COMMON_CLANG_GCC_WARNINGS
         -Wformat=2 # warn on security issues around functions that format output (ie printf)
         -Wimplicit-fallthrough # warn on statements that fallthrough without an explicit annotation
         )
-set(GCC_WARNINGS
-        ${COMMON_CLANG_GCC_WARNINGS}
+
+set(COMMON_CLANG_GCC_CXX_WARNINGS
+        ${COMMON_CLANG_GCC_C_CXX_WARNINGS}
+        -Wnon-virtual-dtor # warn the user if a class with virtual functions has a non-virtual destructor.
+        -Wold-style-cast # warn for c-style casts
+        -Wcast-align # warn for potential performance problem casts
+        -Woverloaded-virtual # warn if you overload (not override) a virtual function
+        )
+set(GCC_CXX_WARNINGS
+        ${COMMON_CLANG_GCC_CXX_WARNINGS}
         -Wmisleading-indentation # warn if indentation implies blocks where blocks do not exist
         -Wduplicated-cond # warn if if / else chain has duplicated conditions
         -Wduplicated-branches # warn if if / else branches have duplicated code
@@ -26,26 +30,34 @@ set(GCC_WARNINGS
         -Wno-unknown-pragmas
         -Wno-attributes
         )
-set(CLANG_WARNINGS
-        ${COMMON_CLANG_GCC_WARNINGS}
+set(CLANG_CXX_WARNINGS
+        ${COMMON_CLANG_GCC_CXX_WARNINGS}
 
         -Wno-unknown-warning-option
         )
 
 if (CMAKE_CXX_COMPILER_ID MATCHES ".*Clang")
-    set_property(GLOBAL PROPERTY PROJECT_WARNINGS "${CLANG_WARNINGS}")
+    set_property(GLOBAL PROPERTY CXX_WARNINGS "${CLANG_CXX_WARNINGS}")
+    set_property(GLOBAL PROPERTY C_WARNINGS "${COMMON_CLANG_GCC_C_CXX_WARNINGS}")
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    set_property(GLOBAL PROPERTY PROJECT_WARNINGS "${GCC_WARNINGS}")
+    set_property(GLOBAL PROPERTY CXX_WARNINGS "${GCC_CXX_WARNINGS}")
+    set_property(GLOBAL PROPERTY C_WARNINGS "${COMMON_CLANG_GCC_C_CXX_WARNINGS}")
 else ()
     # TODO: Windows support!
     message(AUTHOR_WARNING "No compiler warnings set for '${CMAKE_CXX_COMPILER_ID}' compiler.")
-    set_property(GLOBAL PROPERTY PROJECT_WARNINGS "")
+    set_property(GLOBAL PROPERTY CXX_WARNINGS "")
+    set_property(GLOBAL PROPERTY C_WARNINGS "")
 endif ()
 
 function(AddTargetCompileWarnings TARGET)
-    get_property(warnings GLOBAL PROPERTY PROJECT_WARNINGS)
-    if (warnings)
+    get_property(cxx_warnings GLOBAL PROPERTY CXX_WARNINGS)
+    get_property(c_warnings GLOBAL PROPERTY C_WARNINGS)
+    if (cxx_warnings)
         target_compile_options(${TARGET} PRIVATE
-                $<$<COMPILE_LANGUAGE:CXX>:${warnings}>)
+                $<$<COMPILE_LANGUAGE:CXX>:${cxx_warnings}>)
+    endif ()
+    if (c_warnings)
+        target_compile_options(${TARGET} PRIVATE
+                $<$<COMPILE_LANGUAGE:C>:${c_warnings}>)
     endif ()
 endfunction()

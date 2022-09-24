@@ -56,7 +56,7 @@ void testing_expect_impl(int cnd, const char* func, const char* file, int line) 
     }
 }
 
-void testing_step_impl(const char* msg, ...) {
+__attribute__((format(printf, 1, 2))) void testing_step_impl(const char* msg, ...) {
     if (!is_inside_testing_process) {
         return;
     }
@@ -126,22 +126,23 @@ static void read_child_output_pipe(int pipe_fd, char* buf, char* output, size_t*
         }
         if (bytes_read > 0) {
             buf[bytes_read] = '\0';
-            if (*output_size + bytes_read >= CHILD_OUTPUT_MAX_SIZE) {
+            if (*output_size + (size_t)bytes_read >= CHILD_OUTPUT_MAX_SIZE) {
                 printf("Steps output size too large. Please increase capacity (currently %d)\n", CHILD_OUTPUT_MAX_SIZE);
                 _Exit(1);
             }
-            memcpy(output + *output_size, buf, bytes_read);
-            *output_size += bytes_read;
+            memcpy(output + *output_size, buf, (size_t)bytes_read);
+            *output_size += (size_t)bytes_read;
         }
         break;  // Pipe is done.
     }
 }
 
 int main(int argc, char** argv) {
+    (void)argc;
     const char* test_filename = argv[0];
-    const char* cursor = strstr(test_filename, "/tests/");
-    if (cursor != NULL) {
-        test_filename = cursor + 7;
+    const char* test_filename_cursor = strstr(test_filename, "/tests/");
+    if (test_filename_cursor != NULL) {
+        test_filename = test_filename_cursor + 7;
     }
     printf("Running test %s\n", test_filename);
 
@@ -149,9 +150,7 @@ int main(int argc, char** argv) {
     const char* const expected_exit_wrong_error_msg = "Invalid EXPECTED:EXIT request. Must be one of:\n"
                                                       "// EXPECTED:EXIT CODE = n\n"
                                                       "// EXPECTED:EXIT KILLED BY SIGNAL n\n"
-                                                      "// EXPECTED:EXIT KILLED BY SIGNAL SIGABRT\n"
-                                                      "\n"
-                                                      "Instead found: '// EXPECTED:EXIT %s'";
+                                                      "// EXPECTED:EXIT KILLED BY SIGNAL SIGABRT\n";
     int expected_exit_code = 0;
     int expected_exit_signal = 0;
     if (strncmp(expected_exit, "CODE = ", 7) == 0) {
@@ -161,7 +160,8 @@ int main(int argc, char** argv) {
                 expected_exit_code = expected_exit_code * 10 + *cursor - '0';
                 cursor++;
             } else {
-                printf(expected_exit_wrong_error_msg, expected_exit);
+                puts(expected_exit_wrong_error_msg);
+                printf("Instead found: '// EXPECTED:EXIT %s'", expected_exit);
                 return 1;
             }
         }
@@ -175,7 +175,8 @@ int main(int argc, char** argv) {
                     expected_exit_signal = expected_exit_signal * 10 + *cursor;
                     cursor++;
                 } else {
-                    printf(expected_exit_wrong_error_msg, expected_exit);
+                    puts(expected_exit_wrong_error_msg);
+                    printf("Instead found: '// EXPECTED:EXIT %s'", expected_exit);
                     return 1;
                 }
             }
@@ -183,7 +184,8 @@ int main(int argc, char** argv) {
     } else if (expected_exit[0] == '\0') {
         // Do nothing.
     } else {
-        printf(expected_exit_wrong_error_msg, expected_exit);
+        puts(expected_exit_wrong_error_msg);
+        printf("Instead found: '// EXPECTED:EXIT %s'", expected_exit);
         return 1;
     }
 
@@ -278,9 +280,9 @@ int main(int argc, char** argv) {
 
     char output_steps[CHILD_OUTPUT_MAX_SIZE];
     size_t output_steps_size = 0;
-    cursor = child_output;
+    const char* output_cursor = child_output;
     while (1) {
-        char* next = strstr(cursor, "STEP: ");
+        char* next = strstr(output_cursor, "STEP: ");
         if (next == NULL) {
             break;
         }
@@ -293,9 +295,10 @@ int main(int argc, char** argv) {
         if (output_steps_size > 0) {
             output_steps[output_steps_size++] = ',';
         }
-        memcpy(output_steps + output_steps_size, next + 6, step_end - (next + 6));
-        output_steps_size += (step_end - (next + 6));
-        cursor = step_end;
+        size_t step_size = (size_t)(step_end - (next + 6));
+        memcpy(output_steps + output_steps_size, next + 6, step_size);
+        output_steps_size += step_size;
+        output_cursor = step_end;
     }
     output_steps[output_steps_size] = '\0';
     if (expected_steps[0] != '\0') {

@@ -3,7 +3,7 @@
 
 #include "new"
 
-extern "C" void testing_step_impl(const char* msg, ...);
+extern "C" __attribute__((format(printf, 1, 2))) void testing_step_impl(const char* msg, ...);
 
 extern "C" void testing_fail_impl(const char* func, const char* file, int line);
 
