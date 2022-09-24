@@ -1,0 +1,17 @@
+#ifndef _LIGHTCXX_GUARD_CASSERT
+#define _LIGHTCXX_GUARD_CASSERT
+
+namespace std::_Light {
+
+[[noreturn]] void __assert_failed(const char* __func, const char* __file, int __line, const char* __expr);
+
+}  // namespace std::_Light
+
+#ifdef NDEBUG
+#    define assert(__expr) ((void)0)
+#else
+#    define assert(__expr) \
+        (__builtin_expect(!(__expr), false) ? ::std::_Light::__assert_failed(__func__, __FILE__, __LINE__, #__expr) : (void)0)
+#endif
+
+#endif

@@ -34,6 +34,8 @@ endfunction()
 
 set(LIGHTCXX_SRCS
         ${CMAKE_CURRENT_SOURCE_DIR}/src/any.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/cassert.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/cerrno.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/cstdlib.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/cstring.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/exception.cpp
