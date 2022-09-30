@@ -239,9 +239,9 @@ _T* any_cast(any* __a) noexcept {
 }
 
 template<class _T>
-    requires is_constructible_v<_T, const remove_cvref_t<_T>&>
 _T any_cast(const any& __a) {
     using _VT = remove_cvref_t<_T>;
+    static_assert(is_constructible_v<_T, const _VT&>);
     if (const _VT* __value = any_cast<_VT>(addressof(__a)); __value == nullptr) {
         throw bad_any_cast();
     } else {
@@ -250,9 +250,9 @@ _T any_cast(const any& __a) {
 }
 
 template<class _T>
-    requires is_constructible_v<_T, remove_cvref_t<_T>&>
 _T any_cast(any& __a) {
     using _VT = remove_cvref_t<_T>;
+    static_assert(is_constructible_v<_T, _VT&>);
     if (_VT* __value = any_cast<_VT>(addressof(__a)); __value == nullptr) {
         throw bad_any_cast();
     } else {
@@ -261,9 +261,9 @@ _T any_cast(any& __a) {
 }
 
 template<class _T>
-    requires is_constructible_v<_T, remove_cvref_t<_T>>
 _T any_cast(any&& __a) {
     using _VT = remove_cvref_t<_T>;
+    static_assert(is_constructible_v<_T, _VT>);
     if (_VT* __value = any_cast<_VT>(addressof(__a)); __value == nullptr) {
         throw bad_any_cast();
     } else {

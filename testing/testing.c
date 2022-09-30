@@ -1,53 +1,94 @@
-#include <errno.h>
-#include <stdarg.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/wait.h>
-#include <unistd.h>
+// Tests are NOT allowed to expect to exit with code 7, so
+// this will always be a test fail.
+#define ALWAYS_ERROR_EXIT_CODE 7
 
-// Default implementations for hooks, for tests that don't include testing.h and for multi-test binaries.
-__attribute__((__weak__)) const char* testing_get_expected_steps() {
-    return "";
-}
+typedef __SIZE_TYPE__ size_t;
 
-__attribute__((__weak__)) const char* testing_get_expected_exit() {
-    return "";
-}
+extern __attribute__((__noreturn__)) void _Exit(int);
+extern long write(int, const char*, size_t);
 
 struct test_def {
-    void (*test_func)();
+    void (*test_func)(void);
     const char* name;
 };
 typedef struct test_def test_def_t;
 
 enum {
-    MAX_NUM_TESTS = 1024,
-    MAX_NUM_GLOBALS = 1024,
-    PIPE_BUF_SZ = 1024,
-    CHILD_OUTPUT_MAX_SIZE = 1 << 16,
+    MAX_NUM_TESTS = 256,
+    OUTPUT_LINE_CAP = 4096 - sizeof(size_t),
 };
 
 static test_def_t tests[MAX_NUM_TESTS];
 static size_t num_tests = 0;
-static int is_inside_testing_process = 0;
+static char output_line[OUTPUT_LINE_CAP];
 
-struct testing_global_var {
-    void* obj;
-    void (*ctor)(void*);
-    void (*dtor)(void*);
-};
-typedef struct testing_global_var testing_global_var_t;
-static testing_global_var_t globals[MAX_NUM_GLOBALS];
-static size_t num_globals = 0;
+static void write_output_line(size_t sz);
+static void push_char(size_t* current_sz, char ch);
+static void push_string(size_t* current_sz, const char* buf);
+static void push_int(size_t* current_sz, int i);
+
+static void check_size(size_t* current_sz, size_t sz) {
+    if (*current_sz + sz >= OUTPUT_LINE_CAP) {
+        size_t err_sz = 0;
+        push_string(&err_sz, "EXPECTATION FAILED: Output line too long! Check capacity in testing.c");
+        write_output_line(err_sz);
+        _Exit(ALWAYS_ERROR_EXIT_CODE);
+    }
+}
+
+static void push_char(size_t* current_sz, char ch) {
+    check_size(current_sz, (size_t)1);
+    output_line[(*current_sz)++] = ch;
+}
+
+static void push_string(size_t* current_sz, const char* buf) {
+    for (const char* ptr = buf; *ptr != '\0'; ptr++) {
+        push_char(current_sz, *ptr);
+    }
+}
+
+static void push_int(size_t* current_sz, int i) {
+    size_t num_digits = 0;
+    int j = i;
+    do {
+        i /= 10;
+        num_digits++;
+    } while (i > 0);
+    check_size(current_sz, num_digits);
+    size_t pos = *current_sz + num_digits - 1;
+    do {
+        output_line[pos--] = (char)('0' + j % 10);
+        j /= 10;
+    } while (j > 0);
+}
+
+static void write_output_line(size_t sz) {
+    push_char(&sz, '\n');
+    size_t total_written = 0;
+    while (1) {
+        long written = write(1, output_line + total_written, sz - total_written);
+        if (written <= 0) {
+            // If writing fails, there's really no way to print a valuable error message.
+            _Exit(ALWAYS_ERROR_EXIT_CODE);
+        }
+        total_written += (size_t)written;
+        if (total_written == sz) {
+            break;
+        }
+    }
+}
 
 void testing_fail_impl(const char* func, const char* file, int line) {
-    if (!is_inside_testing_process) {
-        return;
-    }
-    printf("EXPECTATION FAILED: IN FUNCTION %s (%s:%d)\n", func, file, line);
-    fflush(stdout);
-    abort();
+    size_t sz = 0;
+    push_string(&sz, "EXPECTATION FAILED: IN FUNCTION ");
+    push_string(&sz, func);
+    push_string(&sz, "( ");
+    push_string(&sz, file);
+    push_char(&sz, ':');
+    push_int(&sz, line);
+    push_char(&sz, ')');
+    write_output_line(sz);
+    _Exit(ALWAYS_ERROR_EXIT_CODE);
 }
 
 void testing_expect_impl(int cnd, const char* func, const char* file, int line) {
@@ -56,285 +97,28 @@ void testing_expect_impl(int cnd, const char* func, const char* file, int line) 
     }
 }
 
-__attribute__((format(printf, 1, 2))) void testing_step_impl(const char* msg, ...) {
-    if (!is_inside_testing_process) {
-        return;
-    }
-    printf("STEP: ");
-    va_list args;
-    va_start(args, msg);
-    vprintf(msg, args);
-    va_end(args);
-    printf("\n");
-    fflush(stdout);
+void step(const char* msg) {
+    size_t sz = 0;
+    push_string(&sz, "STEP: ");
+    push_string(&sz, msg);
+    write_output_line(sz);
 }
 
-void testing_register_test(void (*test)(), const char* name) {
+void testing_register_test(void (*test)(void), const char* name) {
     if (num_tests >= MAX_NUM_TESTS) {
-        num_tests++;
-        return;
+        size_t sz = 0;
+        push_string(&sz, "EXPECTATION FAILED: Too many tests registered in one binary. Check limit in testing.c.");
+        write_output_line(sz);
+        _Exit(ALWAYS_ERROR_EXIT_CODE);
     }
     tests[num_tests].test_func = test;
     tests[num_tests].name = name;
     num_tests++;
 }
 
-void testing_register_global(void* obj, void (*ctor)(void*), void (*dtor)(void*)) {
-    if (num_globals == MAX_NUM_GLOBALS) {
-        printf("EXPECTATION FAILED: Too many registered globals.\n");
-        abort();
-    }
-    globals[num_globals].obj = obj;
-    globals[num_globals].ctor = ctor;
-    globals[num_globals].dtor = dtor;
-    num_globals++;
-}
-
-int run_tests() {
-    if (num_tests == 0) {
-        return 0;
-    }
-    if (num_tests >= MAX_NUM_TESTS) {
-        printf("EXPECTATION FAILED: Too many tests registered: %zu, max supported is %d.\n", num_tests, MAX_NUM_TESTS);
-        return 1;
-    }
-    if (num_globals >= MAX_NUM_GLOBALS) {
-        printf("EXPECTATION FAILED: Too many global variables registered: %zu, max supported is %d.\n", num_globals, MAX_NUM_GLOBALS);
-        return 1;
-    }
-    for (size_t i = 0; i < num_globals; i++) {
-        globals[i].ctor(globals[i].obj);
-    }
+int main(void) {
     for (size_t i = 0; i < num_tests; i++) {
         tests[i].test_func();
     }
-    for (size_t i = 0; i < num_globals; i++) {
-        globals[i].dtor(globals[i].obj);
-    }
     return 0;
-}
-
-static void read_child_output_pipe(int pipe_fd, char* buf, char* output, size_t* output_size) {
-    while (1) {
-        ssize_t bytes_read = read(pipe_fd, buf, PIPE_BUF_SZ - 1);
-        if (bytes_read < 0) {
-            if (errno == EAGAIN) {
-                continue;
-            }
-            printf("read failed: errno=%d message=%s\n", errno, strerror(errno));
-            _Exit(1);
-        }
-        if (bytes_read > 0) {
-            buf[bytes_read] = '\0';
-            if (*output_size + (size_t)bytes_read >= CHILD_OUTPUT_MAX_SIZE) {
-                printf("Steps output size too large. Please increase capacity (currently %d)\n", CHILD_OUTPUT_MAX_SIZE);
-                _Exit(1);
-            }
-            memcpy(output + *output_size, buf, (size_t)bytes_read);
-            *output_size += (size_t)bytes_read;
-        }
-        break;  // Pipe is done.
-    }
-}
-
-int main(int argc, char** argv) {
-    (void)argc;
-    const char* test_filename = argv[0];
-    const char* test_filename_cursor = strstr(test_filename, "/tests/");
-    if (test_filename_cursor != NULL) {
-        test_filename = test_filename_cursor + 7;
-    }
-    printf("Running test %s\n", test_filename);
-
-    const char* expected_exit = testing_get_expected_exit();
-    const char* const expected_exit_wrong_error_msg = "Invalid EXPECTED:EXIT request. Must be one of:\n"
-                                                      "// EXPECTED:EXIT CODE = n\n"
-                                                      "// EXPECTED:EXIT KILLED BY SIGNAL n\n"
-                                                      "// EXPECTED:EXIT KILLED BY SIGNAL SIGABRT\n";
-    int expected_exit_code = 0;
-    int expected_exit_signal = 0;
-    if (strncmp(expected_exit, "CODE = ", 7) == 0) {
-        const char* cursor = expected_exit + 7;
-        while (*cursor) {
-            if ('0' <= *cursor && *cursor <= '9') {
-                expected_exit_code = expected_exit_code * 10 + *cursor - '0';
-                cursor++;
-            } else {
-                puts(expected_exit_wrong_error_msg);
-                printf("Instead found: '// EXPECTED:EXIT %s'", expected_exit);
-                return 1;
-            }
-        }
-    } else if (strncmp(expected_exit, "KILLED BY SIGNAL ", 17) == 0) {
-        if (strcmp(expected_exit + 17, "SIGABRT") == 0) {
-            expected_exit_signal = SIGABRT;
-        } else {
-            const char* cursor = expected_exit + 17;
-            while (*cursor) {
-                if ('0' <= *cursor && *cursor <= '9') {
-                    expected_exit_signal = expected_exit_signal * 10 + *cursor;
-                    cursor++;
-                } else {
-                    puts(expected_exit_wrong_error_msg);
-                    printf("Instead found: '// EXPECTED:EXIT %s'", expected_exit);
-                    return 1;
-                }
-            }
-        }
-    } else if (expected_exit[0] == '\0') {
-        // Do nothing.
-    } else {
-        puts(expected_exit_wrong_error_msg);
-        printf("Instead found: '// EXPECTED:EXIT %s'", expected_exit);
-        return 1;
-    }
-
-    const char* expected_steps = testing_get_expected_steps();
-#define PRINT_EXPECTATIONS()                                             \
-    do {                                                                 \
-        if (expected_steps[0] != '\0') {                                 \
-            printf("Expecting steps: %s\n", expected_steps);             \
-        }                                                                \
-        if (expected_exit_code != 0) {                                   \
-            printf("Expecting exit code: %d\n", expected_exit_code);     \
-        }                                                                \
-        if (expected_exit_signal != 0) {                                 \
-            printf("Expecting exit signal: %d\n", expected_exit_signal); \
-        }                                                                \
-    } while (0)
-
-    if (expected_exit_code != 0 && expected_exit_signal != 0) {
-        PRINT_EXPECTATIONS();
-        printf("Expecting both exit code and exit signal is not supported!\n");
-        return 1;
-    }
-
-    int needs_fork = (expected_exit_signal != 0) || (expected_exit_code != 0) || (expected_steps[0] != '\0');
-    if (!needs_fork) {
-        is_inside_testing_process = 1;
-        return run_tests();
-    }
-
-    int pipe_fd[2];
-    if (pipe(pipe_fd) < 0) {
-        printf("pipe failed: errno=%d message=%s\n", errno, strerror(errno));
-        return 1;
-    }
-
-    pid_t pid = fork();
-    if (pid == -1) {
-        printf("fork failed: return=%d, errno=%d, message=%s\n", pid, errno, strerror(errno));
-        return 1;
-    }
-    if (pid == 0) {
-        close(pipe_fd[0]);                          // close pipe read end in child
-        if (dup2(pipe_fd[1], STDOUT_FILENO) < 0) {  // pipe stdout to parent
-            printf("dup2 failed: errno=%d message=%s\n", errno, strerror(errno));
-            // Still inform the parent we failed.
-            const char* msg = "EXPECTATION FAILED: dup2 didn't work, check stdout for details.\n";
-            ssize_t result = write(pipe_fd[1], msg, strlen(msg));
-            (void)result;  // If this call to write fails, tough luck, nothing to do.
-            return 1;
-        }
-        close(pipe_fd[1]);  // close pipe write end after dup
-        is_inside_testing_process = 1;
-        return run_tests();
-    }
-
-    close(pipe_fd[1]);  // close write end in parent
-
-    int status = 0;
-    char buf[PIPE_BUF_SZ];
-    char child_output[CHILD_OUTPUT_MAX_SIZE];
-    size_t child_output_size = 0;
-    while (1) {
-        read_child_output_pipe(pipe_fd[0], buf, child_output, &child_output_size);
-        int wait_result = waitpid(pid, &status, WNOHANG);
-        if (wait_result < 0) {
-            printf("waitpid failed: return=%d, errno=%d, message=%s\n", wait_result, errno, strerror(errno));
-            return 1;
-        }
-        if (wait_result != 0) {
-            if (wait_result != pid) {
-                printf("waitpid returned different child! wait_result=%d child_pid=%d\n", wait_result, pid);
-                return 1;
-            }
-            break;
-        }
-    }
-    read_child_output_pipe(pipe_fd[0], buf, child_output, &child_output_size);
-    child_output[child_output_size] = '\0';
-
-#define PRINT_CHILD_OUTPUT()                         \
-    do {                                             \
-        printf("------ BEGIN CHILD OUTPUT ------\n"  \
-               "%s\n"                                \
-               "------  END  CHILD OUTPUT ------\n", \
-               child_output);                        \
-    } while (0)
-
-    if (strstr(child_output, "EXPECTATION FAILED") != NULL) {
-        PRINT_CHILD_OUTPUT();
-        printf("Found 'EXPECTATION FAILED' in output, test failed regardless of child exit code / signal.\n");
-        return 1;
-    }
-
-    char output_steps[CHILD_OUTPUT_MAX_SIZE];
-    size_t output_steps_size = 0;
-    const char* output_cursor = child_output;
-    while (1) {
-        char* next = strstr(output_cursor, "STEP: ");
-        if (next == NULL) {
-            break;
-        }
-        char* step_end = strchr(next, '\n');
-        if (step_end == NULL) {
-            PRINT_CHILD_OUTPUT();
-            printf("Unfinished step!\n");
-            return 1;
-        }
-        if (output_steps_size > 0) {
-            output_steps[output_steps_size++] = ',';
-        }
-        size_t step_size = (size_t)(step_end - (next + 6));
-        memcpy(output_steps + output_steps_size, next + 6, step_size);
-        output_steps_size += step_size;
-        output_cursor = step_end;
-    }
-    output_steps[output_steps_size] = '\0';
-    if (expected_steps[0] != '\0') {
-        if (strcmp(expected_steps, output_steps) != 0) {
-            PRINT_CHILD_OUTPUT();
-            printf("Steps checking failed!\nExpected steps: %s\nActual   steps: %s\n", expected_steps, output_steps);
-            return 1;
-        }
-    } else {
-        if (output_steps_size > 0) {
-            PRINT_CHILD_OUTPUT();
-            printf("Output includes unexpected steps: %s\nDid you forget to add // EXPECT:STEPS comment to the test?", output_steps);
-            return 1;
-        }
-    }
-
-    if (WIFSIGNALED(status)) {
-        if (expected_exit_code == 0 && expected_exit_signal == (int)(WTERMSIG(status))) {
-            return 0;
-        }
-        PRINT_EXPECTATIONS();
-        printf("Test process killed by signal %d\n", (int)(WTERMSIG(status)));
-        return 1;
-    }
-
-    if (WIFEXITED(status)) {
-        if (expected_exit_signal == 0 && expected_exit_code == (int)(WEXITSTATUS(status))) {
-            return 0;
-        }
-        PRINT_EXPECTATIONS();
-        printf("Test process exited with code %d\n", WEXITSTATUS(status));
-        return 1;
-    }
-
-    PRINT_EXPECTATIONS();
-    printf("I don't know how this can happen: process terminated without exit code or signal? status=%d\n", status);
-    return 1;
 }

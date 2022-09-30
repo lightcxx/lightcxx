@@ -4,3 +4,4 @@ build/
 .downloads/
 third_party/libcxx
 local/
+/test

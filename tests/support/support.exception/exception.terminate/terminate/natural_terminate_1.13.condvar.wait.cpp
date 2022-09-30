@@ -1,4 +1,4 @@
-// REQUEST:SKIP "Requires <condition_variable>."
+// REQUEST:SKIP Requires <condition_variable>.
 // EXPECT:STEPS terminate
 // EXPECT:EXIT KILLED BY SIGNAL SIGABRT
 

@@ -1,1 +1,1 @@
-// REQUEST:SKIP "Requires <istream>"
+// REQUEST:SKIP Requires <istream>

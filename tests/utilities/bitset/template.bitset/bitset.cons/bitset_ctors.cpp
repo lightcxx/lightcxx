@@ -42,7 +42,7 @@ TEST(default_ctor) {
 template<std::size_t N>
 static void test_bitset_ullong_ctor(unsigned long long value) {
     unsigned long long expected = value;
-    if (N < std::_Light::__n_bits<unsigned long long>()) {
+    if constexpr (N < std::_Light::__n_bits<unsigned long long>()) {
         expected &= ((1ull << N) - 1);
     }
 

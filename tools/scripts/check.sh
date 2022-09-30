@@ -11,5 +11,8 @@ cmake -B${CMAKE_BUILD_DIR} -H. -G "Unix Makefiles" \
       -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} \
       -DLIGHTCXX_ENABLE_TESTS=ON
 
+echo "Build"
+make -C ${CMAKE_BUILD_DIR}
+
 echo "Run tests"
-./${CMAKE_BUILD_DIR}/tests.sh
+make -C ${CMAKE_BUILD_DIR} test

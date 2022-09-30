@@ -1,5 +1,5 @@
 // EXPECT:EXIT CODE = 4
-// EXPECT:STEPS ~inline_thread_local,atexit,~inline_static,~global
+// EXPECT:STEPS inline_thread_local,atexit,inline_static,global
 
 #include <cstdlib>
 
@@ -17,7 +17,7 @@ struct SuccessPrinter {
     const char* name = "local";
 
     ~SuccessPrinter() {
-        step("~%s", name);
+        step(name);
     }
 };
 

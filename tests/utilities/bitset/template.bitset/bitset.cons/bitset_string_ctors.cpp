@@ -1,1 +1,1 @@
-// REQUEST:SKIP "Requires <string>."
+// REQUEST:SKIP Requires <string>.

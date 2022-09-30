@@ -33,7 +33,7 @@ class bitset {
             unsigned long long>>>>;
 
     static inline constexpr size_t __repr_bits = _Light::__n_bits<__repr_t>();
-    static inline constexpr size_t __full_mask = ~__repr_t(0);
+    static inline constexpr __repr_t __full_mask = __repr_t(~__repr_t(0));
 
     using __iter_t = make_signed_t<size_t>;
     static inline constexpr __iter_t __extent = (_N + __repr_bits - 1) / __repr_bits;
@@ -41,7 +41,7 @@ class bitset {
     // Last entry in __storage might be shorter.
     static inline constexpr __repr_t __last_mask = _N % __repr_bits == 0 ? __full_mask : ((__repr_t(1) << (_N % __repr_bits)) - 1);
 
-    __repr_t __storage[__extent];
+    __repr_t __storage[static_cast<size_t>(__extent)];
 
     constexpr bitset(_Light::__bitset_neg_t, const bitset& __other) {
         for (__iter_t __i = 0; __i < __extent; __i++) {
@@ -62,14 +62,14 @@ class bitset {
     }
 
     void __unchecked_flip(size_t __pos) noexcept {
-        __storage[__pos / __repr_bits] ^= __repr_t(1) << (__pos % __repr_bits);
+        __storage[__pos / __repr_bits] ^= __repr_t(__repr_t(1) << (__pos % __repr_bits));
     }
 
     void __unchecked_set(size_t __pos, bool __val) noexcept {
         if (__val) {
-            __storage[__pos / __repr_bits] |= __repr_t(1) << (__pos % __repr_bits);
+            __storage[__pos / __repr_bits] |= __repr_t(__repr_t(1) << (__pos % __repr_bits));
         } else {
-            __storage[__pos / __repr_bits] &= ~(__repr_t(1) << (__pos % __repr_bits));
+            __storage[__pos / __repr_bits] &= __repr_t(~(__repr_t(1) << (__pos % __repr_bits)));
         }
     }
 
@@ -84,7 +84,12 @@ class bitset {
         bitset* __bitset;
         size_t __pos;
 
+        reference(bitset* __bitset, size_t __pos)
+                : __bitset(__bitset), __pos(__pos) {}
+
       public:
+        reference(const reference&) = default;
+
         reference& operator=(bool __val) noexcept {
             __bitset->__unchecked_set(__pos, __val);
             return *this;
@@ -223,16 +228,13 @@ class bitset {
     }
 
     reference operator[](size_t __pos) {
-        reference __ref;
-        __ref.__bitset = this;
-        __ref.__pos = __pos;
-        return __ref;
+        return reference(this, __pos);
     }
 
     unsigned long to_ulong() const {
         if constexpr (sizeof(__repr_t) > sizeof(unsigned long)) {
             // TODO: numeric_limits<unsigned long>::max()!
-            if (__storage[0] > static_cast<unsigned long>(-1)) {
+            if (__storage[0] > static_cast<__repr_t>(static_cast<unsigned long>(-1))) {
                 throw overflow_error("bitset: to_ulong overflow");
             }
         }
@@ -252,7 +254,7 @@ class bitset {
     unsigned long long to_ullong() const {
         if constexpr (sizeof(__repr_t) > sizeof(unsigned long long)) {
             // TODO: numeric_limits<unsigned long long>::max()!
-            if (__storage[0] > static_cast<unsigned long long>(-1)) {
+            if (__storage[0] > static_cast<__repr_t>(static_cast<unsigned long long>(-1))) {
                 throw overflow_error("bitset: to_ullong overflow");
             }
         }
@@ -272,9 +274,9 @@ class bitset {
     size_t count() const noexcept {
         size_t __total = 0;
         for (__iter_t __i = 0; __i + 1 < __extent; __i++) {
-            __total += popcount(__storage[__i]);
+            __total += size_t(popcount(__storage[__i]));
         }
-        return __total + popcount(__last());
+        return __total + size_t(popcount(__last()));
     }
 
     constexpr size_t size() const noexcept {

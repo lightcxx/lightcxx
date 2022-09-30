@@ -1,4 +1,4 @@
-// EXPECT:NO_COMPILE Incomplete
+// EXPECT:NO_COMPILE "Incomplete"
 
 #include <type_traits>
 

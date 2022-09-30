@@ -1,1 +1,1 @@
-// REQUEST:SKIP "Requires hash implementation for integers."
+// REQUEST:SKIP Requires hash implementation for integers.

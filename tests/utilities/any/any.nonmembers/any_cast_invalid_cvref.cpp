@@ -1,4 +1,4 @@
-// EXPECT:NO_COMPILE 17
+// EXPECT:NO_COMPILE 16
 
 #include <any>
 
@@ -42,16 +42,14 @@ TEST() {
 #elif NEGATIVE_COMPILE_ITERATION == 10
     any_cast<int&>(std::move(nonconst_any));
 #elif NEGATIVE_COMPILE_ITERATION == 11
-    any_cast<const int&>(std::move(nonconst_any));
-#elif NEGATIVE_COMPILE_ITERATION == 12
     any_cast<volatile int&>(std::move(nonconst_any));
-#elif NEGATIVE_COMPILE_ITERATION == 13
+#elif NEGATIVE_COMPILE_ITERATION == 12
     any_cast<const volatile int&>(std::move(nonconst_any));
-#elif NEGATIVE_COMPILE_ITERATION == 14
+#elif NEGATIVE_COMPILE_ITERATION == 13
     any_cast<non_copyable>(nonconst_any);
-#elif NEGATIVE_COMPILE_ITERATION == 15
+#elif NEGATIVE_COMPILE_ITERATION == 14
     any_cast<non_movable>(nonconst_any);
-#elif NEGATIVE_COMPILE_ITERATION == 16
+#elif NEGATIVE_COMPILE_ITERATION == 15
     any_cast<non_movable>(std::move(nonconst_any));
 #endif
 }

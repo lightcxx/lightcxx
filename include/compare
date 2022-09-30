@@ -285,9 +285,9 @@ template<class... _Ts>
     requires(sizeof...(_Ts) > 0)
 static constexpr auto _CommonComparisonCategoryImpl() noexcept {
     constexpr int __mapped_Ts[] = {_CmpToNum<_Ts>::__value...};
-    constexpr auto __count_occurrences = [__mapped_Ts](int __counted) {
+    constexpr auto __count_occurrences = [](int __counted) {
         unsigned long __counter = 0;
-        for (int __i = 0; __i < sizeof...(_Ts); ++__i) {
+        for (int __i = 0; __i < static_cast<int>(sizeof...(_Ts)); ++__i) {
             if (__mapped_Ts[__i] == __counted) {
                 ++__counter;
             }

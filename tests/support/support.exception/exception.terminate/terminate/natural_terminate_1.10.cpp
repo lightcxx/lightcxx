@@ -1,4 +1,4 @@
-// REQUEST:SKIP "Requires <thread>."
+// REQUEST:SKIP Requires <thread>.
 // EXPECT:STEPS start_thread,terminate
 // EXPECT:EXIT KILLED BY SIGNAL SIGABRT
 
