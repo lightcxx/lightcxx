@@ -855,9 +855,6 @@ void cmd_line_build_link_command(struct cmd_line* link_command) {
     cmd_line_append(link_command, NULL);
     cmd_line_append(link_command, LIB_DIR PATH_SEP_STR "liblightcxx_static.a");
     cmd_line_append(link_command, LIB_DIR PATH_SEP_STR "libtesting.a");
-#if PLATFORM_IS_APPLE
-    cmd_line_append(link_command, "-lSystem");
-#endif
 #if COMPILER_IS_GCC
 #    if PLATFORM_IS_LINUX
     cmd_line_append(link_command, "-lgcc");
