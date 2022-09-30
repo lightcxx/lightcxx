@@ -767,6 +767,13 @@ void add_base_compiler_flags(struct cmd_line* cmd) {
 #if OPT_IS_RELEASE
     cmd_line_append(cmd, "-O3");
 #endif
+}
+
+void add_compiler_include_flags(struct cmd_line* cmd) {
+    cmd_line_append(cmd, "-std=c++20");
+    cmd_line_append(cmd, "-nostdinc++");
+    cmd_line_append(cmd, "-I" SOURCE_DIR PATH_SEP_STR "include");
+    cmd_line_append(cmd, "-I" SOURCE_DIR PATH_SEP_STR "testing");
 #if PLATFORM_IS_APPLE
     cmd_line_append(cmd, "-isysroot");
     cmd_line_append(cmd, APPLE_ISYSROOT);
@@ -775,14 +782,6 @@ void add_base_compiler_flags(struct cmd_line* cmd) {
 #else
 #    error "Platform not supported! Only Apple and Linux systems are currently supported."
 #endif
-
-}
-
-void add_compiler_include_flags(struct cmd_line* cmd) {
-    cmd_line_append(cmd, "-std=c++20");
-    cmd_line_append(cmd, "-nostdinc++");
-    cmd_line_append(cmd, "-I" SOURCE_DIR PATH_SEP_STR "include");
-    cmd_line_append(cmd, "-I" SOURCE_DIR PATH_SEP_STR "testing");
 }
 
 void cmd_line_build_compile_command(struct cmd_line* compile_command) {
@@ -866,6 +865,8 @@ void cmd_line_build_link_command(struct cmd_line* link_command) {
     cmd_line_append(link_command, "-lc");
     cmd_line_append(link_command, "-lpthread");
     cmd_line_append(link_command, "-ldl");
+#else
+    cmd_line_append(link_command, "-L/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib");
 #endif
 }
 
