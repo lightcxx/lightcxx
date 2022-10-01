@@ -17,4 +17,4 @@ TEST() {
 
 // Example from standard.
 template<class To, class From>
-[[maybe_unused]] decltype(static_cast<To>(declval<From>())) convert(From&&);
+[[maybe_unused]] decltype(static_cast<To>(std::declval<From>())) convert(From&&);
