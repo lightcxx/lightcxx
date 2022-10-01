@@ -56,7 +56,6 @@
 extern char* const* environ;
 
 const int NUM_EXPECTATION_CLAUSES_SUPPORTED = 4;  // EXPECT:NO_COMPILE, EXPECT:STEPS, EXPECT:EXIT and REQUEST:SKIP
-const int CMD_LINE_INITIAL_CAPACITY = 64;
 const size_t PATH_INITIAL_CAPACITY = 256;
 const size_t TESTS_INITIAL_CAPACITY = 512;
 const size_t STR_BUF_INITIAL_CAPACITY = 4096;
@@ -132,6 +131,14 @@ __attribute__((format(printf, 1, 2))) void print_warning(const char* fmt, ...) {
     va_end(args);
 }
 
+__attribute__((format(printf, 1, 2))) void print_todo(const char* fmt, ...) {
+    printf("%sTODO%s: ", color_warning_begin(), color_reset());
+    va_list args;
+    va_start(args, fmt);
+    vprintf(fmt, args);
+    va_end(args);
+}
+
 __attribute__((__noreturn__)) __attribute__((format(printf, 1, 2))) void fatal_error(const char* fmt, ...) {
     printf("\n%sError%s: ", color_error_begin(), color_reset());
     va_list args;
@@ -139,14 +146,6 @@ __attribute__((__noreturn__)) __attribute__((format(printf, 1, 2))) void fatal_e
     vprintf(fmt, args);
     va_end(args);
     abort();
-}
-
-__attribute__((format(printf, 1, 2))) void print_todo(const char* fmt, ...) {
-    printf("%sTODO%s: ", color_warning_begin(), color_reset());
-    va_list args;
-    va_start(args, fmt);
-    vprintf(fmt, args);
-    va_end(args);
 }
 
 bool timespec_before(struct timespec a, struct timespec b) {
@@ -251,31 +250,31 @@ struct cmd_line {
     int argc_capacity;
 };
 
-void cmd_line_init(struct cmd_line* cmd_line) {
-    cmd_line->argc = 0;
-    cmd_line->argc_capacity = CMD_LINE_INITIAL_CAPACITY;
-    cmd_line->argv = malloc_traced(sizeof(char*) * (size_t)cmd_line->argc_capacity);
-    cmd_line->argv[0] = NULL;
-}
+void cmd_line_init(struct cmd_line* cmd_line, int num_sections, ...) {
+    va_list sections;
 
-void cmd_line_append(struct cmd_line* cmd_line, const char* data) {
-    if (cmd_line->argc + 1 == cmd_line->argc_capacity) {
-        print_warning("cmd_line resized! capacity=%d, required=%d.\n"
-                      "Double up CMD_LINE_INITIAL_CAPACITY in test_runner.c.\n",
-                      cmd_line->argc_capacity, cmd_line->argc_capacity + 1);
-        const size_t prev = sizeof(char*) * (size_t)cmd_line->argc_capacity;
-        cmd_line->argc_capacity *= 2;
-        cmd_line->argv = realloc_traced(cmd_line->argv, prev, sizeof(char*) * (size_t)cmd_line->argc_capacity);
+    int num_args = 0;
+    va_start(sections, num_sections);
+    for (int section_id = 0; section_id < num_sections; section_id++) {
+        const char* section = va_arg(sections, const char*);
+        while (*section != '\0') {
+            num_args += 1;
+            section = section + strlen(section) + 1;
+        }
     }
-    char* arg;
-    if (data == NULL) {
-        arg = NULL;
-    } else {
-        size_t data_len = strlen(data);
-        arg = malloc_traced(data_len + 1);
-        memcpy(arg, data, data_len + 1);
+    va_end(sections);
+
+    cmd_line->argc = 0;
+    cmd_line->argv = malloc_traced(sizeof(char*) * (size_t)(num_args + 1));
+    va_start(sections, num_sections);
+    for (int section_id = 0; section_id < num_sections; section_id++) {
+        const char* section = va_arg(sections, const char*);
+        while (*section != '\0') {
+            cmd_line->argv[cmd_line->argc++] = (char*)section;
+            section = section + strlen(section) + 1;
+        }
     }
-    cmd_line->argv[cmd_line->argc++] = arg;
+    va_end(sections);
     cmd_line->argv[cmd_line->argc] = NULL;
 }
 
@@ -488,7 +487,7 @@ void test_run_add_test(struct test_run* test_run, struct path* test_path, struct
     struct string_view expect_exit;
     struct string_view expect_no_compile;
     if (!parse_test_expectations(test_run, test_path, &reason_skip, &expect_steps, &expect_exit, &expect_no_compile)) {
-        print_todo("skipped    test [%.*s].%.*s : %.*s\n", (int)sv_len(section), section.start, (int)sv_len(test_file_stem), test_file_stem.start, (int)(reason_skip.end - reason_skip.start), reason_skip.start);
+        print_todo("skipped test [%.*s].%.*s : %.*s\n", (int)sv_len(section), section.start, (int)sv_len(test_file_stem), test_file_stem.start, (int)(reason_skip.end - reason_skip.start), reason_skip.start);
         return;
     }
 
@@ -594,18 +593,7 @@ void test_run_scan_dir(struct test_run* test_run, struct path* test_path, struct
                 }
                 break;
             }
-            if (strcmp(entry->d_name, "skipped.cpp") == 0) {
-                const char* last_slash = test_path->data + test_path->len - 1;
-                const char* end = test_path->data + test_path->len;
-                if (*last_slash == PATH_SEP) {
-                    --last_slash;
-                    --end;
-                }
-                while (*last_slash != PATH_SEP) {
-                    --last_slash;
-                }
-                print_todo("skipped section [%.*s]\n", (int)(end - last_slash - 1), last_slash + 1);
-            } else if (entry->d_name[0] != '.' && strcmp(entry->d_name, "nothing_to_do.cpp") != 0) {
+            if (entry->d_name[0] != '.' && strcmp(entry->d_name, "nothing_to_do.cpp") != 0) {
                 path_append(test_path, entry->d_name);
                 test_run_scan_dir(test_run, test_path, build_cache_dir_path);
                 path_pop(test_path);
@@ -759,123 +747,110 @@ bool check_test_requires_re_link(struct test* test, struct timespec libs_lmt) {
     return !exe_exists || timespec_before(exe_lmt, libs_lmt) || timespec_before(exe_lmt, test->obj_file_lmt);
 }
 
-void add_base_compiler_flags(struct cmd_line* cmd) {
-    cmd_line_append(cmd, COMPILER);
+static char cmd_line_base[]
+  = "" COMPILER "\0"
+    "-std=c++20\0"
 #if OPT_IS_DEBUG
-    cmd_line_append(cmd, "-g");
+    "-g\0"
 #endif
 #if OPT_IS_RELEASE
-    cmd_line_append(cmd, "-O3");
+    "-O3\0"
 #endif
-}
+  ;
 
-void add_compiler_include_flags(struct cmd_line* cmd) {
-    cmd_line_append(cmd, "-std=c++20");
-    cmd_line_append(cmd, "-nostdinc++");
-    cmd_line_append(cmd, "-I" SOURCE_DIR PATH_SEP_STR "include");
-    cmd_line_append(cmd, "-I" SOURCE_DIR PATH_SEP_STR "testing");
+static char cmd_line_include[]
+  = "-nostdinc++\0"
+    "-I" SOURCE_DIR PATH_SEP_STR "include\0"
+    "-I" SOURCE_DIR PATH_SEP_STR "testing\0"
 #if PLATFORM_IS_APPLE
-    cmd_line_append(cmd, "-isysroot");
-    cmd_line_append(cmd, APPLE_ISYSROOT);
-#elif PLATFORM_IS_LINUX
-    // Nothing to do.
-#else
-#    error "Platform not supported! Only Apple and Linux systems are currently supported."
+    "-isysroot\0" APPLE_ISYSROOT "\0"
 #endif
-}
+  ;
 
-void cmd_line_build_compile_command(struct cmd_line* compile_command) {
-    cmd_line_init(compile_command);
-    add_base_compiler_flags(compile_command);
-    add_compiler_include_flags(compile_command);
-    // Emit object file
-    cmd_line_append(compile_command, "-c");
-    // Emit dependencies file
-    cmd_line_append(compile_command, "-MMD");
-    // Add warning flags for positive-compile tests.
-    cmd_line_append(compile_command, "-Werror");
-    cmd_line_append(compile_command, "-Wall");
-    cmd_line_append(compile_command, "-Wextra");
-    cmd_line_append(compile_command, "-Wunused");
-    cmd_line_append(compile_command, "-Wpedantic");
-    cmd_line_append(compile_command, "-Wconversion");
-    cmd_line_append(compile_command, "-Wsign-conversion");
-    cmd_line_append(compile_command, "-Wsign-compare");
-    cmd_line_append(compile_command, "-Wnull-dereference");
-    cmd_line_append(compile_command, "-Wformat=2");
-    cmd_line_append(compile_command, "-Wimplicit-fallthrough");
-    cmd_line_append(compile_command, "-Wnon-virtual-dtor");
-    cmd_line_append(compile_command, "-Wold-style-cast");
-    cmd_line_append(compile_command, "-Wcast-align");
-    cmd_line_append(compile_command, "-Woverloaded-virtual");
+static char cmd_line_compile[]
+  = "-c\0"       // Emit object file
+    "-MMD\0"     // Emit dependencies file
+    "-Werror\0"  // Add warning flags for positive-compile tests.
+    "-Wall\0"
+    "-Wextra\0"
+    "-Wunused\0"
+    "-Wpedantic\0"
+    "-Wconversion\0"
+    "-Wsign-conversion\0"
+    "-Wsign-compare\0"
+    "-Wnull-dereference\0"
+    "-Wformat=2\0"
+    "-Wimplicit-fallthrough\0"
+    "-Wnon-virtual-dtor\0"
+    "-Wold-style-cast\0"
+    "-Wcast-align\0"
+    "-Woverloaded-virtual\0"
 #if COMPILER_IS_CLANG
-    cmd_line_append(compile_command, "-Wno-unknown-warning-option");  // TODO: fix this flag.
-    cmd_line_append(compile_command, "-Wno-deprecated-volatile");     // TODO: fix this flag.
-#elif COMPILER_IS_GCC
-    cmd_line_append(compile_command, "-Wmisleading-indentation");
-    cmd_line_append(compile_command, "-Wduplicated-cond");
-    cmd_line_append(compile_command, "-Wduplicated-branches");
-    cmd_line_append(compile_command, "-Wlogical-op");
-    cmd_line_append(compile_command, "-Wno-unknown-pragmas");     // TODO: fix this flag.
-    cmd_line_append(compile_command, "-Wno-attributes");          // TODO: fix this flag.
-    cmd_line_append(compile_command, "-Wno-ignored-qualifiers");  // TODO: fix this flag.
-#else
-#    error "Compiler not supported! Only Clang and GCC are currently supported."
+    "-Wno-unknown-warning-option\0"  // TODO: fix this flag.
+    "-Wno-deprecated-volatile\0"     // TODO: fix this flag.
 #endif
-
-    // Last 5 arguments will change from compilation to compilation.
-    cmd_line_append(compile_command, "-o");
-    cmd_line_append(compile_command, NULL);
-    cmd_line_append(compile_command, "-MF");
-    cmd_line_append(compile_command, NULL);
-    cmd_line_append(compile_command, NULL);
-}
-
-void cmd_line_build_negative_compile_command(struct cmd_line* compile_command) {
-    cmd_line_init(compile_command);
-    add_base_compiler_flags(compile_command);
-    add_compiler_include_flags(compile_command);
-    cmd_line_append(compile_command, "-c");
-    cmd_line_append(compile_command, "-o");
-    cmd_line_append(compile_command, "/dev/null");
-    cmd_line_append(compile_command, "-DNEGATIVE_COMPILE_ITERATION=" MAX_NEGATIVE_COMPILE_RUNS_STR);
-    cmd_line_append(compile_command, NULL);  // For file name
-}
-
-void cmd_line_build_link_command(struct cmd_line* link_command) {
-    cmd_line_init(link_command);
-    add_base_compiler_flags(link_command);
 #if COMPILER_IS_GCC
-    cmd_line_append(link_command, "-nodefaultlibs");
-#else
-    cmd_line_append(link_command, "-nostdlib++");
+    "-Wmisleading-indentation\0"
+    "-Wduplicated-cond\0"
+    "-Wduplicated-branches\0"
+    "-Wlogical-op\0"
+    "-Wno-unknown-pragmas\0"     // TODO: fix this flag.
+    "-Wno-attributes\0"          // TODO: fix this flag.
+    "-Wno-ignored-qualifiers\0"  // TODO: fix this flag.
 #endif
-    cmd_line_append(link_command, NULL);
-    cmd_line_append(link_command, "-o");
-    cmd_line_append(link_command, NULL);
-    cmd_line_append(link_command, LIB_DIR PATH_SEP_STR "liblightcxx_static.a");
-    cmd_line_append(link_command, LIB_DIR PATH_SEP_STR "libtesting.a");
+    "-o\0"
+    "@path_to_obj_file@\0"
+    "-MF\0"
+    "@path_to_dep_file@\0"
+    "@path_to_source_file@\0";
+
+static char cmd_line_neg_compile[]
+  = "-fsyntax-only\0"
+    "-DNEGATIVE_COMPILE_ITERATION=" MAX_NEGATIVE_COMPILE_RUNS_STR "\0"
+    "@path_to_source_file@\0";
+
+static char cmd_line_link[]
+  =
+#if COMPILER_IS_GCC
+    "-nodefaultlibs\0"
+#else
+    "-nostdlib++\0"
+#endif
+    "@path_to_obj_file@\0"
+    "-o\0"
+    "@path_to_exe_file@\0"
+    "" LIB_DIR PATH_SEP_STR "liblightcxx_static.a\0"
+    "" LIB_DIR PATH_SEP_STR "libtesting.a\0"
 #if COMPILER_IS_GCC
 #    if PLATFORM_IS_LINUX
-    cmd_line_append(link_command, "-lgcc");
-    cmd_line_append(link_command, "-lgcc_eh");
+    "-lgcc\0"
+    "-lgcc_eh\0"
 #    endif
 #endif
 #if PLATFORM_IS_LINUX
-    cmd_line_append(link_command, "-lc");
-    cmd_line_append(link_command, "-lpthread");
-    cmd_line_append(link_command, "-ldl");
-#else
-    cmd_line_append(link_command, "-L/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib");
+    "-lc\0"
+    "-lpthread\0"
+    "-ldl\0"
 #endif
-}
+#if PLATFORM_IS_APPLE
+    "-L/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib\0"
+#endif
+  ;
 
 void test_run_prepare(struct test_run* test_run) {
     chronometer_t test_run_prepare_timer = chronometer_start();
 
-    cmd_line_build_compile_command(&test_run->compile_command);
-    cmd_line_build_negative_compile_command(&test_run->negative_compile_command);
-    cmd_line_build_link_command(&test_run->link_command);
+    cmd_line_init(&test_run->compile_command, 3,
+                  cmd_line_base,
+                  cmd_line_include,
+                  cmd_line_compile);
+    cmd_line_init(&test_run->negative_compile_command, 3,
+                  cmd_line_base,
+                  cmd_line_include,
+                  cmd_line_neg_compile);
+    cmd_line_init(&test_run->link_command, 2,
+                  cmd_line_base,
+                  cmd_line_link);
 
     struct timespec libs_lmt;
     libs_lmt.tv_sec = 0;
@@ -1107,10 +1082,8 @@ bool compile_test(struct test_run* test_run, struct test* test, struct subproces
 }
 
 bool link_test(struct test_run* test_run, struct test* test, struct subprocess* result_buf) {
-    // Last 3 arguments of link command are always:
-    // -o exe_file obj_file
-    test_run->link_command.argv[3] = test->obj_file_path;
-    test_run->link_command.argv[5] = test->exe_file_path;
+    test_run->link_command.argv[4] = test->obj_file_path;
+    test_run->link_command.argv[6] = test->exe_file_path;
     subprocess_start(result_buf, &test_run->link_command, fail_exit_abort);
     subprocess_poll(result_buf, true);
     if (WIFEXITED(result_buf->exit_status) == 0 || WEXITSTATUS(result_buf->exit_status) != 0) {
@@ -1376,12 +1349,14 @@ int main(int argc, char** argv) {
     size_t num_tests_succeeded = test_run_execute(&test_run);
 
     if (num_tests_succeeded == test_run.num_tests) {
-        printf("All %zu tests succeeded.\n", num_tests_succeeded);
+        printf("%sAll %zu tests succeeded.%s\n", color_success_begin(), num_tests_succeeded, color_reset());
     } else {
-        printf("%zu test%s of %zu failed.\n",
+        printf("%s%zu test%s of %zu failed.%s\n",
+               color_error_begin(),
                test_run.num_tests - num_tests_succeeded,
                test_run.num_tests - num_tests_succeeded == 1 ? "" : "s",
-               test_run.num_tests);
+               test_run.num_tests,
+               color_reset());
     }
 
     printf("Test runner peak malloc size: %.2lfkB\n", (double)peak_memory_allocated / 1024);

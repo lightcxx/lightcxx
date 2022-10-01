@@ -1,7 +1,24 @@
 // @ts-ignore
 import { DOMParser } from "https://deno.land/x/deno_dom/deno-dom-wasm.ts";
 
-const topLevelTags = ["support", "concepts", "diagnostics", "utilities"];
+const topLevelTags = [
+    "support",
+    "concepts",
+    "diagnostics",
+    "utilities",
+    "strings",
+    "containers",
+    "iterators",
+    "ranges",
+    "algorithms",
+    "numerics",
+    "time",
+    "localization",
+    "input\\.output",
+    "re",
+    "atomics",
+    "thread",
+];
 
 class Section {
     tag: string;

@@ -93,9 +93,10 @@ lldiv_t lldiv(long long __num, long long __den);
 
 }  // namespace std
 
-#ifndef NULL
-#define NULL 0L
+#ifdef NULL
+#undef NULL
 #endif
+#define NULL nullptr
 
 #ifndef EXIT_SUCCESS
 #define EXIT_SUCCESS 0
