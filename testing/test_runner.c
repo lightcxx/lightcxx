@@ -62,6 +62,10 @@ const size_t STR_BUF_INITIAL_CAPACITY = 4096;
 const char PATH_SEP = '/';
 #define PATH_SEP_STR "/"
 
+// Tests are NOT allowed to expect to exit with code 7, so
+// this will always be a test fail.
+#define ALWAYS_ERROR_EXIT_CODE 7
+
 #define MAX_NEGATIVE_COMPILE_RUNS 999
 #define MAX_NEGATIVE_COMPILE_RUNS_STR "999"
 #define TEST_OUTPUT_FORMAT "------ BEGIN TEST OUTPUT ------\n%s\n------  END  TEST OUTPUT ------\n"
@@ -388,7 +392,7 @@ void subprocess_start(struct subprocess* result, struct cmd_line* cmd, enum subp
             if (exit_strategy == fail_exit_abort) {
                 abort();
             } else {
-                exit(exit_strategy == fail_exit_code_0 ? 0 : 1);
+                _Exit(exit_strategy == fail_exit_code_0 ? 0 : ALWAYS_ERROR_EXIT_CODE);
             }
         }
         close(stdout_pipe_fd[1]);  // close pipe write end after dup
@@ -398,7 +402,7 @@ void subprocess_start(struct subprocess* result, struct cmd_line* cmd, enum subp
             if (exit_strategy == fail_exit_abort) {
                 abort();
             } else {
-                exit(exit_strategy == fail_exit_code_0 ? 0 : 1);
+                _Exit(exit_strategy == fail_exit_code_0 ? 0 : ALWAYS_ERROR_EXIT_CODE);
             }
         }
         close(stderr_pipe_fd[1]);  // close pipe write end after dup
@@ -1080,17 +1084,17 @@ void test_run_print(struct test_run* test_run) {
     }
     printf("(%zu/%zu) %s", test_run->id, test_run->num_tests, test_run->test->test_name);
     if (test_run->test->requires_re_compile && test_run->step >= s_compiling) {
-        printf(" compiling...");
+        printf(" compiling..");
     }
     if (test_run->test->requires_re_link && test_run->step >= s_linking) {
-        printf(" linking...");
+        printf(" linking..");
     }
     if (test_run->step >= s_running) {
-        printf(" running...");
+        printf(" running..");
     }
     if (test_run->test->is_no_compile != '\0') {
         for (int i = 0; i < test_run->non_compile_index; i++) {
-            printf("#%d...", i);
+            printf("#%d.", i);
         }
     }
     if (test_run->step >= s_done) {
@@ -1197,6 +1201,14 @@ bool run_test(struct tests_db* tests, struct test_run* test_run) {
         expect_exit = "CODE = 0";
     } else {
         return test_fail(test_run, "%s\nInstead found: '// EXPECTED:EXIT %s'", expected_exit_wrong_error_msg, expect_exit);
+    }
+
+    if (expected_exit_code == ALWAYS_ERROR_EXIT_CODE) {
+        return test_fail(test_run,
+                         "Invalid EXPECTED:EXIT request: exit code %d is reserved"
+                         " for the test runner to detect errors before process start."
+                         " Pick a different exit code to expect.\n",
+                         ALWAYS_ERROR_EXIT_CODE);
     }
 
     char* argv[2];
