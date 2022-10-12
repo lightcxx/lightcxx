@@ -701,7 +701,7 @@ static bool parse_test_expectations(struct tests_db* tests,
                         test_path->data, ferror(test_source_file), strerror(ferror(test_source_file)));
         }
         cursor = cursor + strlen(cursor);
-        if (cursor == tests->scratch_space + tests->scratch_space_cap) {
+        if (cursor + 1 >= tests->scratch_space + tests->scratch_space_cap) {
             tests->scratch_space = realloc(tests->scratch_space, tests->scratch_space_cap * 2);
             cursor = tests->scratch_space + tests->scratch_space_cap;
             tests->scratch_space_cap *= 2;
