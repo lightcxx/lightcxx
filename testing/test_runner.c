@@ -903,7 +903,7 @@ static bool find_header_dep_with_lmt_gt(struct tests_db* tests, struct timespec 
                         dep_file_path, ferror(dep_file), strerror(ferror(dep_file)));
         }
         cursor = cursor + strlen(cursor);
-        if (cursor == tests->scratch_space + tests->scratch_space_cap - 1) {
+        if (cursor + 1 >= tests->scratch_space + tests->scratch_space_cap) {
             tests->scratch_space = realloc(tests->scratch_space, tests->scratch_space_cap * 2);
             cursor = tests->scratch_space + tests->scratch_space_cap - 1;
             tests->scratch_space_cap *= 2;
