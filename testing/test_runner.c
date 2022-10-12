@@ -51,7 +51,6 @@
 extern char* const* environ;
 
 static const int NUM_EXPECTATION_CLAUSES_SUPPORTED = 4;  // EXPECT:NO_COMPILE, EXPECT:STEPS, EXPECT:EXIT and REQUEST:SKIP
-static const size_t PATH_INITIAL_CAPACITY = 64;
 static const size_t TESTS_INITIAL_CAPACITY = 8;
 static const size_t STR_BUF_INITIAL_CAPACITY = 128;
 static const char PATH_SEP = '/';
@@ -65,6 +64,95 @@ static const char PATH_SEP = '/';
 #define MAX_NEGATIVE_COMPILE_RUNS_STR "999"
 #define TEST_OUTPUT_FORMAT "------ BEGIN TEST OUTPUT ------\n%s\n------  END  TEST OUTPUT ------\n"
 #define COMPILER_OUTPUT_FORMAT "------ BEGIN COMPILER OUTPUT ------\n%s\n------  END  COMPILER OUTPUT ------\n"
+
+static char cmd_line_base[]
+  = "" COMPILER "\0"
+    "-std=c++20\0"
+#if OPT_IS_DEBUG
+    "-g\0"
+#endif
+#if OPT_IS_RELEASE
+    "-O3\0"
+#endif
+  ;
+
+static char cmd_line_include[]
+  = "-nostdinc++\0"
+    "-I" SOURCE_DIR PATH_SEP_STR "include\0"
+    "-I" SOURCE_DIR PATH_SEP_STR "testing\0"
+#if __APPLE__
+    "-isysroot\0"
+    "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/\0"
+#endif
+  ;
+
+static char cmd_line_compile[]
+  = "-c\0"       // Emit object file
+    "-MMD\0"     // Emit dependencies file
+    "-Werror\0"  // Add warning flags for positive-compile tests.
+    "-Wall\0"
+    "-Wextra\0"
+    "-Wunused\0"
+    "-Wpedantic\0"
+    "-Wconversion\0"
+    "-Wsign-conversion\0"
+    "-Wsign-compare\0"
+    "-Wnull-dereference\0"
+    "-Wformat=2\0"
+    "-Wimplicit-fallthrough\0"
+    "-Wnon-virtual-dtor\0"
+    "-Wold-style-cast\0"
+    "-Wcast-align\0"
+    "-Woverloaded-virtual\0"
+#if COMPILER_IS_CLANG
+    "-Wno-unknown-warning-option\0"  // TODO: fix this flag.
+    "-Wno-deprecated-volatile\0"     // TODO: fix this flag.
+#endif
+#if COMPILER_IS_GCC
+    "-Wmisleading-indentation\0"
+    "-Wduplicated-cond\0"
+    "-Wduplicated-branches\0"
+    "-Wlogical-op\0"
+    "-Wno-unknown-pragmas\0"     // TODO: fix this flag.
+    "-Wno-attributes\0"          // TODO: fix this flag.
+    "-Wno-ignored-qualifiers\0"  // TODO: fix this flag.
+#endif
+    "-o\0"
+    "@path_to_obj_file@\0"
+    "-MF\0"
+    "@path_to_dep_file@\0"
+    "@path_to_source_file@\0";
+
+static char cmd_line_neg_compile[]
+  = "-fsyntax-only\0"
+    "-DNEGATIVE_COMPILE_ITERATION=" MAX_NEGATIVE_COMPILE_RUNS_STR "\0"
+    "@path_to_source_file@\0";
+
+static char cmd_line_link[]
+  =
+#if COMPILER_IS_GCC
+    "-nodefaultlibs\0"
+#else
+    "-nostdlib++\0"
+#endif
+    "@path_to_obj_file@\0"
+    "-o\0"
+    "@path_to_exe_file@\0"
+    "" LIB_DIR PATH_SEP_STR "liblightcxx_static.a\0"
+    "" LIB_DIR PATH_SEP_STR "libtesting.a\0"
+#if !__APPLE__ && COMPILER_IS_GCC
+    "-lgcc\0"
+    "-lgcc_eh\0"
+#endif
+#if !__APPLE__
+    "-lc\0"
+    "-lpthread\0"
+    "-ldl\0"
+#endif
+#if __APPLE__
+    "-L/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib\0"
+#endif
+  ;
 
 static bool flag_colors = true;
 static bool flag_interactive = true;
@@ -170,14 +258,10 @@ struct path {
     size_t capacity;
 };
 
-static void path_new(struct path* path, const char* from) {
-    path->capacity = PATH_INITIAL_CAPACITY;
+static void path_take_ownership(struct path* path, char* from) {
+    path->data = from;
     path->len = strlen(from);
-    while (path->len >= path->capacity) {
-        path->capacity *= 2;
-    }
-    path->data = malloc(path->capacity);
-    memcpy(path->data, from, path->len + 1);
+    path->capacity = path->len + 1;
 }
 
 static void path_append(struct path* path, const char* part) {
@@ -292,6 +376,11 @@ static void cmd_line_init(struct cmd_line* cmd_line, int num_sections, ...) {
     cmd_line->argv[cmd_line->argc] = NULL;
 }
 
+static void cmd_line_destroy(struct cmd_line* cmd_line) {
+    free(cmd_line->argv_buf);
+    free(cmd_line->argv);
+}
+
 static const char* cmd_line_to_str(struct cmd_line* cmd_line, char** buf, size_t* buf_capacity) {
     if (cmd_line->argc == 0) {
         **buf = '\0';
@@ -363,6 +452,10 @@ static void subprocess_init(struct subprocess* result) {
     result->output_buf_size = 0;
     result->output_buf_capacity = STR_BUF_INITIAL_CAPACITY;
     result->output_buf = malloc(result->output_buf_capacity);
+}
+
+static void subprocess_destroy(struct subprocess* result) {
+    free(result->output_buf);
 }
 
 enum subprocess_fail_exit {
@@ -527,6 +620,20 @@ struct test_run {
     struct cmd_line negative_compile_command;
 };
 
+static void test_run_init(struct test_run* test_run) {
+    cmd_line_init(&test_run->compile_command, 3, cmd_line_base, cmd_line_include, cmd_line_compile);
+    cmd_line_init(&test_run->negative_compile_command, 3, cmd_line_base, cmd_line_include, cmd_line_neg_compile);
+    cmd_line_init(&test_run->link_command, 2, cmd_line_base, cmd_line_link);
+    subprocess_init(&test_run->proc);
+}
+
+static void test_run_destroy(struct test_run* test_run) {
+    cmd_line_destroy(&test_run->compile_command);
+    cmd_line_destroy(&test_run->negative_compile_command);
+    cmd_line_destroy(&test_run->link_command);
+    subprocess_destroy(&test_run->proc);
+}
+
 struct tests_db {
     // Tests
     struct test* tests;
@@ -555,6 +662,16 @@ static void tests_db_init(struct tests_db* tests) {
     tests->num_mis_configured_tests = 0;
     tests->num_tests_to_compile = 0;
     tests->num_tests_to_link = 0;
+    test_run_init(&tests->test_run);
+}
+
+static void tests_db_destroy(struct tests_db* tests) {
+    test_run_destroy(&tests->test_run);
+    for (size_t i = 0; i < tests->num_tests; i++) {
+        free(tests->tests[i].file_path);
+    }
+    free(tests->tests);
+    free(tests->scratch_space);
 }
 
 struct string_view {
@@ -845,6 +962,7 @@ static void tests_db_scan_dir(struct tests_db* tests, struct path* test_path, st
                 path_pop(test_path);
             }
         }
+        closedir(dir);
     } else if (test_path->len > 4 && memcmp(test_path->data + test_path->len - 4, ".cpp", 4) == 0) {
         tests_db_add_test(tests, test_path, lmt, build_cache_dir_path);
     }
@@ -867,11 +985,14 @@ static void tests_db_scan(struct tests_db* tests, const char* test_dir, const ch
 
     struct path build_cache_dir_path;
     char* realpath_build_cache_dir = realpath(build_cache_dir, NULL);
-    path_new(&build_cache_dir_path, realpath_build_cache_dir);
+    path_take_ownership(&build_cache_dir_path, realpath_build_cache_dir);
     path_append(&build_cache_dir_path, PATH_SEP_STR);  // Ensure this ends in a PATH_SEP
 
     struct path test_path;
-    path_new(&test_path, test_dir);
+    // Take absolute path of the test directory. This is required to maintain the integrity of the cache.
+    char* realpath_test_dir = realpath(test_dir, NULL);
+    path_take_ownership(&test_path, realpath_test_dir);
+
     tests_db_scan_dir(tests, &test_path, &build_cache_dir_path);
 
     free(build_cache_dir_path.data);
@@ -986,103 +1107,8 @@ static bool check_test_requires_re_link(struct test* test, struct timespec libs_
     return !exe_exists || timespec_before(exe_lmt, libs_lmt) || timespec_before(exe_lmt, test->obj_file_lmt);
 }
 
-static char cmd_line_base[]
-  = "" COMPILER "\0"
-    "-std=c++20\0"
-#if OPT_IS_DEBUG
-    "-g\0"
-#endif
-#if OPT_IS_RELEASE
-    "-O3\0"
-#endif
-  ;
-
-static char cmd_line_include[]
-  = "-nostdinc++\0"
-    "-I" SOURCE_DIR PATH_SEP_STR "include\0"
-    "-I" SOURCE_DIR PATH_SEP_STR "testing\0"
-#if __APPLE__
-    "-isysroot\0"
-    "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/\0"
-#endif
-  ;
-
-static char cmd_line_compile[]
-  = "-c\0"       // Emit object file
-    "-MMD\0"     // Emit dependencies file
-    "-Werror\0"  // Add warning flags for positive-compile tests.
-    "-Wall\0"
-    "-Wextra\0"
-    "-Wunused\0"
-    "-Wpedantic\0"
-    "-Wconversion\0"
-    "-Wsign-conversion\0"
-    "-Wsign-compare\0"
-    "-Wnull-dereference\0"
-    "-Wformat=2\0"
-    "-Wimplicit-fallthrough\0"
-    "-Wnon-virtual-dtor\0"
-    "-Wold-style-cast\0"
-    "-Wcast-align\0"
-    "-Woverloaded-virtual\0"
-#if COMPILER_IS_CLANG
-    "-Wno-unknown-warning-option\0"  // TODO: fix this flag.
-    "-Wno-deprecated-volatile\0"     // TODO: fix this flag.
-#endif
-#if COMPILER_IS_GCC
-    "-Wmisleading-indentation\0"
-    "-Wduplicated-cond\0"
-    "-Wduplicated-branches\0"
-    "-Wlogical-op\0"
-    "-Wno-unknown-pragmas\0"     // TODO: fix this flag.
-    "-Wno-attributes\0"          // TODO: fix this flag.
-    "-Wno-ignored-qualifiers\0"  // TODO: fix this flag.
-#endif
-    "-o\0"
-    "@path_to_obj_file@\0"
-    "-MF\0"
-    "@path_to_dep_file@\0"
-    "@path_to_source_file@\0";
-
-static char cmd_line_neg_compile[]
-  = "-fsyntax-only\0"
-    "-DNEGATIVE_COMPILE_ITERATION=" MAX_NEGATIVE_COMPILE_RUNS_STR "\0"
-    "@path_to_source_file@\0";
-
-static char cmd_line_link[]
-  =
-#if COMPILER_IS_GCC
-    "-nodefaultlibs\0"
-#else
-    "-nostdlib++\0"
-#endif
-    "@path_to_obj_file@\0"
-    "-o\0"
-    "@path_to_exe_file@\0"
-    "" LIB_DIR PATH_SEP_STR "liblightcxx_static.a\0"
-    "" LIB_DIR PATH_SEP_STR "libtesting.a\0"
-#if !__APPLE__ && COMPILER_IS_GCC
-    "-lgcc\0"
-    "-lgcc_eh\0"
-#endif
-#if !__APPLE__
-    "-lc\0"
-    "-lpthread\0"
-    "-ldl\0"
-#endif
-#if __APPLE__
-    "-L/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib\0"
-#endif
-  ;
-
 static void tests_db_prepare(struct tests_db* db) {
     chronometer_t test_run_prepare_timer = chronometer_start();
-
-    cmd_line_init(&db->test_run.compile_command, 3, cmd_line_base, cmd_line_include, cmd_line_compile);
-    cmd_line_init(&db->test_run.negative_compile_command, 3, cmd_line_base, cmd_line_include, cmd_line_neg_compile);
-    cmd_line_init(&db->test_run.link_command, 2, cmd_line_base, cmd_line_link);
-    subprocess_init(&db->test_run.proc);
-
     struct timespec libs_lmt;
     libs_lmt.tv_sec = 0;
     libs_lmt.tv_nsec = 0;
@@ -1342,6 +1368,9 @@ static bool run_negative_compile_test(struct tests_db* tests, struct test_run* t
         subprocess_poll(&test_run->proc, true);
 
         if (WIFSIGNALED(test_run->proc.exit_status)) {
+            if (has_msg_pattern) {
+                regfree(&msg_pattern);
+            }
             return test_fail(test_run,
                              "Compiler killed by signal %d.\n"
                              "Compiler command: %s\n" COMPILER_OUTPUT_FORMAT,
@@ -1350,6 +1379,9 @@ static bool run_negative_compile_test(struct tests_db* tests, struct test_run* t
                              test_run->proc.output_buf);
         }
         if (WEXITSTATUS(test_run->proc.exit_status) == 0) {
+            if (has_msg_pattern) {
+                regfree(&msg_pattern);
+            }
             return test_fail(test_run,
                              "Compiler exited with code 0.\n"
                              "Compiler command: %s\n" COMPILER_OUTPUT_FORMAT,
@@ -1360,6 +1392,7 @@ static bool run_negative_compile_test(struct tests_db* tests, struct test_run* t
         if (has_msg_pattern) {
             int regexec_status = regexec(&msg_pattern, test_run->proc.output_buf, 0, NULL, 0);
             if (regexec_status == REG_NOMATCH) {
+                regfree(&msg_pattern);
                 return test_fail(test_run,
                                  "Pattern '%s' not found in compiler output.\n"
                                  "Compiler command: %s\n" COMPILER_OUTPUT_FORMAT,
@@ -1368,6 +1401,9 @@ static bool run_negative_compile_test(struct tests_db* tests, struct test_run* t
                                  test_run->proc.output_buf);
             }
         }
+    }
+    if (has_msg_pattern) {
+        regfree(&msg_pattern);
     }
     return true;
 }
@@ -1428,9 +1464,7 @@ int main(int argc, char** argv) {
     if (argc == 2) {
         test_dir = argv[1];
     }
-    // Take absolute path of the test directory. This is required to maintain the integrity of the cache.
-    char* realpath_test_dir = realpath(test_dir, NULL);
-    printf("Testing %s\n\n", realpath_test_dir);
+    printf("Testing %s\n\n", test_dir);
 
     struct tests_db tests;
     tests_db_scan(&tests, test_dir, cache_dir);
@@ -1461,10 +1495,14 @@ int main(int argc, char** argv) {
                color_reset());
     }
 
+    const int exit_code = (tests.num_mis_configured_tests == 0 && tests.num_tests > 0 && num_tests_succeeded == tests.num_tests)
+                            ? EXIT_SUCCESS
+                            : EXIT_FAILURE;
+
+    tests_db_destroy(&tests);
+
     double entire_duration_ms = chronometer_ms_elapsed(entire_duration_start);
     printf("Testing done in %s%.3lf%s seconds.\n", color_success_begin(), entire_duration_ms * 1e-3, color_reset());
 
-    return (tests.num_mis_configured_tests == 0 && tests.num_tests > 0 && num_tests_succeeded == tests.num_tests)
-             ? EXIT_SUCCESS
-             : EXIT_FAILURE;
+    return exit_code;
 }
