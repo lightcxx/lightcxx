@@ -71,33 +71,6 @@ static bool flag_interactive = true;
 static bool flag_die_on_fail = false;
 static bool flag_print_on_success = false;
 
-static size_t peak_memory_allocated = 0;
-static size_t current_memory_allocated = 0;
-static void* malloc_traced(size_t size) {
-    current_memory_allocated += (size > 16 ? size : 16);
-    if (current_memory_allocated > peak_memory_allocated) {
-        peak_memory_allocated = current_memory_allocated;
-    }
-    return malloc(size);
-}
-static void* realloc_traced(void* from, size_t prev, size_t next) {
-    current_memory_allocated -= (prev > 16 ? prev : 16);
-    current_memory_allocated += (next > 16 ? next : 16);
-    if (current_memory_allocated > peak_memory_allocated) {
-        peak_memory_allocated = current_memory_allocated;
-    }
-    return realloc(from, next);
-}
-static void free_traced(void* ptr, size_t size) {
-    current_memory_allocated -= (size > 16 ? size : 16);
-    free(ptr);
-}
-
-#define malloc "THIS FUNCTION IS NOT ALLOWED. USE malloc_traced INSTEAD."
-#define calloc "THIS FUNCTION IS NOT ALLOWED. USE malloc_traced INSTEAD."
-#define realloc "THIS FUNCTION IS NOT ALLOWED. USE relloc_traced INSTEAD."
-#define free "THIS FUNCTION IS NOT ALLOWED. USE free_traced INSTEAD."
-
 static const char* color_error_begin(void) {
     if (!flag_colors) {
         return "";
@@ -121,14 +94,6 @@ static const char* color_reset(void) {
         return "";
     }
     return "\033[0m";
-}
-
-static __attribute__((format(printf, 1, 2))) void print_warning(const char* fmt, ...) {
-    printf("\n%sWarning%s: ", color_warning_begin(), color_reset());
-    va_list args;
-    va_start(args, fmt);
-    vprintf(fmt, args);
-    va_end(args);
 }
 
 static __attribute__((format(printf, 1, 2))) void print_todo(const char* fmt, ...) {
@@ -211,7 +176,7 @@ static void path_new(struct path* path, const char* from) {
     while (path->len >= path->capacity) {
         path->capacity *= 2;
     }
-    path->data = malloc_traced(path->capacity);
+    path->data = malloc(path->capacity);
     memcpy(path->data, from, path->len + 1);
 }
 
@@ -223,14 +188,10 @@ static void path_append(struct path* path, const char* part) {
     }
     const size_t part_len = strlen(part);
     if (path->len + part_len >= path->capacity) {
-        print_warning("path resized! capacity=%zu, required=%zu.\n"
-                      "  Double up PATH_INITIAL_CAPACITY in test_runner.c.\n",
-                      path->capacity, path->len + part_len + 1);
-        const size_t prev = path->capacity;
         while (path->len + part_len >= path->capacity) {
             path->capacity *= 2;
         }
-        path->data = realloc_traced(path->data, prev, path->capacity);
+        path->data = realloc(path->data, path->capacity);
     }
     memcpy(path->data + path->len, part, part_len + 1);
     path->len += part_len;
@@ -313,8 +274,8 @@ static void cmd_line_init(struct cmd_line* cmd_line, int num_sections, ...) {
     va_end(sections);
 
     cmd_line->argc = 0;
-    cmd_line->argv = malloc_traced(sizeof(char*) * (size_t)(num_args + 1));
-    cmd_line->argv_buf = malloc_traced(sizeof(char) * argv_buf_size);
+    cmd_line->argv = malloc(sizeof(char*) * (size_t)(num_args + 1));
+    cmd_line->argv_buf = malloc(sizeof(char) * argv_buf_size);
     cmd_line->argv_buf_size = 0;
     va_start(sections, num_sections);
     for (int section_id = 0; section_id < num_sections; section_id++) {
@@ -353,11 +314,10 @@ static const char* cmd_line_to_str(struct cmd_line* cmd_line, char** buf, size_t
         }
     }
     if (*buf_capacity <= size) {
-        size_t initial = *buf_capacity;
         while (*buf_capacity <= size) {
             *buf_capacity *= 2;
         }
-        *buf = realloc_traced(*buf, initial, *buf_capacity);
+        *buf = realloc(*buf, *buf_capacity);
     }
     memcpy(*buf, cmd_line->argv[0], argv0_size);
     size = argv0_size;
@@ -402,7 +362,7 @@ static void subprocess_init(struct subprocess* result) {
     result->exit_status = 0;
     result->output_buf_size = 0;
     result->output_buf_capacity = STR_BUF_INITIAL_CAPACITY;
-    result->output_buf = malloc_traced(result->output_buf_capacity);
+    result->output_buf = malloc(result->output_buf_capacity);
 }
 
 enum subprocess_fail_exit {
@@ -491,11 +451,10 @@ static void subprocess_poll_output(struct subprocess* result, int fd, bool to_eo
             break;
         }
         if (result->output_buf_size + (size_t)num_bytes >= result->output_buf_capacity) {
-            size_t prev = result->output_buf_capacity;
             while (result->output_buf_size + (size_t)num_bytes >= result->output_buf_capacity) {
                 result->output_buf_capacity *= 2;
             }
-            result->output_buf = realloc_traced(result->output_buf, prev, result->output_buf_capacity);
+            result->output_buf = realloc(result->output_buf, result->output_buf_capacity);
         }
         memcpy(result->output_buf + result->output_buf_size, result->pipe_buf, (size_t)num_bytes);
         result->output_buf_size += (size_t)num_bytes;
@@ -590,9 +549,9 @@ struct tests_db {
 static void tests_db_init(struct tests_db* tests) {
     tests->num_tests = 0;
     tests->capacity = TESTS_INITIAL_CAPACITY;
-    tests->tests = malloc_traced(sizeof(struct test) * tests->capacity);
+    tests->tests = malloc(sizeof(struct test) * tests->capacity);
     tests->scratch_space_cap = STR_BUF_INITIAL_CAPACITY;
-    tests->scratch_space = malloc_traced(tests->scratch_space_cap);
+    tests->scratch_space = malloc(tests->scratch_space_cap);
     tests->num_mis_configured_tests = 0;
     tests->num_tests_to_compile = 0;
     tests->num_tests_to_link = 0;
@@ -743,11 +702,7 @@ static bool parse_test_expectations(struct tests_db* tests,
         }
         cursor = cursor + strlen(cursor);
         if (cursor == tests->scratch_space + tests->scratch_space_cap) {
-            print_warning("reading expectations from test file %s: expectations too large!\n"
-                          "  Split or fix this test so the first %d lines add up to less than %zu bytes,\n"
-                          "  or increase STR_BUF_INITIAL_CAPACITY in test_runner.c.\n",
-                          test_path->data, NUM_EXPECTATION_CLAUSES_SUPPORTED, (size_t)STR_BUF_INITIAL_CAPACITY);
-            tests->scratch_space = realloc_traced(tests->scratch_space, tests->scratch_space_cap, tests->scratch_space_cap * 2);
+            tests->scratch_space = realloc(tests->scratch_space, tests->scratch_space_cap * 2);
             cursor = tests->scratch_space + tests->scratch_space_cap;
             tests->scratch_space_cap *= 2;
             continue;  // Didn't finish reading the line, skip incrementing loop counter.
@@ -791,12 +746,8 @@ static void tests_db_add_test(struct tests_db* tests, struct path* test_path, st
     }
 
     if (tests->num_tests == tests->capacity) {
-        print_warning("tests db resized! capacity=%zu, required=%zu.\n"
-                      "Double up TESTS_INITIAL_CAPACITY in test_runner.c.\n",
-                      tests->capacity, tests->capacity + 1);
-        const size_t prev = sizeof(struct test) * tests->capacity;
         tests->capacity *= 2;
-        tests->tests = realloc_traced(tests->tests, prev, sizeof(struct test) * tests->capacity);
+        tests->tests = realloc(tests->tests, sizeof(struct test) * tests->capacity);
     }
     struct test* test = tests->tests + tests->num_tests;
     tests->num_tests++;
@@ -809,13 +760,13 @@ static void tests_db_add_test(struct tests_db* tests, struct path* test_path, st
 
     test->source_file_lmt = lmt;
     // Total memory required is sum of all of the above, plus null terminators.
-    test->file_path = malloc_traced(file_path_len + 1
-                                    + test_name_len + 1
-                                    + dep_file_path_len + 1
-                                    + obj_file_path_len + 1
-                                    + exe_file_path_len + 1
-                                    + sv_len(expect_steps) + 1
-                                    + sv_len(expect_no_compile) + 1);
+    test->file_path = malloc(file_path_len + 1
+                             + test_name_len + 1
+                             + dep_file_path_len + 1
+                             + obj_file_path_len + 1
+                             + exe_file_path_len + 1
+                             + sv_len(expect_steps) + 1
+                             + sv_len(expect_no_compile) + 1);
     memcpy(test->file_path, test_path->data, test_path->len + 1);  // Include the null terminator.
 
     test->test_name = test->file_path + test_path->len + 1;
@@ -923,8 +874,8 @@ static void tests_db_scan(struct tests_db* tests, const char* test_dir, const ch
     path_new(&test_path, test_dir);
     tests_db_scan_dir(tests, &test_path, &build_cache_dir_path);
 
-    free_traced(build_cache_dir_path.data, build_cache_dir_path.capacity);
-    free_traced(test_path.data, test_path.capacity);
+    free(build_cache_dir_path.data);
+    free(test_path.data);
 
     double duration_millis = chronometer_ms_elapsed(timer);
     printf("\nFound %zu test files in %.3lfms\n", tests->num_tests, duration_millis);
@@ -953,10 +904,7 @@ static bool find_header_dep_with_lmt_gt(struct tests_db* tests, struct timespec 
         }
         cursor = cursor + strlen(cursor);
         if (cursor == tests->scratch_space + tests->scratch_space_cap - 1) {
-            print_warning("reading dependencies from file %s: line too long!\n"
-                          "  increase STR_BUF_INITIAL_CAPACITY in test_runner.c.\n",
-                          dep_file_path);
-            tests->scratch_space = realloc_traced(tests->scratch_space, tests->scratch_space_cap, tests->scratch_space_cap * 2);
+            tests->scratch_space = realloc(tests->scratch_space, tests->scratch_space_cap * 2);
             cursor = tests->scratch_space + tests->scratch_space_cap - 1;
             tests->scratch_space_cap *= 2;
             continue;  // Didn't finish reading the line, continue reading.
@@ -1330,14 +1278,14 @@ static bool run_test(struct tests_db* tests, struct test_run* test_run) {
         }
         if (output_steps_size > 0) {
             if (output_steps_size + 1 >= tests->scratch_space_cap) {
-                tests->scratch_space = realloc_traced(tests->scratch_space, tests->scratch_space_cap, tests->scratch_space_cap * 2);
+                tests->scratch_space = realloc(tests->scratch_space, tests->scratch_space_cap * 2);
                 tests->scratch_space_cap *= 2;
             }
             output_steps[output_steps_size++] = ',';
         }
         size_t step_size = (size_t)(step_end - (next + 6));
         while (output_steps_size + step_size >= tests->scratch_space_cap) {
-            test_run->test->file_path = realloc_traced(tests->scratch_space, tests->scratch_space_cap, tests->scratch_space_cap * 2);
+            test_run->test->file_path = realloc(tests->scratch_space, tests->scratch_space_cap * 2);
             tests->scratch_space_cap *= 2;
         }
         memcpy(output_steps + output_steps_size, next + 6, step_size);
@@ -1512,6 +1460,7 @@ int main(int argc, char** argv) {
                color_reset());
     }
 
-    printf("Test runner peak malloc size: %.2lfkB\n", (double)peak_memory_allocated / 1024);
-    return (tests.num_mis_configured_tests == 0 && num_tests_succeeded == tests.num_tests) ? EXIT_SUCCESS : EXIT_FAILURE;
+    return (tests.num_mis_configured_tests == 0 && num_tests_succeeded == tests.num_tests)
+             ? EXIT_SUCCESS
+             : EXIT_FAILURE;
 }
