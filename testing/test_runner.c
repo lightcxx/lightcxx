@@ -440,7 +440,6 @@ struct subprocess {
     char* output_buf;
     size_t output_buf_size;
     size_t output_buf_capacity;
-    char pipe_buf[4096];
 };
 
 static void subprocess_init(struct subprocess* result) {
@@ -529,8 +528,16 @@ static void subprocess_start(struct subprocess* result, struct cmd_line* cmd, en
 
 static void subprocess_poll_output(struct subprocess* result, int fd, bool to_eof) {
     while (1) {
+        size_t remaining_cap = result->output_buf_capacity - result->output_buf_size;
+        if (remaining_cap < 512) {
+            while (remaining_cap < 512) {
+                result->output_buf_capacity *= 2;
+                remaining_cap = result->output_buf_capacity - result->output_buf_size;
+            }
+            result->output_buf = realloc(result->output_buf, result->output_buf_capacity);
+        }
         errno = 0;
-        ssize_t num_bytes = read(fd, result->pipe_buf, 4096);
+        ssize_t num_bytes = read(fd, result->output_buf + result->output_buf_size, remaining_cap);
         if (num_bytes < 0) {
             if (errno == EAGAIN) {
                 if (to_eof) {
@@ -543,13 +550,6 @@ static void subprocess_poll_output(struct subprocess* result, int fd, bool to_eo
         if (num_bytes == 0) {
             break;
         }
-        if (result->output_buf_size + (size_t)num_bytes >= result->output_buf_capacity) {
-            while (result->output_buf_size + (size_t)num_bytes >= result->output_buf_capacity) {
-                result->output_buf_capacity *= 2;
-            }
-            result->output_buf = realloc(result->output_buf, result->output_buf_capacity);
-        }
-        memcpy(result->output_buf + result->output_buf_size, result->pipe_buf, (size_t)num_bytes);
         result->output_buf_size += (size_t)num_bytes;
     }
 }
@@ -558,8 +558,17 @@ static bool subprocess_poll(struct subprocess* result, bool blocking) {
     if (result->is_done) {
         return true;
     }
-    pid_t status = waitpid(result->pid, &result->exit_status, blocking ? 0 : (WNOHANG));
-    if (status < 0) {
+    pid_t status;
+    while (1) {
+        errno = 0;
+        status = waitpid(result->pid, &result->exit_status, blocking ? 0 : (WNOHANG));
+        if (status >= 0) {
+            break;
+        }
+        if (errno == EINTR) {
+            sleep(1);  // This is probably a debugger.
+            continue;
+        }
         fatal_error("waitpid failed: errno=%d message=%s\n", errno, strerror(errno));
     }
     if (status == 0) {
@@ -589,12 +598,13 @@ struct test {
     char* obj_file_path;  // <build_cache_dir><section>.<test_file_stem>.o   (<build_cache_dir> must end in PATH_SEP)  // TODO: Maybe don't store, copy on-demand.
     char* exe_file_path;  // <build_cache_dir><section>.<test_file_stem>     (<build_cache_dir> must end in PATH_SEP)
     char* expect_steps;
-    char* expect_no_compile;
     int expect_exit_code;
     int expect_exit_signal;
+    int expect_no_compile_num_runs;
+    bool expect_no_compile_has_pattern;
+    regex_t expect_no_compile_pattern;
 
     struct timespec obj_file_lmt;
-    bool is_no_compile;
     bool requires_re_compile;
     bool requires_re_link;
 };
@@ -669,6 +679,9 @@ static void tests_db_destroy(struct tests_db* tests) {
     test_run_destroy(&tests->test_run);
     for (size_t i = 0; i < tests->num_tests; i++) {
         free(tests->tests[i].file_path);
+        if (tests->tests[i].expect_no_compile_has_pattern) {
+            regfree(&tests->tests[i].expect_no_compile_pattern);
+        }
     }
     free(tests->tests);
     free(tests->scratch_space);
@@ -716,6 +729,13 @@ static bool parse_exit_expectation(const char* test_path, struct string_view exp
                                                       "\t// EXPECTED:EXIT CODE = n\n"
                                                       "\t// EXPECTED:EXIT KILLED BY SIGNAL n\n"
                                                       "\t// EXPECTED:EXIT KILLED BY SIGNAL SIGABRT\n";
+
+    *exit_code = 0;
+    *exit_signal = 0;
+    if (expect_exit.start == NULL) {
+        return true;
+    }
+
     if (sv_len(expect_exit) > 7 && strncmp(expect_exit.start, "CODE = ", 7) == 0) {
         const char* cursor = expect_exit.start + 7;
         while (cursor != expect_exit.end) {
@@ -773,6 +793,55 @@ static bool parse_exit_expectation(const char* test_path, struct string_view exp
     return true;
 }
 
+static bool parse_no_compile_expectation(const char* test_path, struct string_view expect_no_compile, int* num_runs, bool* has_pattern, regex_t* pattern) {
+    *num_runs = 0;
+    *has_pattern = false;
+    if (expect_no_compile.start == NULL) {
+        return true;
+    }
+
+    const char* raw_pattern = "";
+    *num_runs = atoi(expect_no_compile.start);
+    if (*num_runs < 0 || *num_runs > MAX_NEGATIVE_COMPILE_RUNS) {
+        printf("%sMis-configured test%s %s\n"
+               "\tInvalid EXPECT:NO_COMPILE request: number of runs must be 1 to %d, got %d.\n\n",
+               color_error_begin(), color_reset(), test_path,
+               MAX_NEGATIVE_COMPILE_RUNS, *num_runs);
+        return false;
+    }
+    if (*num_runs == 0) {
+        *num_runs = 1;
+        size_t pattern_len = sv_len(expect_no_compile);
+        if (pattern_len < 2 || expect_no_compile.start[0] != '"' || expect_no_compile.end[-1] != '"') {
+            printf("%sMis-configured test%s %s\n"
+                   "\tInvalid EXPECT:NO_COMPILE request: must be either number of runs, or pattern enclosed in '\"'.\n"
+                   "\tInstead got: // EXPECT:NO_COMPILE %.*s\n\n",
+                   color_error_begin(), color_reset(), test_path,
+                   (int)sv_len(expect_no_compile), expect_no_compile.start);
+            return false;
+        }
+        // This is "safe", because it points into the scratch space. Once the regex_t pattern is constructed,
+        // this data is no longer used.
+        // TODO: This should still be refactored.
+        ((char*)expect_no_compile.end)[-1] = '\0';
+        raw_pattern = expect_no_compile.start + 1;
+    }
+    *has_pattern = (raw_pattern[0] != '\0') && (raw_pattern[0] != '.' || raw_pattern[1] != '*' || raw_pattern[2] != '\0');
+    if (*has_pattern) {
+        int regcomp_status = regcomp(pattern, raw_pattern, REG_EXTENDED | REG_NOSUB);
+        if (regcomp_status != 0) {
+            char regerror_msg[256];
+            regerror(regcomp_status, pattern, regerror_msg, 256);
+            printf("%sMis-configured test%s %s\n"
+                   "\tInvalid EXPECT:NO_COMPILE request: failed to compile pattern '%s': %s\n\n",
+                   color_error_begin(), color_reset(), test_path,
+                   raw_pattern, regerror_msg);
+            return false;
+        }
+    }
+    return true;
+}
+
 // Parse the test source file to discover expectations.
 // Results are pointing inside tests_db->test_expectations_buf.
 static bool parse_test_expectations(struct tests_db* tests,
@@ -783,7 +852,9 @@ static bool parse_test_expectations(struct tests_db* tests,
                                     struct string_view* expect_steps,
                                     int* expect_exit_code,
                                     int* expect_exit_signal,
-                                    struct string_view* expect_no_compile) {
+                                    int* expect_no_compile_num_runs,
+                                    bool* expect_no_compile_has_pattern,
+                                    regex_t* expect_no_compile_pattern) {
     // Parse the test path to discover section and test name stem.
     test_file_stem->end = test_path->data + test_path->len - 4;
     section->end = test_file_stem->end;
@@ -841,12 +912,17 @@ static bool parse_test_expectations(struct tests_db* tests,
 
     struct string_view expect_exit;
     parse_test_single_expectation(tests->scratch_space, "// EXPECT:EXIT", &expect_exit);
-    if (expect_exit.start != NULL && !parse_exit_expectation(test_path->data, expect_exit, expect_exit_code, expect_exit_signal)) {
+    if (!parse_exit_expectation(test_path->data, expect_exit, expect_exit_code, expect_exit_signal)) {
         tests->num_mis_configured_tests += 1;
         return false;
     }
 
-    parse_test_single_expectation(tests->scratch_space, "// EXPECT:NO_COMPILE", expect_no_compile);
+    struct string_view expect_no_compile;
+    parse_test_single_expectation(tests->scratch_space, "// EXPECT:NO_COMPILE", &expect_no_compile);
+    if (!parse_no_compile_expectation(test_path->data, expect_no_compile, expect_no_compile_num_runs, expect_no_compile_has_pattern, expect_no_compile_pattern)) {
+        tests->num_mis_configured_tests += 1;
+        return false;
+    }
     return true;
 }
 
@@ -855,10 +931,22 @@ static void tests_db_add_test(struct tests_db* tests, struct path* test_path, st
     struct string_view test_file_stem;
     struct string_view reason_skip;
     struct string_view expect_steps;
-    int expect_exit_code = 0;
-    int expect_exit_signal = 0;
-    struct string_view expect_no_compile;
-    if (!parse_test_expectations(tests, test_path, &section, &test_file_stem, &reason_skip, &expect_steps, &expect_exit_code, &expect_exit_signal, &expect_no_compile)) {
+    int expect_exit_code;
+    int expect_exit_signal;
+    int expect_no_compile_num_runs;
+    bool expect_no_compile_has_pattern;
+    regex_t expect_no_compile_pattern;
+    if (!parse_test_expectations(tests,
+                                 test_path,
+                                 &section,
+                                 &test_file_stem,
+                                 &reason_skip,
+                                 &expect_steps,
+                                 &expect_exit_code,
+                                 &expect_exit_signal,
+                                 &expect_no_compile_num_runs,
+                                 &expect_no_compile_has_pattern,
+                                 &expect_no_compile_pattern)) {
         return;
     }
 
@@ -882,8 +970,7 @@ static void tests_db_add_test(struct tests_db* tests, struct path* test_path, st
                              + dep_file_path_len + 1
                              + obj_file_path_len + 1
                              + exe_file_path_len + 1
-                             + sv_len(expect_steps) + 1
-                             + sv_len(expect_no_compile) + 1);
+                             + sv_len(expect_steps) + 1);
     memcpy(test->file_path, test_path->data, test_path->len + 1);  // Include the null terminator.
 
     test->test_name = test->file_path + test_path->len + 1;
@@ -925,11 +1012,9 @@ static void tests_db_add_test(struct tests_db* tests, struct path* test_path, st
     }
     test->expect_steps[sv_len(expect_steps)] = '\0';
 
-    test->expect_no_compile = test->expect_steps + sv_len(expect_steps) + 1;
-    if (sv_len(expect_no_compile)) {
-        memcpy(test->expect_no_compile, expect_no_compile.start, sv_len(expect_no_compile));
-    }
-    test->expect_no_compile[sv_len(expect_no_compile)] = '\0';
+    test->expect_no_compile_num_runs = expect_no_compile_num_runs;
+    test->expect_no_compile_has_pattern = expect_no_compile_has_pattern;
+    test->expect_no_compile_pattern = expect_no_compile_pattern;
 
     test->expect_exit_code = expect_exit_code;
     test->expect_exit_signal = expect_exit_signal;
@@ -1061,7 +1146,7 @@ static bool find_header_dep_with_lmt_gt(struct tests_db* tests, struct timespec 
 }
 
 static bool check_test_requires_re_compile(struct tests_db* tests, struct test* test) {
-    if (test->is_no_compile) {
+    if (test->expect_no_compile_num_runs > 0) {
         // A negative compile test is never compiled (running the test involves doing the compilation).
         return false;
     }
@@ -1089,7 +1174,7 @@ static bool check_test_requires_re_compile(struct tests_db* tests, struct test* 
 }
 
 static bool check_test_requires_re_link(struct test* test, struct timespec libs_lmt) {
-    if (test->is_no_compile) {
+    if (test->expect_no_compile_num_runs > 0) {
         // A negative compile test is never linked (running the test involves doing the compilation).
         return false;
     }
@@ -1135,8 +1220,6 @@ static void tests_db_prepare(struct tests_db* db) {
     db->num_tests_to_compile = 0;
     db->num_tests_to_link = 0;
     for (size_t i = 0; i < db->num_tests; i++) {
-        db->tests[i].is_no_compile = (*db->tests[i].expect_no_compile != '\0');
-
         db->tests[i].requires_re_compile = check_test_requires_re_compile(db, db->tests + i);
         db->num_tests_to_compile += db->tests[i].requires_re_compile;
 
@@ -1177,7 +1260,7 @@ static void test_run_print(struct test_run* test_run) {
     if (test_run->step >= s_running) {
         printf(" running...");
     }
-    if (test_run->test->is_no_compile != '\0') {
+    if (test_run->test->expect_no_compile_num_runs > 0) {
         for (int i = 0; i < test_run->non_compile_index; i++) {
             printf("#%d..", i);
         }
@@ -1215,7 +1298,7 @@ static void test_run_set_test(struct tests_db* tests, struct test_run* test_run,
     test_run->step = s_starting;
     test_run->non_compile_index = 0;
 
-    // Last 4 arguments of compile command are -o obj_file -MF dep_file source_file
+    // Last arguments of compile command are -o obj_file -MF dep_file source_file
     test_run->compile_command.argv[test_run->compile_command.argc - 4] = test_run->test->obj_file_path;
     test_run->compile_command.argv[test_run->compile_command.argc - 2] = test_run->test->dep_file_path;
     test_run->compile_command.argv[test_run->compile_command.argc - 1] = test_run->test->file_path;
@@ -1336,31 +1419,8 @@ static bool run_test(struct tests_db* tests, struct test_run* test_run) {
 }
 
 static bool run_negative_compile_test(struct tests_db* tests, struct test_run* test_run) {
-    const char* pattern = "";
-    int num_runs = atoi(test_run->test->expect_no_compile);
-    if (num_runs == 0) {
-        num_runs = 1;
-        size_t pattern_len = strlen(test_run->test->expect_no_compile);
-        if (pattern_len < 2 || test_run->test->expect_no_compile[0] != '"' || test_run->test->expect_no_compile[pattern_len - 1] != '"') {
-            return test_fail(test_run, "Invalid non-compile expectation: %s\n", test_run->test->expect_no_compile);
-        }
-        test_run->test->expect_no_compile[pattern_len - 1] = '\0';
-        pattern = test_run->test->expect_no_compile + 1;
-    } else if (num_runs < 1 || num_runs > MAX_NEGATIVE_COMPILE_RUNS) {
-        return test_fail(test_run, "Invalid non-compile test num runs: %d. Supported 1 to %d\n", num_runs, MAX_NEGATIVE_COMPILE_RUNS);
-    }
-    bool has_msg_pattern = (pattern[0] != '\0') && (pattern[0] != '.' || pattern[1] != '*' || pattern[2] != '\0');
-    regex_t msg_pattern;
-    if (has_msg_pattern) {
-        int regcomp_status = regcomp(&msg_pattern, pattern, REG_EXTENDED | REG_NOSUB);
-        if (regcomp_status != 0) {
-            char regerror_msg[256];
-            regerror(regcomp_status, &msg_pattern, regerror_msg, 256);
-            return test_fail(test_run, "Invalid message pattern '%s': %s\n", pattern, regerror_msg);
-        }
-    }
-
-    for (int test_id = 0; test_id < num_runs; test_id++) {
+    struct test* test = test_run->test;
+    for (int test_id = 0; test_id < test->expect_no_compile_num_runs; test_id++) {
         sprintf(test_run->negative_compile_command.argv[test_run->negative_compile_command.argc - 2], "-DNEGATIVE_COMPILE_ITERATION=%d", test_id);
         test_run->non_compile_index = test_id;
         test_run_print(test_run);
@@ -1368,9 +1428,6 @@ static bool run_negative_compile_test(struct tests_db* tests, struct test_run* t
         subprocess_poll(&test_run->proc, true);
 
         if (WIFSIGNALED(test_run->proc.exit_status)) {
-            if (has_msg_pattern) {
-                regfree(&msg_pattern);
-            }
             return test_fail(test_run,
                              "Compiler killed by signal %d.\n"
                              "Compiler command: %s\n" COMPILER_OUTPUT_FORMAT,
@@ -1379,9 +1436,6 @@ static bool run_negative_compile_test(struct tests_db* tests, struct test_run* t
                              test_run->proc.output_buf);
         }
         if (WEXITSTATUS(test_run->proc.exit_status) == 0) {
-            if (has_msg_pattern) {
-                regfree(&msg_pattern);
-            }
             return test_fail(test_run,
                              "Compiler exited with code 0.\n"
                              "Compiler command: %s\n" COMPILER_OUTPUT_FORMAT,
@@ -1389,21 +1443,16 @@ static bool run_negative_compile_test(struct tests_db* tests, struct test_run* t
                              test_run->proc.output_buf);
         }
 
-        if (has_msg_pattern) {
-            int regexec_status = regexec(&msg_pattern, test_run->proc.output_buf, 0, NULL, 0);
+        if (test->expect_no_compile_has_pattern) {
+            int regexec_status = regexec(&test->expect_no_compile_pattern, test_run->proc.output_buf, 0, NULL, 0);
             if (regexec_status == REG_NOMATCH) {
-                regfree(&msg_pattern);
                 return test_fail(test_run,
-                                 "Pattern '%s' not found in compiler output.\n"
+                                 "Expected pattern not found in compiler output.\n"
                                  "Compiler command: %s\n" COMPILER_OUTPUT_FORMAT,
-                                 pattern,
                                  cmd_line_to_str(&test_run->negative_compile_command, &tests->scratch_space, &tests->scratch_space_cap),
                                  test_run->proc.output_buf);
             }
         }
-    }
-    if (has_msg_pattern) {
-        regfree(&msg_pattern);
     }
     return true;
 }
@@ -1423,7 +1472,7 @@ static size_t tests_db_execute(struct tests_db* tests) {
             link_test(tests, &tests->test_run);
         }
         if (!tests->test_run.failed) {
-            if (tests->test_run.test->is_no_compile) {
+            if (tests->test_run.test->expect_no_compile_num_runs > 0) {
                 tests->test_run.step = s_non_compile_running;
                 test_run_print(&tests->test_run);
                 run_negative_compile_test(tests, &tests->test_run);
