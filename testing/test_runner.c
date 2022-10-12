@@ -51,9 +51,9 @@
 extern char* const* environ;
 
 static const int NUM_EXPECTATION_CLAUSES_SUPPORTED = 4;  // EXPECT:NO_COMPILE, EXPECT:STEPS, EXPECT:EXIT and REQUEST:SKIP
-static const size_t PATH_INITIAL_CAPACITY = 256;
-static const size_t TESTS_INITIAL_CAPACITY = 512;
-static const size_t STR_BUF_INITIAL_CAPACITY = 4096;
+static const size_t PATH_INITIAL_CAPACITY = 64;
+static const size_t TESTS_INITIAL_CAPACITY = 8;
+static const size_t STR_BUF_INITIAL_CAPACITY = 128;
 static const char PATH_SEP = '/';
 #define PATH_SEP_STR "/"
 
@@ -923,12 +923,8 @@ static bool find_header_dep_with_lmt_gt(struct tests_db* tests, struct timespec 
                 bool exists, is_dir;
                 struct timespec header_lmt;
                 path_stat(p, &exists, &header_lmt, &is_dir);  // TODO: cache map of header files lmt-s!
-                if (!exists || is_dir) {
-                    fatal_error("Header %s not found.\n"
-                                "Required for dependency file %s",
-                                p, dep_file_path);
-                }
-                if (timespec_before(lmt, header_lmt)) {
+                // If we can't find a dependency, or it's somehow a directory now, re-compile.
+                if (!exists || is_dir || timespec_before(lmt, header_lmt)) {
                     fclose(dep_file);
                     return true;
                 }
@@ -1411,6 +1407,8 @@ static size_t tests_db_execute(struct tests_db* tests) {
 }
 
 int main(int argc, char** argv) {
+    chronometer_t entire_duration_start = chronometer_start();
+
     bool is_term_output = isatty(STDOUT_FILENO);
 
     flag_die_on_fail = get_flag_bool("x", "TEST_DIE_ON_FAIL", false, &argc, &argv);
@@ -1445,6 +1443,9 @@ int main(int argc, char** argv) {
                tests.num_mis_configured_tests, tests.num_mis_configured_tests > 1 ? "s" : "",
                color_reset());
     }
+    if (tests.num_tests == 0) {
+        printf("%sNo tests run!%s\n", color_warning_begin(), color_reset());
+    }
     if (num_tests_succeeded > 0) {
         printf("%s%zu test%s succeeded.%s\n",
                color_success_begin(),
@@ -1460,7 +1461,10 @@ int main(int argc, char** argv) {
                color_reset());
     }
 
-    return (tests.num_mis_configured_tests == 0 && num_tests_succeeded == tests.num_tests)
+    double entire_duration_ms = chronometer_ms_elapsed(entire_duration_start);
+    printf("Testing done in %s%.3lf%s seconds.\n", color_success_begin(), entire_duration_ms * 1e-3, color_reset());
+
+    return (tests.num_mis_configured_tests == 0 && tests.num_tests > 0 && num_tests_succeeded == tests.num_tests)
              ? EXIT_SUCCESS
              : EXIT_FAILURE;
 }
