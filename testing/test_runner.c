@@ -42,25 +42,18 @@
 #    error "Please define OPT_IS_RELEASE 0/1."
 #endif
 
-#if __APPLE__
-#    define PLATFORM_IS_LINUX 0
-#else
-#    define PLATFORM_IS_LINUX 1
-#endif
-
 extern char* const* environ;
 
-static const int NUM_EXPECTATION_CLAUSES_SUPPORTED = 4;  // EXPECT:NO_COMPILE, EXPECT:STEPS, EXPECT:EXIT and REQUEST:SKIP
-static const size_t TESTS_INITIAL_CAPACITY = 8;
-static const size_t STR_BUF_INITIAL_CAPACITY = 128;
-static const char PATH_SEP = '/';
+enum {
+    NUM_EXPECTATION_CLAUSES_SUPPORTED = 4,  // EXPECT:NO_COMPILE, EXPECT:STEPS, EXPECT:EXIT and REQUEST:SKIP
+    TESTS_INITIAL_CAPACITY = 8,
+    STR_BUF_INITIAL_CAPACITY = 128,
+    ALWAYS_ERROR_EXIT_CODE = 7,  // Tests are NOT allowed to expect to exit with code 7, so this will always be a test fail.
+    MAX_NEGATIVE_COMPILE_RUNS = 999,
+};
+#define PATH_SEP '/'
 #define PATH_SEP_STR "/"
 
-// Tests are NOT allowed to expect to exit with code 7, so
-// this will always be a test fail.
-#define ALWAYS_ERROR_EXIT_CODE 7
-
-#define MAX_NEGATIVE_COMPILE_RUNS 999
 #define MAX_NEGATIVE_COMPILE_RUNS_STR "999"
 #define TEST_OUTPUT_FORMAT "------ BEGIN TEST OUTPUT ------\n%s\n------  END  TEST OUTPUT ------\n"
 #define COMPILER_OUTPUT_FORMAT "------ BEGIN COMPILER OUTPUT ------\n%s\n------  END  COMPILER OUTPUT ------\n"
@@ -192,6 +185,16 @@ static __attribute__((format(printf, 1, 2))) void print_todo(const char* fmt, ..
     va_end(args);
 }
 
+static __attribute__((format(printf, 2, 3))) bool config_error(const char* test_path, const char* fmt, ...) {
+    printf("%sMis-configured test%s %s\n\t", color_error_begin(), color_reset(), test_path);
+    va_list args;
+    va_start(args, fmt);
+    vprintf(fmt, args);
+    va_end(args);
+    printf("\n\n");
+    return false;
+}
+
 static __attribute__((__noreturn__)) __attribute__((format(printf, 1, 2))) void fatal_error(const char* fmt, ...) {
     printf("\n%sError%s: ", color_error_begin(), color_reset());
     va_list args;
@@ -258,17 +261,29 @@ struct path {
     size_t capacity;
 };
 
-static void path_take_ownership(struct path* path, char* from) {
-    path->data = from;
-    path->len = strlen(from);
+static void path_init_realpath(struct path* path, const char* from) {
+    path->data = realpath(from, NULL);
+    path->len = strlen(path->data);
     path->capacity = path->len + 1;
+}
+
+static void path_ensure_trailing_slash(struct path* path) {
+    if (path->data[path->len - 1] != PATH_SEP) {
+        if (path->len + 1 >= path->capacity) {
+            path->capacity *= 2;
+            path->data = realloc(path->data, path->capacity);
+        }
+        path->data[path->len] = PATH_SEP;
+        path->len++;
+        path->data[path->len] = '\0';
+    }
 }
 
 static void path_append(struct path* path, const char* part) {
     if (part[0] == PATH_SEP && path->data[path->len - 1] == PATH_SEP) {
         part++;
     } else if (part[0] != PATH_SEP && path->data[path->len - 1] != PATH_SEP) {
-        path_append(path, PATH_SEP_STR);
+        path_ensure_trailing_slash(path);
     }
     const size_t part_len = strlen(part);
     if (path->len + part_len >= path->capacity) {
@@ -661,6 +676,7 @@ struct tests_db {
     size_t num_mis_configured_tests;
     size_t num_tests_to_compile;
     size_t num_tests_to_link;
+    size_t num_neg_compile_tests;
 };
 
 static void tests_db_init(struct tests_db* tests) {
@@ -724,12 +740,18 @@ static bool parse_test_single_expectation(const char* file_contents, const char*
     return false;
 }
 
-static bool parse_exit_expectation(const char* test_path, struct string_view expect_exit, int* exit_code, int* exit_signal) {
-    const char* const expected_exit_wrong_error_msg = "\tInvalid EXPECTED:EXIT request. Must be one of:\n"
-                                                      "\t// EXPECTED:EXIT CODE = n\n"
-                                                      "\t// EXPECTED:EXIT KILLED BY SIGNAL n\n"
-                                                      "\t// EXPECTED:EXIT KILLED BY SIGNAL SIGABRT\n";
+static bool exit_expectation_config_error(const char* test_path, struct string_view expect_exit) {
+    return config_error(test_path,
+                        "Invalid EXPECT:EXIT request. Must be one of:\n"
+                        "\t// EXPECT:EXIT CODE = n\n"
+                        "\t// EXPECT:EXIT KILLED BY SIGNAL n\n"
+                        "\t// EXPECT:EXIT KILLED BY SIGNAL SIGABRT\n"
+                        "\n"
+                        "\tInstead found: '// EXPECT:EXIT %.*s'",
+                        (int)sv_len(expect_exit), expect_exit.start);
+}
 
+static bool parse_exit_expectation(const char* test_path, struct string_view expect_exit, int* exit_code, int* exit_signal) {
     *exit_code = 0;
     *exit_signal = 0;
     if (expect_exit.start == NULL) {
@@ -743,13 +765,7 @@ static bool parse_exit_expectation(const char* test_path, struct string_view exp
                 *exit_code = (*exit_code) * 10 + *cursor - '0';
                 cursor++;
             } else {
-                printf("%sMis-configured test%s %s\n"
-                       "%s\n"
-                       "\tInstead found: '// EXPECTED:EXIT %.*s'\n\n",
-                       color_error_begin(), color_reset(), test_path,
-                       expected_exit_wrong_error_msg,
-                       (int)sv_len(expect_exit), expect_exit.start);
-                return false;
+                return exit_expectation_config_error(test_path, expect_exit);
             }
         }
     } else if (sv_len(expect_exit) > 17 && strncmp(expect_exit.start, "KILLED BY SIGNAL ", 17) == 0) {
@@ -762,33 +778,19 @@ static bool parse_exit_expectation(const char* test_path, struct string_view exp
                     *exit_signal = *exit_signal * 10 + *cursor;
                     cursor++;
                 } else {
-                    printf("%sMis-configured test%s %s\n"
-                           "%s\n"
-                           "\tInstead found: '// EXPECTED:EXIT %.*s'\n\n",
-                           color_error_begin(), color_reset(), test_path,
-                           expected_exit_wrong_error_msg,
-                           (int)sv_len(expect_exit), expect_exit.start);
-                    return false;
+                    return exit_expectation_config_error(test_path, expect_exit);
                 }
             }
         }
     } else {
-        printf("%sMis-configured test%s %s\n"
-               "%s\n"
-               "\tInstead found: '// EXPECTED:EXIT %.*s'\n\n",
-               color_error_begin(), color_reset(), test_path,
-               expected_exit_wrong_error_msg,
-               (int)sv_len(expect_exit), expect_exit.start);
-        return false;
+        return exit_expectation_config_error(test_path, expect_exit);
     }
 
     if (*exit_code == ALWAYS_ERROR_EXIT_CODE) {
-        printf("%sMis-configured test%s %s\n"
-               "\tInvalid EXPECTED:EXIT request: exit code %d is reserved for expectation failures.\n"
-               "\tPick a different exit code to expect.\n\n",
-               color_error_begin(), color_reset(), test_path,
-               ALWAYS_ERROR_EXIT_CODE);
-        return false;
+        return config_error(test_path,
+                            "Invalid EXPECT:EXIT request: exit code %d is reserved for expectation failures.\n"
+                            "\tPick a different exit code to expect.",
+                            ALWAYS_ERROR_EXIT_CODE);
     }
     return true;
 }
@@ -1054,8 +1056,6 @@ static void tests_db_scan_dir(struct tests_db* tests, struct path* test_path, st
 }
 
 static void tests_db_scan(struct tests_db* tests, const char* test_dir, const char* build_cache_dir) {
-    chronometer_t timer = chronometer_start();
-
     bool exists, is_dir;
     struct timespec lmt;
     path_stat(build_cache_dir, &exists, &lmt, &is_dir);
@@ -1069,22 +1069,16 @@ static void tests_db_scan(struct tests_db* tests, const char* test_dir, const ch
     tests_db_init(tests);
 
     struct path build_cache_dir_path;
-    char* realpath_build_cache_dir = realpath(build_cache_dir, NULL);
-    path_take_ownership(&build_cache_dir_path, realpath_build_cache_dir);
-    path_append(&build_cache_dir_path, PATH_SEP_STR);  // Ensure this ends in a PATH_SEP
+    path_init_realpath(&build_cache_dir_path, build_cache_dir);
+    path_ensure_trailing_slash(&build_cache_dir_path);
 
     struct path test_path;
-    // Take absolute path of the test directory. This is required to maintain the integrity of the cache.
-    char* realpath_test_dir = realpath(test_dir, NULL);
-    path_take_ownership(&test_path, realpath_test_dir);
+    path_init_realpath(&test_path, test_dir);
 
     tests_db_scan_dir(tests, &test_path, &build_cache_dir_path);
 
     free(build_cache_dir_path.data);
     free(test_path.data);
-
-    double duration_millis = chronometer_ms_elapsed(timer);
-    printf("\nFound %zu test files in %.3lfms\n", tests->num_tests, duration_millis);
 }
 
 static bool find_header_dep_with_lmt_gt(struct tests_db* tests, struct timespec lmt, const char* dep_file_path) {
@@ -1193,7 +1187,6 @@ static bool check_test_requires_re_link(struct test* test, struct timespec libs_
 }
 
 static void tests_db_prepare(struct tests_db* db) {
-    chronometer_t test_run_prepare_timer = chronometer_start();
     struct timespec libs_lmt;
     libs_lmt.tv_sec = 0;
     libs_lmt.tv_nsec = 0;
@@ -1219,21 +1212,16 @@ static void tests_db_prepare(struct tests_db* db) {
 
     db->num_tests_to_compile = 0;
     db->num_tests_to_link = 0;
+    db->num_neg_compile_tests = 0;
     for (size_t i = 0; i < db->num_tests; i++) {
         db->tests[i].requires_re_compile = check_test_requires_re_compile(db, db->tests + i);
         db->num_tests_to_compile += db->tests[i].requires_re_compile;
 
         db->tests[i].requires_re_link = check_test_requires_re_link(db->tests + i, libs_lmt);
         db->num_tests_to_link += db->tests[i].requires_re_link;
-    }
 
-    double duration = chronometer_ms_elapsed(test_run_prepare_timer);
-    printf("Prepared test run in %.3lfms:\n"
-           "  %zu tests to re-compile\n"
-           "  %zu tests to re-link\n"
-           "  %zu tests to run\n"
-           "\n",
-           duration, db->num_tests_to_compile, db->num_tests_to_link, db->num_tests);
+        db->num_neg_compile_tests += (db->tests[i].expect_no_compile_num_runs > 0);
+    }
 }
 
 static void test_run_print(struct test_run* test_run) {
@@ -1518,6 +1506,28 @@ int main(int argc, char** argv) {
     struct tests_db tests;
     tests_db_scan(&tests, test_dir, cache_dir);
     tests_db_prepare(&tests);
+
+    size_t num_test_files = tests.num_tests + tests.num_mis_configured_tests;
+    printf("\nFound %zu test file%s\n", num_test_files, num_test_files > 1 ? "s" : "");
+    if (tests.num_mis_configured_tests > 0) {
+        printf("\t%s%zu%s test%s are mis-configured\n",
+               color_error_begin(), tests.num_mis_configured_tests, color_reset(),
+               tests.num_mis_configured_tests > 1 ? "s" : "");
+    }
+    printf("\t%3zu test%s to re-compile\n"
+           "\t%3zu test%s to re-link\n"
+           "\t%3zu test%s to run\n"
+           "\t%3zu negative compile test%s\n"
+           "\n",
+           tests.num_tests_to_compile,
+           tests.num_tests_to_compile > 1 ? "s" : "",
+           tests.num_tests_to_link,
+           tests.num_tests_to_link > 1 ? "s" : "",
+           tests.num_tests - tests.num_neg_compile_tests,
+           tests.num_tests - tests.num_neg_compile_tests > 1 ? "s" : "",
+           tests.num_neg_compile_tests,
+           tests.num_neg_compile_tests > 1 ? "s" : "");
+
     size_t num_tests_succeeded = tests_db_execute(&tests);
 
     if (tests.num_mis_configured_tests > 0) {
