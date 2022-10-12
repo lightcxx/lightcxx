@@ -153,16 +153,10 @@ if (LIGHTCXX_ENABLE_TESTS)
             RUNTIME_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
     target_compile_options(test_runner PRIVATE
             -DCOMPILER="${CMAKE_CXX_COMPILER}"
-            -DAPPLE_ISYSROOT="${CMAKE_OSX_SYSROOT}"
             -DSOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}"
             -DLIB_DIR="${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}"
             -DDEFAULT_TEST_DIR="${CMAKE_CURRENT_SOURCE_DIR}/tests"
-            -DDEFAULT_BUILD_CACHE_DIR="${CMAKE_CURRENT_BINARY_DIR}/tests")
-    if (APPLE)
-        target_compile_options(test_runner PRIVATE -DPLATFORM_IS_APPLE=1 -DPLATFORM_IS_LINUX=0)
-    else ()
-        target_compile_options(test_runner PRIVATE -DPLATFORM_IS_APPLE=0 -DPLATFORM_IS_LINUX=1)
-    endif ()
+            -DDEFAULT_CACHE_DIR="${CMAKE_CURRENT_BINARY_DIR}/tests")
     if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
         target_compile_options(test_runner PRIVATE -DCOMPILER_IS_CLANG=0 -DCOMPILER_IS_GCC=1)
     else ()
@@ -182,7 +176,7 @@ if (LIGHTCXX_ENABLE_TESTS)
             DEPENDS lightcxx_static testing test_runner)
 
     if ($ENV{CLION_IDE})
-        message(STATUS "Adding all test files to a target for CLion")
+        message(STATUS "Adding all test files to a target for CLion integration")
         file(GLOB_RECURSE TEST_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/tests/*.cpp)
         add_library(test_sources EXCLUDE_FROM_ALL OBJECT ${TEST_SOURCES})
         AddTargetCompileWarnings(test_sources)

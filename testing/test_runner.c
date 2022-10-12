@@ -23,14 +23,8 @@
 #ifndef DEFAULT_TEST_DIR
 #    error "Please define DEFAULT_TEST_DIR to point to a sensible tests directory (probably SOURCE_DIR/tests)."
 #endif
-#ifndef DEFAULT_BUILD_CACHE_DIR
-#    error "Please define DEFAULT_BUILD_CACHE_DIR to point to a directory to store test build executables and cache."
-#endif
-#ifndef PLATFORM_IS_APPLE
-#    error "Please define PLATFORM_IS_APPLE 0/1."
-#endif
-#ifndef PLATFORM_IS_LINUX
-#    error "Please define PLATFORM_IS_LINUX 0/1."
+#ifndef DEFAULT_CACHE_DIR
+#    error "Please define DEFAULT_CACHE_DIR to point to a directory to store test build executables and cache."
 #endif
 #ifndef COMPILER
 #    error "Please define COMPILER macro to path to the compiler to use."
@@ -47,19 +41,20 @@
 #ifndef OPT_IS_RELEASE
 #    error "Please define OPT_IS_RELEASE 0/1."
 #endif
-#if PLATFORM_IS_APPLE
-#    ifndef APPLE_ISYSROOT
-#        error "Please define APPLE_ISYSROOT to point to the framework root on Mac OS. This is not used on other platforms."
-#    endif
+
+#if __APPLE__
+#    define PLATFORM_IS_LINUX 0
+#else
+#    define PLATFORM_IS_LINUX 1
 #endif
 
 extern char* const* environ;
 
-const int NUM_EXPECTATION_CLAUSES_SUPPORTED = 4;  // EXPECT:NO_COMPILE, EXPECT:STEPS, EXPECT:EXIT and REQUEST:SKIP
-const size_t PATH_INITIAL_CAPACITY = 256;
-const size_t TESTS_INITIAL_CAPACITY = 512;
-const size_t STR_BUF_INITIAL_CAPACITY = 4096;
-const char PATH_SEP = '/';
+static const int NUM_EXPECTATION_CLAUSES_SUPPORTED = 4;  // EXPECT:NO_COMPILE, EXPECT:STEPS, EXPECT:EXIT and REQUEST:SKIP
+static const size_t PATH_INITIAL_CAPACITY = 256;
+static const size_t TESTS_INITIAL_CAPACITY = 512;
+static const size_t STR_BUF_INITIAL_CAPACITY = 4096;
+static const char PATH_SEP = '/';
 #define PATH_SEP_STR "/"
 
 // Tests are NOT allowed to expect to exit with code 7, so
@@ -71,21 +66,21 @@ const char PATH_SEP = '/';
 #define TEST_OUTPUT_FORMAT "------ BEGIN TEST OUTPUT ------\n%s\n------  END  TEST OUTPUT ------\n"
 #define COMPILER_OUTPUT_FORMAT "------ BEGIN COMPILER OUTPUT ------\n%s\n------  END  COMPILER OUTPUT ------\n"
 
-bool flag_no_colors = false;
-bool flag_no_interactive = false;
-bool flag_die_on_fail = false;
-bool flag_print_on_success = false;
+static bool flag_colors = true;
+static bool flag_interactive = true;
+static bool flag_die_on_fail = false;
+static bool flag_print_on_success = false;
 
-size_t peak_memory_allocated = 0;
-size_t current_memory_allocated = 0;
-void* malloc_traced(size_t size) {
+static size_t peak_memory_allocated = 0;
+static size_t current_memory_allocated = 0;
+static void* malloc_traced(size_t size) {
     current_memory_allocated += (size > 16 ? size : 16);
     if (current_memory_allocated > peak_memory_allocated) {
         peak_memory_allocated = current_memory_allocated;
     }
     return malloc(size);
 }
-void* realloc_traced(void* from, size_t prev, size_t next) {
+static void* realloc_traced(void* from, size_t prev, size_t next) {
     current_memory_allocated -= (prev > 16 ? prev : 16);
     current_memory_allocated += (next > 16 ? next : 16);
     if (current_memory_allocated > peak_memory_allocated) {
@@ -93,7 +88,7 @@ void* realloc_traced(void* from, size_t prev, size_t next) {
     }
     return realloc(from, next);
 }
-void free_traced(void* ptr, size_t size) {
+static void free_traced(void* ptr, size_t size) {
     current_memory_allocated -= (size > 16 ? size : 16);
     free(ptr);
 }
@@ -103,32 +98,32 @@ void free_traced(void* ptr, size_t size) {
 #define realloc "THIS FUNCTION IS NOT ALLOWED. USE relloc_traced INSTEAD."
 #define free "THIS FUNCTION IS NOT ALLOWED. USE free_traced INSTEAD."
 
-const char* color_error_begin(void) {
-    if (flag_no_colors) {
+static const char* color_error_begin(void) {
+    if (!flag_colors) {
         return "";
     }
     return "\033[31m";
 }
-const char* color_warning_begin(void) {
-    if (flag_no_colors) {
+static const char* color_warning_begin(void) {
+    if (!flag_colors) {
         return "";
     }
     return "\033[33m";
 }
-const char* color_success_begin(void) {
-    if (flag_no_colors) {
+static const char* color_success_begin(void) {
+    if (!flag_colors) {
         return "";
     }
     return "\033[32m";
 }
-const char* color_reset(void) {
-    if (flag_no_colors) {
+static const char* color_reset(void) {
+    if (!flag_colors) {
         return "";
     }
     return "\033[0m";
 }
 
-__attribute__((format(printf, 1, 2))) void print_warning(const char* fmt, ...) {
+static __attribute__((format(printf, 1, 2))) void print_warning(const char* fmt, ...) {
     printf("\n%sWarning%s: ", color_warning_begin(), color_reset());
     va_list args;
     va_start(args, fmt);
@@ -136,7 +131,7 @@ __attribute__((format(printf, 1, 2))) void print_warning(const char* fmt, ...) {
     va_end(args);
 }
 
-__attribute__((format(printf, 1, 2))) void print_todo(const char* fmt, ...) {
+static __attribute__((format(printf, 1, 2))) void print_todo(const char* fmt, ...) {
     printf("%sTODO%s: ", color_warning_begin(), color_reset());
     va_list args;
     va_start(args, fmt);
@@ -144,7 +139,7 @@ __attribute__((format(printf, 1, 2))) void print_todo(const char* fmt, ...) {
     va_end(args);
 }
 
-__attribute__((__noreturn__)) __attribute__((format(printf, 1, 2))) void fatal_error(const char* fmt, ...) {
+static __attribute__((__noreturn__)) __attribute__((format(printf, 1, 2))) void fatal_error(const char* fmt, ...) {
     printf("\n%sError%s: ", color_error_begin(), color_reset());
     va_list args;
     va_start(args, fmt);
@@ -153,7 +148,51 @@ __attribute__((__noreturn__)) __attribute__((format(printf, 1, 2))) void fatal_e
     abort();
 }
 
-bool timespec_before(struct timespec a, struct timespec b) {
+static const char* get_flag_string(const char* flag, const char* env_var, const char* default_val, int* argc_ptr, char*** argv_ptr) {
+    const char* val = NULL;
+    char** argv = *argv_ptr;
+    size_t flag_len = strlen(flag);
+    for (int i = 0; i < *argc_ptr; i++) {
+        if (argv[i][0] == '-') {
+            char* flag_start = argv[i] + 1;
+            if (argv[i][1] == '-') {
+                flag_start++;
+            }
+            if (!strncmp(flag_start, flag, flag_len)) {
+                if (flag_start[flag_len] != '\0' && flag_start[flag_len] != '=') {
+                    continue;
+                }
+                memmove(argv + i, argv + i + 1, sizeof(char*) * (size_t)((*argc_ptr) - i - 1));
+                (*argc_ptr)--;
+                if (flag_start[flag_len] == '\0') {
+                    val = flag_start + flag_len;
+                    break;
+                }
+                if (flag_start[flag_len] == '=') {
+                    val = flag_start + flag_len + 1;
+                    break;
+                }
+            }
+        }
+    }
+    if (val == NULL) {
+        val = getenv(env_var);
+    }
+    return val != NULL ? val : default_val;
+}
+
+static bool get_flag_bool(const char* flag, const char* env_var, bool default_val, int* argc_ptr, char*** argv_ptr) {
+    const char* val = get_flag_string(flag, env_var, default_val ? "1" : "0", argc_ptr, argv_ptr);
+    return val[0] == '\0'
+           || (strcasecmp(val, "no")
+               && strcasecmp(val, "false")
+               && strcasecmp(val, "off")
+               && strcasecmp(val, "disabled")
+               && strcasecmp(val, "0")
+               && strcasecmp(val, "-"));
+}
+
+static bool timespec_before(struct timespec a, struct timespec b) {
     if (a.tv_sec == b.tv_sec) {
         return a.tv_nsec < b.tv_nsec;
     }
@@ -166,7 +205,7 @@ struct path {
     size_t capacity;
 };
 
-void path_new(struct path* path, const char* from) {
+static void path_new(struct path* path, const char* from) {
     path->capacity = PATH_INITIAL_CAPACITY;
     path->len = strlen(from);
     while (path->len >= path->capacity) {
@@ -176,7 +215,7 @@ void path_new(struct path* path, const char* from) {
     memcpy(path->data, from, path->len + 1);
 }
 
-void path_append(struct path* path, const char* part) {
+static void path_append(struct path* path, const char* part) {
     if (part[0] == PATH_SEP && path->data[path->len - 1] == PATH_SEP) {
         part++;
     } else if (part[0] != PATH_SEP && path->data[path->len - 1] != PATH_SEP) {
@@ -197,7 +236,7 @@ void path_append(struct path* path, const char* part) {
     path->len += part_len;
 }
 
-void path_pop(struct path* path) {
+static void path_pop(struct path* path) {
     if (path->data[path->len - 1] == PATH_SEP) {
         path->len--;
     }
@@ -207,7 +246,7 @@ void path_pop(struct path* path) {
     path->data[path->len--] = '\0';
 }
 
-void path_stat(const char* path, bool* exists, struct timespec* last_touch_ts, bool* is_dir) {
+static void path_stat(const char* path, bool* exists, struct timespec* last_touch_ts, bool* is_dir) {
     struct stat st_buf;
     int result = stat(path, &st_buf);
     if (result != 0) {
@@ -221,7 +260,7 @@ void path_stat(const char* path, bool* exists, struct timespec* last_touch_ts, b
         fatal_error("Failed stat() on %s: error=%d %s\n", path, errno, strerror(errno));
     }
     *exists = true;
-#if PLATFORM_IS_APPLE
+#if __APPLE__
     *last_touch_ts = st_buf.st_mtimespec;
 #else
     *last_touch_ts = st_buf.st_mtim;
@@ -237,13 +276,13 @@ void path_stat(const char* path, bool* exists, struct timespec* last_touch_ts, b
 
 typedef double chronometer_t;
 
-chronometer_t chronometer_start(void) {
+static chronometer_t chronometer_start(void) {
     struct timespec start_time;
     clock_gettime(CLOCK_MONOTONIC, &start_time);
     return (double)start_time.tv_sec * 1e3 + (double)start_time.tv_nsec * 1.e-6;
 }
 
-double chronometer_ms_elapsed(chronometer_t timer) {
+static double chronometer_ms_elapsed(chronometer_t timer) {
     struct timespec end_time;
     clock_gettime(CLOCK_MONOTONIC, &end_time);
     return (double)end_time.tv_sec * 1e3 + (double)end_time.tv_nsec * 1.e-6 - timer;
@@ -256,7 +295,7 @@ struct cmd_line {
     size_t argv_buf_size;
 };
 
-void cmd_line_init(struct cmd_line* cmd_line, int num_sections, ...) {
+static void cmd_line_init(struct cmd_line* cmd_line, int num_sections, ...) {
     va_list sections;
 
     int num_args = 0;
@@ -292,7 +331,7 @@ void cmd_line_init(struct cmd_line* cmd_line, int num_sections, ...) {
     cmd_line->argv[cmd_line->argc] = NULL;
 }
 
-const char* cmd_line_to_str(struct cmd_line* cmd_line, char** buf, size_t* buf_capacity) {
+static const char* cmd_line_to_str(struct cmd_line* cmd_line, char** buf, size_t* buf_capacity) {
     if (cmd_line->argc == 0) {
         **buf = '\0';
         return *buf;
@@ -355,7 +394,7 @@ struct subprocess {
     char pipe_buf[4096];
 };
 
-void subprocess_init(struct subprocess* result) {
+static void subprocess_init(struct subprocess* result) {
     result->pid = 0;
     result->child_stdout_fd = 0;
     result->child_stderr_fd = 0;
@@ -371,7 +410,7 @@ enum subprocess_fail_exit {
     fail_exit_code_0,
 };
 
-void subprocess_start(struct subprocess* result, struct cmd_line* cmd, enum subprocess_fail_exit exit_strategy) {
+static void subprocess_start(struct subprocess* result, struct cmd_line* cmd, enum subprocess_fail_exit exit_strategy) {
     int stdout_pipe_fd[2];
     int stderr_pipe_fd[2];
     if (pipe(stdout_pipe_fd) < 0) {
@@ -435,7 +474,7 @@ void subprocess_start(struct subprocess* result, struct cmd_line* cmd, enum subp
     result->output_buf_size = 0;
 }
 
-void subprocess_poll_output(struct subprocess* result, int fd, bool to_eof) {
+static void subprocess_poll_output(struct subprocess* result, int fd, bool to_eof) {
     while (1) {
         errno = 0;
         ssize_t num_bytes = read(fd, result->pipe_buf, 4096);
@@ -463,7 +502,7 @@ void subprocess_poll_output(struct subprocess* result, int fd, bool to_eof) {
     }
 }
 
-bool subprocess_poll(struct subprocess* result, bool blocking) {
+static bool subprocess_poll(struct subprocess* result, bool blocking) {
     if (result->is_done) {
         return true;
     }
@@ -498,8 +537,9 @@ struct test {
     char* obj_file_path;  // <build_cache_dir><section>.<test_file_stem>.o   (<build_cache_dir> must end in PATH_SEP)  // TODO: Maybe don't store, copy on-demand.
     char* exe_file_path;  // <build_cache_dir><section>.<test_file_stem>     (<build_cache_dir> must end in PATH_SEP)
     char* expect_steps;
-    char* expect_exit;
     char* expect_no_compile;
+    int expect_exit_code;
+    int expect_exit_signal;
 
     struct timespec obj_file_lmt;
     bool is_no_compile;
@@ -542,16 +582,20 @@ struct tests_db {
     size_t scratch_space_cap;
 
     // Stats
+    size_t num_mis_configured_tests;
     size_t num_tests_to_compile;
     size_t num_tests_to_link;
 };
 
-void tests_db_init(struct tests_db* tests) {
+static void tests_db_init(struct tests_db* tests) {
     tests->num_tests = 0;
     tests->capacity = TESTS_INITIAL_CAPACITY;
     tests->tests = malloc_traced(sizeof(struct test) * tests->capacity);
     tests->scratch_space_cap = STR_BUF_INITIAL_CAPACITY;
     tests->scratch_space = malloc_traced(tests->scratch_space_cap);
+    tests->num_mis_configured_tests = 0;
+    tests->num_tests_to_compile = 0;
+    tests->num_tests_to_link = 0;
 }
 
 struct string_view {
@@ -559,26 +603,11 @@ struct string_view {
     const char* end;
 };
 
-size_t sv_len(struct string_view view) {
+static size_t sv_len(struct string_view view) {
     return (size_t)(view.end - view.start);
 }
 
-// Parse the test path to discover section and test name stem.
-void parse_test_path(struct path* test_path, struct string_view* section, struct string_view* test_file_stem) {
-    test_file_stem->end = test_path->data + test_path->len - 4;
-    section->end = test_file_stem->end;
-    while (*section->end != PATH_SEP) {
-        section->end--;
-    }
-    test_file_stem->start = section->end + 1;
-    section->start = section->end - 1;
-    while (*section->start != PATH_SEP) {
-        section->start--;
-    }
-    section->start++;
-}
-
-bool parse_test_single_expectation(const char* file_contents, const char* pattern, struct string_view* result) {
+static bool parse_test_single_expectation(const char* file_contents, const char* pattern, struct string_view* result) {
     const size_t pattern_len = strlen(pattern);
     const char* cursor = file_contents;
     while (true) {
@@ -606,12 +635,92 @@ bool parse_test_single_expectation(const char* file_contents, const char* patter
     return false;
 }
 
-// Parse the test source file to discover expectations. Results are pointing inside tests_db->test_expectations_buf.
-bool parse_test_expectations(struct tests_db* tests, struct path* test_path,
-                             struct string_view* skip_reason,
-                             struct string_view* expect_steps,
-                             struct string_view* expect_exit,
-                             struct string_view* expect_no_compile) {
+static bool parse_exit_expectation(const char* test_path, struct string_view expect_exit, int* exit_code, int* exit_signal) {
+    const char* const expected_exit_wrong_error_msg = "\tInvalid EXPECTED:EXIT request. Must be one of:\n"
+                                                      "\t// EXPECTED:EXIT CODE = n\n"
+                                                      "\t// EXPECTED:EXIT KILLED BY SIGNAL n\n"
+                                                      "\t// EXPECTED:EXIT KILLED BY SIGNAL SIGABRT\n";
+    if (sv_len(expect_exit) > 7 && strncmp(expect_exit.start, "CODE = ", 7) == 0) {
+        const char* cursor = expect_exit.start + 7;
+        while (cursor != expect_exit.end) {
+            if ('0' <= *cursor && *cursor <= '9') {
+                *exit_code = (*exit_code) * 10 + *cursor - '0';
+                cursor++;
+            } else {
+                printf("%sMis-configured test%s %s\n"
+                       "%s\n"
+                       "\tInstead found: '// EXPECTED:EXIT %.*s'\n\n",
+                       color_error_begin(), color_reset(), test_path,
+                       expected_exit_wrong_error_msg,
+                       (int)sv_len(expect_exit), expect_exit.start);
+                return false;
+            }
+        }
+    } else if (sv_len(expect_exit) > 17 && strncmp(expect_exit.start, "KILLED BY SIGNAL ", 17) == 0) {
+        if (sv_len(expect_exit) == 17 + 7 && strncmp(expect_exit.start + 17, "SIGABRT", 7) == 0) {
+            *exit_signal = SIGABRT;
+        } else {
+            const char* cursor = expect_exit.start + 17;
+            while (cursor != expect_exit.end) {
+                if ('0' <= *cursor && *cursor <= '9') {
+                    *exit_signal = *exit_signal * 10 + *cursor;
+                    cursor++;
+                } else {
+                    printf("%sMis-configured test%s %s\n"
+                           "%s\n"
+                           "\tInstead found: '// EXPECTED:EXIT %.*s'\n\n",
+                           color_error_begin(), color_reset(), test_path,
+                           expected_exit_wrong_error_msg,
+                           (int)sv_len(expect_exit), expect_exit.start);
+                    return false;
+                }
+            }
+        }
+    } else {
+        printf("%sMis-configured test%s %s\n"
+               "%s\n"
+               "\tInstead found: '// EXPECTED:EXIT %.*s'\n\n",
+               color_error_begin(), color_reset(), test_path,
+               expected_exit_wrong_error_msg,
+               (int)sv_len(expect_exit), expect_exit.start);
+        return false;
+    }
+
+    if (*exit_code == ALWAYS_ERROR_EXIT_CODE) {
+        printf("%sMis-configured test%s %s\n"
+               "\tInvalid EXPECTED:EXIT request: exit code %d is reserved for expectation failures.\n"
+               "\tPick a different exit code to expect.\n\n",
+               color_error_begin(), color_reset(), test_path,
+               ALWAYS_ERROR_EXIT_CODE);
+        return false;
+    }
+    return true;
+}
+
+// Parse the test source file to discover expectations.
+// Results are pointing inside tests_db->test_expectations_buf.
+static bool parse_test_expectations(struct tests_db* tests,
+                                    struct path* test_path,
+                                    struct string_view* section,
+                                    struct string_view* test_file_stem,
+                                    struct string_view* skip_reason,
+                                    struct string_view* expect_steps,
+                                    int* expect_exit_code,
+                                    int* expect_exit_signal,
+                                    struct string_view* expect_no_compile) {
+    // Parse the test path to discover section and test name stem.
+    test_file_stem->end = test_path->data + test_path->len - 4;
+    section->end = test_file_stem->end;
+    while (*section->end != PATH_SEP) {
+        section->end--;
+    }
+    test_file_stem->start = section->end + 1;
+    section->start = section->end - 1;
+    while (*section->start != PATH_SEP) {
+        section->start--;
+    }
+    section->start++;
+
     errno = 0;
     FILE* test_source_file = fopen(test_path->data, "r");
     if (test_source_file == NULL) {
@@ -649,26 +758,35 @@ bool parse_test_expectations(struct tests_db* tests, struct path* test_path,
 
     parse_test_single_expectation(tests->scratch_space, "// REQUEST:SKIP", skip_reason);
     if (skip_reason->start != NULL) {
+        print_todo("skipped test [%.*s].%.*s : %.*s\n",
+                   (int)sv_len(*section), section->start,
+                   (int)sv_len(*test_file_stem), test_file_stem->start,
+                   (int)sv_len(*skip_reason), skip_reason->start);
         return false;
     }
 
     parse_test_single_expectation(tests->scratch_space, "// EXPECT:STEPS", expect_steps);
-    parse_test_single_expectation(tests->scratch_space, "// EXPECT:EXIT", expect_exit);
+
+    struct string_view expect_exit;
+    parse_test_single_expectation(tests->scratch_space, "// EXPECT:EXIT", &expect_exit);
+    if (expect_exit.start != NULL && !parse_exit_expectation(test_path->data, expect_exit, expect_exit_code, expect_exit_signal)) {
+        tests->num_mis_configured_tests += 1;
+        return false;
+    }
+
     parse_test_single_expectation(tests->scratch_space, "// EXPECT:NO_COMPILE", expect_no_compile);
     return true;
 }
 
-void tests_db_add_test(struct tests_db* tests, struct path* test_path, struct timespec lmt, struct path* build_cache_dir_path) {
+static void tests_db_add_test(struct tests_db* tests, struct path* test_path, struct timespec lmt, struct path* build_cache_dir_path) {
     struct string_view section;
     struct string_view test_file_stem;
-    parse_test_path(test_path, &section, &test_file_stem);
-
     struct string_view reason_skip;
     struct string_view expect_steps;
-    struct string_view expect_exit;
+    int expect_exit_code = 0;
+    int expect_exit_signal = 0;
     struct string_view expect_no_compile;
-    if (!parse_test_expectations(tests, test_path, &reason_skip, &expect_steps, &expect_exit, &expect_no_compile)) {
-        print_todo("skipped test [%.*s].%.*s : %.*s\n", (int)sv_len(section), section.start, (int)sv_len(test_file_stem), test_file_stem.start, (int)(reason_skip.end - reason_skip.start), reason_skip.start);
+    if (!parse_test_expectations(tests, test_path, &section, &test_file_stem, &reason_skip, &expect_steps, &expect_exit_code, &expect_exit_signal, &expect_no_compile)) {
         return;
     }
 
@@ -697,7 +815,6 @@ void tests_db_add_test(struct tests_db* tests, struct path* test_path, struct ti
                                     + obj_file_path_len + 1
                                     + exe_file_path_len + 1
                                     + sv_len(expect_steps) + 1
-                                    + sv_len(expect_exit) + 1
                                     + sv_len(expect_no_compile) + 1);
     memcpy(test->file_path, test_path->data, test_path->len + 1);  // Include the null terminator.
 
@@ -740,20 +857,17 @@ void tests_db_add_test(struct tests_db* tests, struct path* test_path, struct ti
     }
     test->expect_steps[sv_len(expect_steps)] = '\0';
 
-    test->expect_exit = test->expect_steps + sv_len(expect_steps) + 1;
-    if (sv_len(expect_exit)) {
-        memcpy(test->expect_exit, expect_exit.start, sv_len(expect_exit));
-    }
-    test->expect_exit[sv_len(expect_exit)] = '\0';
-
-    test->expect_no_compile = test->expect_exit + sv_len(expect_exit) + 1;
+    test->expect_no_compile = test->expect_steps + sv_len(expect_steps) + 1;
     if (sv_len(expect_no_compile)) {
         memcpy(test->expect_no_compile, expect_no_compile.start, sv_len(expect_no_compile));
     }
     test->expect_no_compile[sv_len(expect_no_compile)] = '\0';
+
+    test->expect_exit_code = expect_exit_code;
+    test->expect_exit_signal = expect_exit_signal;
 }
 
-void tests_db_scan_dir(struct tests_db* tests, struct path* test_path, struct path* build_cache_dir_path) {
+static void tests_db_scan_dir(struct tests_db* tests, struct path* test_path, struct path* build_cache_dir_path) {
     bool exists, is_dir;
     struct timespec lmt;
     path_stat(test_path->data, &exists, &lmt, &is_dir);
@@ -785,7 +899,7 @@ void tests_db_scan_dir(struct tests_db* tests, struct path* test_path, struct pa
     }
 }
 
-void tests_db_scan(struct tests_db* tests, const char* test_dir, const char* build_cache_dir) {
+static void tests_db_scan(struct tests_db* tests, const char* test_dir, const char* build_cache_dir) {
     chronometer_t timer = chronometer_start();
 
     bool exists, is_dir;
@@ -816,7 +930,7 @@ void tests_db_scan(struct tests_db* tests, const char* test_dir, const char* bui
     printf("\nFound %zu test files in %.3lfms\n", tests->num_tests, duration_millis);
 }
 
-bool find_header_dep_with_lmt_gt(struct tests_db* tests, struct timespec lmt, const char* dep_file_path) {
+static bool find_header_dep_with_lmt_gt(struct tests_db* tests, struct timespec lmt, const char* dep_file_path) {
     FILE* dep_file = fopen(dep_file_path, "r");
     if (dep_file == NULL) {
         fatal_error("Failed to fopen() dependencies file %s: error: %d %s", dep_file_path, errno, strerror(errno));
@@ -881,7 +995,7 @@ bool find_header_dep_with_lmt_gt(struct tests_db* tests, struct timespec lmt, co
     return false;
 }
 
-bool check_test_requires_re_compile(struct tests_db* tests, struct test* test) {
+static bool check_test_requires_re_compile(struct tests_db* tests, struct test* test) {
     if (test->is_no_compile) {
         // A negative compile test is never compiled (running the test involves doing the compilation).
         return false;
@@ -909,7 +1023,7 @@ bool check_test_requires_re_compile(struct tests_db* tests, struct test* test) {
     return find_header_dep_with_lmt_gt(tests, test->obj_file_lmt, test->dep_file_path);
 }
 
-bool check_test_requires_re_link(struct test* test, struct timespec libs_lmt) {
+static bool check_test_requires_re_link(struct test* test, struct timespec libs_lmt) {
     if (test->is_no_compile) {
         // A negative compile test is never linked (running the test involves doing the compilation).
         return false;
@@ -943,8 +1057,9 @@ static char cmd_line_include[]
   = "-nostdinc++\0"
     "-I" SOURCE_DIR PATH_SEP_STR "include\0"
     "-I" SOURCE_DIR PATH_SEP_STR "testing\0"
-#if PLATFORM_IS_APPLE
-    "-isysroot\0" APPLE_ISYSROOT "\0"
+#if __APPLE__
+    "-isysroot\0"
+    "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/\0"
 #endif
   ;
 
@@ -1002,23 +1117,21 @@ static char cmd_line_link[]
     "@path_to_exe_file@\0"
     "" LIB_DIR PATH_SEP_STR "liblightcxx_static.a\0"
     "" LIB_DIR PATH_SEP_STR "libtesting.a\0"
-#if COMPILER_IS_GCC
-#    if PLATFORM_IS_LINUX
+#if !__APPLE__ && COMPILER_IS_GCC
     "-lgcc\0"
     "-lgcc_eh\0"
-#    endif
 #endif
-#if PLATFORM_IS_LINUX
+#if !__APPLE__
     "-lc\0"
     "-lpthread\0"
     "-ldl\0"
 #endif
-#if PLATFORM_IS_APPLE
+#if __APPLE__
     "-L/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib\0"
 #endif
   ;
 
-void tests_db_prepare(struct tests_db* db) {
+static void tests_db_prepare(struct tests_db* db) {
     chronometer_t test_run_prepare_timer = chronometer_start();
 
     cmd_line_init(&db->test_run.compile_command, 3, cmd_line_base, cmd_line_include, cmd_line_compile);
@@ -1070,44 +1183,46 @@ void tests_db_prepare(struct tests_db* db) {
            duration, db->num_tests_to_compile, db->num_tests_to_link, db->num_tests);
 }
 
-void test_run_print(struct test_run* test_run) {
-    if (test_run->step == s_done && !test_run->failed && !flag_print_on_success && !flag_no_interactive) {
-        printf("\r\033[K");
-        fflush(stdout);
+static void test_run_print(struct test_run* test_run) {
+    if (test_run->step == s_done && !test_run->failed && !flag_print_on_success) {
+        if (flag_interactive) {
+            printf("\r\033[K");
+            fflush(stdout);
+        }
         return;
     }
-    if (test_run->step != s_done && flag_no_interactive) {
+    if (test_run->step != s_done && !flag_interactive) {
         return;  // Don't print anything until we're done if not in interactive mode.
     }
-    if (!flag_no_interactive) {
+    if (flag_interactive) {
         printf("\r\033[K");
     }
     printf("(%zu/%zu) %s", test_run->id, test_run->num_tests, test_run->test->test_name);
     if (test_run->test->requires_re_compile && test_run->step >= s_compiling) {
-        printf(" compiling..");
+        printf(" compiling...");
     }
     if (test_run->test->requires_re_link && test_run->step >= s_linking) {
-        printf(" linking..");
+        printf(" linking...");
     }
     if (test_run->step >= s_running) {
-        printf(" running..");
+        printf(" running...");
     }
     if (test_run->test->is_no_compile != '\0') {
         for (int i = 0; i < test_run->non_compile_index; i++) {
-            printf("#%d.", i);
+            printf("#%d..", i);
         }
     }
     if (test_run->step >= s_done) {
         if (test_run->failed) {
-            printf("%sfailed%s.\n", color_error_begin(), color_reset());
+            printf("%sfailed%s\n", color_error_begin(), color_reset());
         } else {
-            printf("%ssuccess%s.\n", color_success_begin(), color_reset());
+            printf("%ssuccess%s\n", color_success_begin(), color_reset());
         }
     }
     fflush(stdout);
 }
 
-__attribute__((format(printf, 2, 3))) bool test_fail(struct test_run* test_run, const char* fmt, ...) {
+static __attribute__((format(printf, 2, 3))) bool test_fail(struct test_run* test_run, const char* fmt, ...) {
     test_run->step = s_done;
     test_run->failed = true;
     test_run_print(test_run);
@@ -1122,7 +1237,7 @@ __attribute__((format(printf, 2, 3))) bool test_fail(struct test_run* test_run, 
     return false;
 }
 
-void test_run_set_test(struct tests_db* tests, struct test_run* test_run, size_t i) {
+static void test_run_set_test(struct tests_db* tests, struct test_run* test_run, size_t i) {
     test_run->id = i + 1;
     test_run->num_tests = tests->num_tests;
     test_run->test = tests->tests + i;
@@ -1141,7 +1256,7 @@ void test_run_set_test(struct tests_db* tests, struct test_run* test_run, size_t
     test_run->negative_compile_command.argv[test_run->negative_compile_command.argc - 1] = test_run->test->file_path;
 }
 
-bool compile_test(struct tests_db* tests, struct test_run* test_run) {
+static bool compile_test(struct tests_db* tests, struct test_run* test_run) {
     subprocess_start(&test_run->proc, &test_run->compile_command, fail_exit_abort);
     subprocess_poll(&test_run->proc, true);
     if (WIFEXITED(test_run->proc.exit_status) == 0 || WEXITSTATUS(test_run->proc.exit_status) != 0) {
@@ -1153,7 +1268,7 @@ bool compile_test(struct tests_db* tests, struct test_run* test_run) {
     return true;
 }
 
-bool link_test(struct tests_db* tests, struct test_run* test_run) {
+static bool link_test(struct tests_db* tests, struct test_run* test_run) {
     subprocess_start(&test_run->proc, &test_run->link_command, fail_exit_abort);
     subprocess_poll(&test_run->proc, true);
     if (WIFEXITED(test_run->proc.exit_status) == 0 || WEXITSTATUS(test_run->proc.exit_status) != 0) {
@@ -1165,59 +1280,14 @@ bool link_test(struct tests_db* tests, struct test_run* test_run) {
     return true;
 }
 
-bool run_test(struct tests_db* tests, struct test_run* test_run) {
-    const char* const expected_exit_wrong_error_msg = "Invalid EXPECTED:EXIT request. Must be one of:\n"
-                                                      "// EXPECTED:EXIT CODE = n\n"
-                                                      "// EXPECTED:EXIT KILLED BY SIGNAL n\n"
-                                                      "// EXPECTED:EXIT KILLED BY SIGNAL SIGABRT\n";
-    const char* expect_exit = test_run->test->expect_exit;
-    int expected_exit_code = 0;
-    int expected_exit_signal = 0;
-    if (strncmp(expect_exit, "CODE = ", 7) == 0) {
-        const char* cursor = expect_exit + 7;
-        while (*cursor) {
-            if ('0' <= *cursor && *cursor <= '9') {
-                expected_exit_code = expected_exit_code * 10 + *cursor - '0';
-                cursor++;
-            } else {
-                return test_fail(test_run, "%s\nInstead found: '// EXPECTED:EXIT %s'", expected_exit_wrong_error_msg, expect_exit);
-            }
-        }
-    } else if (strncmp(expect_exit, "KILLED BY SIGNAL ", 17) == 0) {
-        if (strcmp(expect_exit + 17, "SIGABRT") == 0) {
-            expected_exit_signal = SIGABRT;
-        } else {
-            const char* cursor = expect_exit + 17;
-            while (*cursor) {
-                if ('0' <= *cursor && *cursor <= '9') {
-                    expected_exit_signal = expected_exit_signal * 10 + *cursor;
-                    cursor++;
-                } else {
-                    return test_fail(test_run, "%s\nInstead found: '// EXPECTED:EXIT %s'", expected_exit_wrong_error_msg, expect_exit);
-                }
-            }
-        }
-    } else if (expect_exit[0] == '\0') {
-        expect_exit = "CODE = 0";
-    } else {
-        return test_fail(test_run, "%s\nInstead found: '// EXPECTED:EXIT %s'", expected_exit_wrong_error_msg, expect_exit);
-    }
-
-    if (expected_exit_code == ALWAYS_ERROR_EXIT_CODE) {
-        return test_fail(test_run,
-                         "Invalid EXPECTED:EXIT request: exit code %d is reserved"
-                         " for the test runner to detect errors before process start."
-                         " Pick a different exit code to expect.\n",
-                         ALWAYS_ERROR_EXIT_CODE);
-    }
-
+static bool run_test(struct tests_db* tests, struct test_run* test_run) {
     char* argv[2];
     argv[0] = test_run->test->exe_file_path;
     argv[1] = NULL;
     struct cmd_line test_cmd_line;
     test_cmd_line.argc = 1;
     test_cmd_line.argv = argv;
-    subprocess_start(&test_run->proc, &test_cmd_line, expected_exit_signal ? fail_exit_code_0 : fail_exit_abort);
+    subprocess_start(&test_run->proc, &test_cmd_line, test_run->test->expect_exit_signal ? fail_exit_code_0 : fail_exit_abort);
     subprocess_poll(&test_run->proc, true);
 
     if (strstr(test_run->proc.output_buf, "EXPECTATION FAILED") != NULL) {
@@ -1226,13 +1296,23 @@ bool run_test(struct tests_db* tests, struct test_run* test_run) {
                          test_run->proc.output_buf);
     }
     if (WIFSIGNALED(test_run->proc.exit_status)) {
-        if (expected_exit_code != 0 || expected_exit_signal != (int)(WTERMSIG(test_run->proc.exit_status))) {
-            return test_fail(test_run, "Test process killed by signal %d (expected EXIT %s)\n", (int)(WTERMSIG(test_run->proc.exit_status)), expect_exit);
+        if (test_run->test->expect_exit_code != 0) {
+            return test_fail(test_run, "Test process killed by signal %d (expected exit with code = %d)\n",
+                             (int)(WTERMSIG(test_run->proc.exit_status)), test_run->test->expect_exit_code);
+        }
+        if (test_run->test->expect_exit_signal != (int)(WTERMSIG(test_run->proc.exit_status))) {
+            return test_fail(test_run, "Test process killed by signal %d (expected exit with signal %d)\n",
+                             (int)(WTERMSIG(test_run->proc.exit_status)), test_run->test->expect_exit_signal);
         }
     }
     if (WIFEXITED(test_run->proc.exit_status)) {
-        if (expected_exit_signal != 0 || expected_exit_code != (int)(WEXITSTATUS(test_run->proc.exit_status))) {
-            return test_fail(test_run, "Test process exited with code %d (expected EXIT %s)\n", WEXITSTATUS(test_run->proc.exit_status), expect_exit);
+        if (test_run->test->expect_exit_signal != 0) {
+            return test_fail(test_run, "Test process exited with code %d (expected exit with signal %d)\n",
+                             (int)(WEXITSTATUS(test_run->proc.exit_status)), test_run->test->expect_exit_signal);
+        }
+        if (test_run->test->expect_exit_code != (int)(WEXITSTATUS(test_run->proc.exit_status))) {
+            return test_fail(test_run, "Test process exited with code %d (expected exit with code = %d)\n",
+                             (int)(WEXITSTATUS(test_run->proc.exit_status)), test_run->test->expect_exit_code);
         }
     }
 
@@ -1285,7 +1365,7 @@ bool run_test(struct tests_db* tests, struct test_run* test_run) {
     return true;
 }
 
-bool run_negative_compile_test(struct tests_db* tests, struct test_run* test_run) {
+static bool run_negative_compile_test(struct tests_db* tests, struct test_run* test_run) {
     const char* pattern = "";
     int num_runs = atoi(test_run->test->expect_no_compile);
     if (num_runs == 0) {
@@ -1348,7 +1428,7 @@ bool run_negative_compile_test(struct tests_db* tests, struct test_run* test_run
     return true;
 }
 
-size_t tests_db_execute(struct tests_db* tests) {
+static size_t tests_db_execute(struct tests_db* tests) {
     size_t num_tests_succeeded = 0;
     for (size_t i = 0; i < tests->num_tests; i++) {
         test_run_set_test(tests, &tests->test_run, i);
@@ -1383,8 +1463,16 @@ size_t tests_db_execute(struct tests_db* tests) {
 }
 
 int main(int argc, char** argv) {
+    bool is_term_output = isatty(STDOUT_FILENO);
+
+    flag_die_on_fail = get_flag_bool("x", "TEST_DIE_ON_FAIL", false, &argc, &argv);
+    flag_print_on_success = get_flag_bool("v", "TEST_PRINT_ON_SUCCESS", !is_term_output, &argc, &argv);
+    flag_colors = get_flag_bool("c", "TEST_COLORS", is_term_output, &argc, &argv);
+    flag_interactive = get_flag_bool("i", "TEST_INTERACTIVE", is_term_output, &argc, &argv);
+    const char* cache_dir = get_flag_string("cache-dir", "TEST_CACHE_DIR", DEFAULT_CACHE_DIR, &argc, &argv);
+
     if (argc > 2) {
-        printf("Usage: %s [<tests-directory/test-file>]\n"
+        printf("Usage: %s [options] [<tests-directory/test-file>]\n"
                "  Default tests directory: %s\n",
                argv[0], DEFAULT_TEST_DIR);
         return 1;
@@ -1396,53 +1484,34 @@ int main(int argc, char** argv) {
     }
     // Take absolute path of the test directory. This is required to maintain the integrity of the cache.
     char* realpath_test_dir = realpath(test_dir, NULL);
-    printf("Testing %s\n", realpath_test_dir);
-
-    if (!isatty(STDOUT_FILENO)) {
-        flag_no_colors = true;
-        flag_print_on_success = true;
-        flag_no_interactive = true;
-    }
-
-    char* env_die_on_fail = getenv("TEST_DIE_ON_FAIL");
-    if (env_die_on_fail != NULL && *env_die_on_fail != '\0' && *env_die_on_fail != '0') {
-        flag_die_on_fail = true;
-    }
-
-    char* env_print_on_success = getenv("TEST_PRINT_ON_SUCCESS");
-    if (env_print_on_success != NULL && *env_print_on_success != '\0' && *env_print_on_success != '0') {
-        flag_print_on_success = true;
-    }
-
-    char* env_no_colors = getenv("TEST_NO_COLORS");
-    if (env_no_colors != NULL && *env_no_colors != '\0' && *env_no_colors != '0') {
-        flag_no_colors = true;
-    }
-
-    char* env_no_interactive = getenv("TEST_NO_INTERACTIVE");
-    if (env_no_interactive != NULL && *env_no_interactive != '\0' && *env_no_interactive != '0') {
-        flag_no_interactive = true;
-    }
-
-    char* env_cache_dir = getenv("TEST_CACHE_DIR");
-    const char* cache_dir = (env_cache_dir != NULL && *env_cache_dir != '\0') ? env_cache_dir : DEFAULT_BUILD_CACHE_DIR;
+    printf("Testing %s\n\n", realpath_test_dir);
 
     struct tests_db tests;
     tests_db_scan(&tests, test_dir, cache_dir);
     tests_db_prepare(&tests);
     size_t num_tests_succeeded = tests_db_execute(&tests);
 
-    if (num_tests_succeeded == tests.num_tests) {
-        printf("%sAll %zu tests succeeded.%s\n", color_success_begin(), num_tests_succeeded, color_reset());
-    } else {
+    if (tests.num_mis_configured_tests > 0) {
+        printf("%s%zu test%s mis-configured.%s\n",
+               color_error_begin(),
+               tests.num_mis_configured_tests, tests.num_mis_configured_tests > 1 ? "s" : "",
+               color_reset());
+    }
+    if (num_tests_succeeded > 0) {
+        printf("%s%zu test%s succeeded.%s\n",
+               color_success_begin(),
+               num_tests_succeeded, num_tests_succeeded > 1 ? "s" : "",
+               color_reset());
+    }
+    if (num_tests_succeeded < tests.num_tests) {
         printf("%s%zu test%s of %zu failed.%s\n",
                color_error_begin(),
                tests.num_tests - num_tests_succeeded,
-               tests.num_tests - num_tests_succeeded == 1 ? "" : "s",
+               tests.num_tests - num_tests_succeeded > 1 ? "s" : "",
                tests.num_tests,
                color_reset());
     }
 
     printf("Test runner peak malloc size: %.2lfkB\n", (double)peak_memory_allocated / 1024);
-    return num_tests_succeeded == tests.num_tests ? EXIT_SUCCESS : EXIT_FAILURE;
+    return (tests.num_mis_configured_tests == 0 && num_tests_succeeded == tests.num_tests) ? EXIT_SUCCESS : EXIT_FAILURE;
 }
