@@ -184,8 +184,13 @@ static void interactive_clear(void) {
             // move to the start of the previous line and clear it.
             printf("\033[F\033[K");
         }
-        fflush(stdout);
         num_lines_interactive = 0;
+    }
+}
+
+static void interactive_flush(void) {
+    if (flag_interactive) {
+        fflush(stdout);
     }
 }
 
@@ -1268,7 +1273,6 @@ static void test_run_print(struct test_run* test_run) {
     if (test_run->step != s_success && !test_run->failed) {
         // This is an interactive line.
         num_lines_interactive += 1;
-        fflush(stdout);
     }
 }
 
@@ -1281,6 +1285,7 @@ static __attribute__((format(printf, 2, 3))) bool test_fail(struct test_run* tes
     va_start(args, fmt);
     vprintf(fmt, args);
     va_end(args);
+    interactive_flush();
     if (flag_die_on_fail) {
         printf("\n%sExiting early...%s\n", color_error_begin(), color_reset());
         // TODO: Wait all other test_run processes!
@@ -1531,6 +1536,7 @@ static void test_run_poll_all(struct test_run* test_runs, size_t* num_test_runs,
         for (size_t i = 0; i < *num_test_runs;i ++) {
             test_run_print(test_runs + i);
         }
+        interactive_flush();
     }
 }
 
