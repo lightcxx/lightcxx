@@ -47,7 +47,7 @@ extern char* const* environ;
 enum {
     NUM_EXPECTATION_CLAUSES_SUPPORTED = 4,  // EXPECT:NO_COMPILE, EXPECT:STEPS, EXPECT:EXIT and REQUEST:SKIP
     TESTS_INITIAL_CAPACITY = 8,
-    STR_BUF_INITIAL_CAPACITY = 128,
+    STRING_INITIAL_CAPACITY = 128,
     ALWAYS_ERROR_EXIT_CODE = 7,  // Tests are NOT allowed to expect to exit with code 7, so this will always be a test fail.
     MAX_NEGATIVE_COMPILE_RUNS = 999,
 };
@@ -147,10 +147,11 @@ static char cmd_line_link[]
 #endif
   ;
 
-static bool flag_colors = true;
-static bool flag_interactive = true;
 static bool flag_die_on_fail = false;
 static bool flag_print_on_success = false;
+static bool flag_colors = true;
+static bool flag_interactive = true;
+static int num_lines_interactive = 0;
 
 static const char* color_error_begin(void) {
     if (!flag_colors) {
@@ -177,6 +178,24 @@ static const char* color_reset(void) {
     return "\033[0m";
 }
 
+static void interactive_clear(void) {
+    if (flag_interactive && num_lines_interactive > 0) {
+        // Move to the start of the current line and clear it.
+        printf("\r\033[K");
+        for (int i = 1; i < num_lines_interactive; i++) {
+            // move to the start of the previous line and clear it.
+            printf("\033[F\033[K");
+        }
+        num_lines_interactive = 0;
+    }
+}
+
+static void interactive_flush(void) {
+    if (flag_interactive) {
+        fflush(stdout);
+    }
+}
+
 static __attribute__((format(printf, 1, 2))) void print_todo(const char* fmt, ...) {
     printf("%sTODO%s: ", color_warning_begin(), color_reset());
     va_list args;
@@ -201,7 +220,7 @@ static __attribute__((__noreturn__)) __attribute__((format(printf, 1, 2))) void 
     va_start(args, fmt);
     vprintf(fmt, args);
     va_end(args);
-    abort();
+    exit(EXIT_FAILURE);
 }
 
 static const char* get_flag_string(const char* flag, const char* env_var, const char* default_val, int* argc_ptr, char*** argv_ptr) {
@@ -248,6 +267,11 @@ static bool get_flag_bool(const char* flag, const char* env_var, bool default_va
                && strcasecmp(val, "-"));
 }
 
+static int get_flag_int(const char* flag, const char* env_var, const char* default_val, int* argc_ptr, char*** argv_ptr) {
+    const char* raw_val = get_flag_string(flag, env_var, default_val, argc_ptr, argv_ptr);
+    return atoi(raw_val);
+}
+
 static bool timespec_before(struct timespec a, struct timespec b) {
     if (a.tv_sec == b.tv_sec) {
         return a.tv_nsec < b.tv_nsec;
@@ -255,48 +279,72 @@ static bool timespec_before(struct timespec a, struct timespec b) {
     return a.tv_sec < b.tv_sec;
 }
 
-struct path {
+struct string_view {
+    const char* start;
+    const char* end;
+};
+
+static size_t sv_len(struct string_view view) {
+    return (size_t)(view.end - view.start);
+}
+
+struct string {
     char* data;
     size_t len;
     size_t capacity;
 };
 
-static void path_init_realpath(struct path* path, const char* from) {
+static void string_clear(struct string* str) {
+    str->len = 0;
+    str->data[str->len] = '\0';
+}
+
+static void string_init(struct string* str) {
+    str->capacity = STRING_INITIAL_CAPACITY;
+    str->data = malloc(str->capacity);
+    string_clear(str);
+}
+
+static void string_destroy(struct string* str) {
+    free(str->data);
+}
+
+static void string_reserve(struct string* str, size_t sz) {
+    if (str->capacity <= sz) {
+        while (str->capacity <= sz) {
+            str->capacity *= 2;
+        }
+        str->data = realloc(str->data, str->capacity);
+    }
+}
+
+static void path_init_realpath(struct string* path, const char* from) {
     path->data = realpath(from, NULL);
     path->len = strlen(path->data);
     path->capacity = path->len + 1;
 }
 
-static void path_ensure_trailing_slash(struct path* path) {
+static void path_ensure_trailing_slash(struct string* path) {
     if (path->data[path->len - 1] != PATH_SEP) {
-        if (path->len + 1 >= path->capacity) {
-            path->capacity *= 2;
-            path->data = realloc(path->data, path->capacity);
-        }
-        path->data[path->len] = PATH_SEP;
-        path->len++;
+        string_reserve(path, path->len + 1);
+        path->data[path->len++] = PATH_SEP;
         path->data[path->len] = '\0';
     }
 }
 
-static void path_append(struct path* path, const char* part) {
+static void path_append(struct string* path, const char* part) {
     if (part[0] == PATH_SEP && path->data[path->len - 1] == PATH_SEP) {
         part++;
-    } else if (part[0] != PATH_SEP && path->data[path->len - 1] != PATH_SEP) {
+    } else if (part[0] != PATH_SEP) {
         path_ensure_trailing_slash(path);
     }
     const size_t part_len = strlen(part);
-    if (path->len + part_len >= path->capacity) {
-        while (path->len + part_len >= path->capacity) {
-            path->capacity *= 2;
-        }
-        path->data = realloc(path->data, path->capacity);
-    }
+    string_reserve(path, path->len + part_len);
     memcpy(path->data + path->len, part, part_len + 1);
     path->len += part_len;
 }
 
-static void path_pop(struct path* path) {
+static void path_pop(struct string* path) {
     if (path->data[path->len - 1] == PATH_SEP) {
         path->len--;
     }
@@ -396,10 +444,10 @@ static void cmd_line_destroy(struct cmd_line* cmd_line) {
     free(cmd_line->argv);
 }
 
-static const char* cmd_line_to_str(struct cmd_line* cmd_line, char** buf, size_t* buf_capacity) {
+static const char* cmd_line_to_str(struct cmd_line* cmd_line, struct string* str) {
     if (cmd_line->argc == 0) {
-        **buf = '\0';
-        return *buf;
+        string_clear(str);
+        return str->data;
     }
     size_t argv0_size = strlen(cmd_line->argv[0]);
     size_t size = argv0_size + (size_t)(cmd_line->argc - 1) /* spaces */;
@@ -417,33 +465,29 @@ static const char* cmd_line_to_str(struct cmd_line* cmd_line, char** buf, size_t
             size += 2;
         }
     }
-    if (*buf_capacity <= size) {
-        while (*buf_capacity <= size) {
-            *buf_capacity *= 2;
-        }
-        *buf = realloc(*buf, *buf_capacity);
-    }
-    memcpy(*buf, cmd_line->argv[0], argv0_size);
+    string_reserve(str, size);
+    memcpy(str->data, cmd_line->argv[0], argv0_size);
     size = argv0_size;
     for (int i = 1; i < cmd_line->argc; i++) {
-        (*buf)[size++] = ' ';
+        str->data[size++] = ' ';
         bool escape = false;
-        char* start = *buf + size;
+        char* start = str->data + size;
         for (char* p = cmd_line->argv[i]; *p; p++) {
             if (*p == '"' || *p == '\\') {
-                (*buf)[size++] = '\\';
+                str->data[size++] = '\\';
                 escape = true;
             }
-            (*buf)[size++] = *p;
+            str->data[size++] = *p;
         }
         if (escape) {
-            memmove(start + 1, start, (size_t)((*buf + size) - start));
+            memmove(start + 1, start, (size_t)((str->data + size) - start));
             *start = '"';
-            (*buf)[size++] = '"';
+            str->data[size++] = '"';
         }
     }
-    (*buf)[size] = '\0';
-    return *buf;
+    str->len = size;
+    str->data[str->len] = '\0';
+    return str->data;
 }
 
 struct subprocess {
@@ -452,9 +496,7 @@ struct subprocess {
     int child_stderr_fd;
     bool is_done;
     int exit_status;
-    char* output_buf;
-    size_t output_buf_size;
-    size_t output_buf_capacity;
+    struct string output_buf;
 };
 
 static void subprocess_init(struct subprocess* result) {
@@ -463,13 +505,11 @@ static void subprocess_init(struct subprocess* result) {
     result->child_stderr_fd = 0;
     result->is_done = false;
     result->exit_status = 0;
-    result->output_buf_size = 0;
-    result->output_buf_capacity = STR_BUF_INITIAL_CAPACITY;
-    result->output_buf = malloc(result->output_buf_capacity);
+    string_init(&result->output_buf);
 }
 
 static void subprocess_destroy(struct subprocess* result) {
-    free(result->output_buf);
+    string_destroy(&result->output_buf);
 }
 
 enum subprocess_fail_exit {
@@ -538,21 +578,15 @@ static void subprocess_start(struct subprocess* result, struct cmd_line* cmd, en
 
     result->is_done = false;
     result->exit_status = 0;
-    result->output_buf_size = 0;
+    string_clear(&result->output_buf);
 }
 
 static void subprocess_poll_output(struct subprocess* result, int fd, bool to_eof) {
     while (1) {
-        size_t remaining_cap = result->output_buf_capacity - result->output_buf_size;
-        if (remaining_cap < 512) {
-            while (remaining_cap < 512) {
-                result->output_buf_capacity *= 2;
-                remaining_cap = result->output_buf_capacity - result->output_buf_size;
-            }
-            result->output_buf = realloc(result->output_buf, result->output_buf_capacity);
-        }
+        // Ensure at least 512 bytes can be read from the subprocess output in one call to read().
+        string_reserve(&result->output_buf, result->output_buf.len + 512);
         errno = 0;
-        ssize_t num_bytes = read(fd, result->output_buf + result->output_buf_size, remaining_cap);
+        ssize_t num_bytes = read(fd, result->output_buf.data + result->output_buf.len, result->output_buf.capacity - result->output_buf.len);
         if (num_bytes < 0) {
             if (errno == EAGAIN) {
                 if (to_eof) {
@@ -565,23 +599,22 @@ static void subprocess_poll_output(struct subprocess* result, int fd, bool to_eo
         if (num_bytes == 0) {
             break;
         }
-        result->output_buf_size += (size_t)num_bytes;
+        result->output_buf.len += (size_t)num_bytes;
     }
 }
 
-static bool subprocess_poll(struct subprocess* result, bool blocking) {
+static bool subprocess_poll(struct subprocess* result) {
     if (result->is_done) {
         return true;
     }
     pid_t status;
     while (1) {
         errno = 0;
-        status = waitpid(result->pid, &result->exit_status, blocking ? 0 : (WNOHANG));
+        status = waitpid(result->pid, &result->exit_status, WNOHANG);
         if (status >= 0) {
             break;
         }
         if (errno == EINTR) {
-            sleep(1);  // This is probably a debugger.
             continue;
         }
         fatal_error("waitpid failed: errno=%d message=%s\n", errno, strerror(errno));
@@ -599,7 +632,7 @@ static bool subprocess_poll(struct subprocess* result, bool blocking) {
     }
     subprocess_poll_output(result, result->child_stdout_fd, true);
     subprocess_poll_output(result, result->child_stderr_fd, true);
-    result->output_buf[result->output_buf_size] = '\0';
+    result->output_buf.data[result->output_buf.len] = '\0';
     close(result->child_stdout_fd);
     close(result->child_stderr_fd);
     return true;
@@ -624,13 +657,13 @@ struct test {
     bool requires_re_link;
 };
 
+// If a test fails, it will stay in one of the intermediary steps (to know when it failed).
 enum test_run_step {
     s_starting = 0,
     s_compiling = 1,
     s_linking = 2,
     s_running = 3,
-    s_non_compile_running = 4,
-    s_done = 5,
+    s_success = 4,
 };
 struct test_run {
     size_t id;
@@ -638,24 +671,27 @@ struct test_run {
     struct test* test;
     bool failed;
     enum test_run_step step;
-    int non_compile_index;
+    int no_compile_run_id;
     struct subprocess proc;
     struct cmd_line compile_command;
     struct cmd_line link_command;
     struct cmd_line negative_compile_command;
+    struct string scratch_space;
 };
 
 static void test_run_init(struct test_run* test_run) {
-    cmd_line_init(&test_run->compile_command, 3, cmd_line_base, cmd_line_include, cmd_line_compile);
-    cmd_line_init(&test_run->negative_compile_command, 3, cmd_line_base, cmd_line_include, cmd_line_neg_compile);
-    cmd_line_init(&test_run->link_command, 2, cmd_line_base, cmd_line_link);
     subprocess_init(&test_run->proc);
+    cmd_line_init(&test_run->compile_command, 3, cmd_line_base, cmd_line_include, cmd_line_compile);
+    cmd_line_init(&test_run->link_command, 2, cmd_line_base, cmd_line_link);
+    cmd_line_init(&test_run->negative_compile_command, 3, cmd_line_base, cmd_line_include, cmd_line_neg_compile);
+    string_init(&test_run->scratch_space);
 }
 
 static void test_run_destroy(struct test_run* test_run) {
-    cmd_line_destroy(&test_run->compile_command);
+    string_destroy(&test_run->scratch_space);
     cmd_line_destroy(&test_run->negative_compile_command);
     cmd_line_destroy(&test_run->link_command);
+    cmd_line_destroy(&test_run->compile_command);
     subprocess_destroy(&test_run->proc);
 }
 
@@ -665,12 +701,9 @@ struct tests_db {
     size_t num_tests;
     size_t capacity;
 
-    // Test run
-    struct test_run test_run;
-
-    // Buffer for reading test expectations
-    char* scratch_space;
-    size_t scratch_space_cap;
+    // Runners
+    size_t num_test_runs;
+    struct test_run* test_runs;
 
     // Stats
     size_t num_mis_configured_tests;
@@ -679,20 +712,25 @@ struct tests_db {
     size_t num_neg_compile_tests;
 };
 
-static void tests_db_init(struct tests_db* tests) {
+static void tests_db_init(struct tests_db* tests, int num_jobs) {
     tests->num_tests = 0;
     tests->capacity = TESTS_INITIAL_CAPACITY;
     tests->tests = malloc(sizeof(struct test) * tests->capacity);
-    tests->scratch_space_cap = STR_BUF_INITIAL_CAPACITY;
-    tests->scratch_space = malloc(tests->scratch_space_cap);
     tests->num_mis_configured_tests = 0;
     tests->num_tests_to_compile = 0;
     tests->num_tests_to_link = 0;
-    test_run_init(&tests->test_run);
+    tests->num_test_runs = (size_t)num_jobs;
+    tests->test_runs = malloc(sizeof(struct test_run) * tests->num_test_runs);
+    for (size_t i = 0; i < tests->num_test_runs; i++) {
+        test_run_init(tests->test_runs + i);
+    }
 }
 
 static void tests_db_destroy(struct tests_db* tests) {
-    test_run_destroy(&tests->test_run);
+    for (size_t i = 0; i < tests->num_test_runs; i++) {
+        test_run_destroy(tests->test_runs + i);
+    }
+    free(tests->test_runs);
     for (size_t i = 0; i < tests->num_tests; i++) {
         free(tests->tests[i].file_path);
         if (tests->tests[i].expect_no_compile_has_pattern) {
@@ -700,16 +738,6 @@ static void tests_db_destroy(struct tests_db* tests) {
         }
     }
     free(tests->tests);
-    free(tests->scratch_space);
-}
-
-struct string_view {
-    const char* start;
-    const char* end;
-};
-
-static size_t sv_len(struct string_view view) {
-    return (size_t)(view.end - view.start);
 }
 
 static bool parse_test_single_expectation(const char* file_contents, const char* pattern, struct string_view* result) {
@@ -805,22 +833,18 @@ static bool parse_no_compile_expectation(const char* test_path, struct string_vi
     const char* raw_pattern = "";
     *num_runs = atoi(expect_no_compile.start);
     if (*num_runs < 0 || *num_runs > MAX_NEGATIVE_COMPILE_RUNS) {
-        printf("%sMis-configured test%s %s\n"
-               "\tInvalid EXPECT:NO_COMPILE request: number of runs must be 1 to %d, got %d.\n\n",
-               color_error_begin(), color_reset(), test_path,
-               MAX_NEGATIVE_COMPILE_RUNS, *num_runs);
-        return false;
+        return config_error(test_path,
+                            "Invalid EXPECT:NO_COMPILE request: number of runs must be 1 to %d, got %d.",
+                            MAX_NEGATIVE_COMPILE_RUNS, *num_runs);
     }
     if (*num_runs == 0) {
         *num_runs = 1;
         size_t pattern_len = sv_len(expect_no_compile);
         if (pattern_len < 2 || expect_no_compile.start[0] != '"' || expect_no_compile.end[-1] != '"') {
-            printf("%sMis-configured test%s %s\n"
-                   "\tInvalid EXPECT:NO_COMPILE request: must be either number of runs, or pattern enclosed in '\"'.\n"
-                   "\tInstead got: // EXPECT:NO_COMPILE %.*s\n\n",
-                   color_error_begin(), color_reset(), test_path,
-                   (int)sv_len(expect_no_compile), expect_no_compile.start);
-            return false;
+            return config_error(test_path,
+                                "Invalid EXPECT:NO_COMPILE request: must be either number of runs, or pattern enclosed in '\"'.\n"
+                                "\tInstead got: // EXPECT:NO_COMPILE %.*s",
+                                (int)sv_len(expect_no_compile), expect_no_compile.start);
         }
         // This is "safe", because it points into the scratch space. Once the regex_t pattern is constructed,
         // this data is no longer used.
@@ -834,20 +858,19 @@ static bool parse_no_compile_expectation(const char* test_path, struct string_vi
         if (regcomp_status != 0) {
             char regerror_msg[256];
             regerror(regcomp_status, pattern, regerror_msg, 256);
-            printf("%sMis-configured test%s %s\n"
-                   "\tInvalid EXPECT:NO_COMPILE request: failed to compile pattern '%s': %s\n\n",
-                   color_error_begin(), color_reset(), test_path,
-                   raw_pattern, regerror_msg);
-            return false;
+            return config_error(test_path,
+                                "Invalid EXPECT:NO_COMPILE request: failed to compile pattern '%s': %s",
+                                raw_pattern, regerror_msg);
         }
     }
     return true;
 }
 
 // Parse the test source file to discover expectations.
-// Results are pointing inside tests_db->test_expectations_buf.
-static bool parse_test_expectations(struct tests_db* tests,
-                                    struct path* test_path,
+// Results are pointing inside scratch_space. scratch_space may be resized, according to needs.
+static bool parse_test_expectations(struct string* scratch_space,
+                                    bool* misconfigured,
+                                    const struct string* test_path,
                                     struct string_view* section,
                                     struct string_view* test_file_stem,
                                     struct string_view* skip_reason,
@@ -857,6 +880,8 @@ static bool parse_test_expectations(struct tests_db* tests,
                                     int* expect_no_compile_num_runs,
                                     bool* expect_no_compile_has_pattern,
                                     regex_t* expect_no_compile_pattern) {
+    *misconfigured = false;
+
     // Parse the test path to discover section and test name stem.
     test_file_stem->end = test_path->data + test_path->len - 4;
     section->end = test_file_stem->end;
@@ -879,10 +904,10 @@ static bool parse_test_expectations(struct tests_db* tests,
         fatal_error("Failed to read expectations from test file %s: fopen failed error: %d %s\n",
                     test_path->data, ferror(test_source_file), strerror(ferror(test_source_file)));
     }
-    char* cursor = tests->scratch_space;
-    *cursor = '\0';
+
+    string_clear(scratch_space);
     for (int i = 0; i < NUM_EXPECTATION_CLAUSES_SUPPORTED;) {
-        char* result = fgets(cursor, (int)(tests->scratch_space_cap - (size_t)(cursor - tests->scratch_space)), test_source_file);
+        char* result = fgets(scratch_space->data + scratch_space->len, (int)(scratch_space->capacity - scratch_space->len), test_source_file);
         if (result == NULL || ferror(test_source_file)) {
             if (feof(test_source_file)) {
                 break;
@@ -890,18 +915,16 @@ static bool parse_test_expectations(struct tests_db* tests,
             fatal_error("Failed to read expectations from test file %s: fgets failed error: %d %s\n",
                         test_path->data, ferror(test_source_file), strerror(ferror(test_source_file)));
         }
-        cursor = cursor + strlen(cursor);
-        if (cursor + 1 >= tests->scratch_space + tests->scratch_space_cap) {
-            tests->scratch_space = realloc(tests->scratch_space, tests->scratch_space_cap * 2);
-            cursor = tests->scratch_space + tests->scratch_space_cap;
-            tests->scratch_space_cap *= 2;
+        scratch_space->len += strlen(scratch_space->data + scratch_space->len);
+        if (scratch_space->len + 1 == scratch_space->capacity) {
+            string_reserve(scratch_space, scratch_space->len + 1);
             continue;  // Didn't finish reading the line, skip incrementing loop counter.
         }
         i++;
     }
     fclose(test_source_file);
 
-    parse_test_single_expectation(tests->scratch_space, "// REQUEST:SKIP", skip_reason);
+    parse_test_single_expectation(scratch_space->data, "// REQUEST:SKIP", skip_reason);
     if (skip_reason->start != NULL) {
         print_todo("skipped test [%.*s].%.*s : %.*s\n",
                    (int)sv_len(*section), section->start,
@@ -910,25 +933,26 @@ static bool parse_test_expectations(struct tests_db* tests,
         return false;
     }
 
-    parse_test_single_expectation(tests->scratch_space, "// EXPECT:STEPS", expect_steps);
+    parse_test_single_expectation(scratch_space->data, "// EXPECT:STEPS", expect_steps);
 
     struct string_view expect_exit;
-    parse_test_single_expectation(tests->scratch_space, "// EXPECT:EXIT", &expect_exit);
+    parse_test_single_expectation(scratch_space->data, "// EXPECT:EXIT", &expect_exit);
     if (!parse_exit_expectation(test_path->data, expect_exit, expect_exit_code, expect_exit_signal)) {
-        tests->num_mis_configured_tests += 1;
+        *misconfigured = true;
         return false;
     }
 
     struct string_view expect_no_compile;
-    parse_test_single_expectation(tests->scratch_space, "// EXPECT:NO_COMPILE", &expect_no_compile);
+    parse_test_single_expectation(scratch_space->data, "// EXPECT:NO_COMPILE", &expect_no_compile);
     if (!parse_no_compile_expectation(test_path->data, expect_no_compile, expect_no_compile_num_runs, expect_no_compile_has_pattern, expect_no_compile_pattern)) {
-        tests->num_mis_configured_tests += 1;
+        *misconfigured = true;
         return false;
     }
     return true;
 }
 
-static void tests_db_add_test(struct tests_db* tests, struct path* test_path, struct timespec lmt, struct path* build_cache_dir_path) {
+static void tests_db_add_test(struct tests_db* tests, struct string* test_path, struct timespec lmt, struct string* build_cache_dir_path) {
+    bool misconfigured;
     struct string_view section;
     struct string_view test_file_stem;
     struct string_view reason_skip;
@@ -938,7 +962,8 @@ static void tests_db_add_test(struct tests_db* tests, struct path* test_path, st
     int expect_no_compile_num_runs;
     bool expect_no_compile_has_pattern;
     regex_t expect_no_compile_pattern;
-    if (!parse_test_expectations(tests,
+    if (!parse_test_expectations(&tests->test_runs[0].scratch_space,
+                                 &misconfigured,
                                  test_path,
                                  &section,
                                  &test_file_stem,
@@ -949,6 +974,7 @@ static void tests_db_add_test(struct tests_db* tests, struct path* test_path, st
                                  &expect_no_compile_num_runs,
                                  &expect_no_compile_has_pattern,
                                  &expect_no_compile_pattern)) {
+        tests->num_mis_configured_tests += misconfigured;
         return;
     }
 
@@ -1022,7 +1048,7 @@ static void tests_db_add_test(struct tests_db* tests, struct path* test_path, st
     test->expect_exit_signal = expect_exit_signal;
 }
 
-static void tests_db_scan_dir(struct tests_db* tests, struct path* test_path, struct path* build_cache_dir_path) {
+static void tests_db_scan_dir(struct tests_db* tests, struct string* test_path, struct string* build_cache_dir_path) {
     bool exists, is_dir;
     struct timespec lmt;
     path_stat(test_path->data, &exists, &lmt, &is_dir);
@@ -1066,22 +1092,20 @@ static void tests_db_scan(struct tests_db* tests, const char* test_dir, const ch
         fatal_error("Cache directory %s is not a directory.\n", build_cache_dir);
     }
 
-    tests_db_init(tests);
-
-    struct path build_cache_dir_path;
+    struct string build_cache_dir_path;
     path_init_realpath(&build_cache_dir_path, build_cache_dir);
     path_ensure_trailing_slash(&build_cache_dir_path);
 
-    struct path test_path;
+    struct string test_path;
     path_init_realpath(&test_path, test_dir);
 
     tests_db_scan_dir(tests, &test_path, &build_cache_dir_path);
 
-    free(build_cache_dir_path.data);
-    free(test_path.data);
+    string_destroy(&build_cache_dir_path);
+    string_destroy(&test_path);
 }
 
-static bool find_header_dep_with_lmt_gt(struct tests_db* tests, struct timespec lmt, const char* dep_file_path) {
+static bool find_header_dep_with_lmt_gt(struct string* scratch_space, struct timespec lmt, const char* dep_file_path) {
     FILE* dep_file = fopen(dep_file_path, "r");
     if (dep_file == NULL) {
         fatal_error("Failed to fopen() dependencies file %s: error: %d %s", dep_file_path, errno, strerror(errno));
@@ -1090,34 +1114,33 @@ static bool find_header_dep_with_lmt_gt(struct tests_db* tests, struct timespec 
         fatal_error("Failed to read test header dependencies from file %s: fopen failed error: %d %s\n",
                     dep_file_path, ferror(dep_file), strerror(ferror(dep_file)));
     }
-    char* cursor = tests->scratch_space;
-    *cursor = '\0';
+    string_clear(scratch_space);
     while (!feof(dep_file)) {
-        char* result = fgets(cursor, (int)(tests->scratch_space_cap - (size_t)(cursor - tests->scratch_space) - 1), dep_file);
+        char* result = fgets(scratch_space->data + scratch_space->len, (int)(scratch_space->capacity - scratch_space->len), dep_file);
         if (result == NULL || ferror(dep_file)) {
             if (feof(dep_file)) {
                 fclose(dep_file);
                 return false;
             }
-            fatal_error("Failed to read expectations from test file %s: fgets failed error: %d %s\n",
+            fatal_error("Failed to read test header dependencies from file %s: fgets failed error: %d %s\n",
                         dep_file_path, ferror(dep_file), strerror(ferror(dep_file)));
         }
-        cursor = cursor + strlen(cursor);
-        if (cursor + 1 >= tests->scratch_space + tests->scratch_space_cap) {
-            tests->scratch_space = realloc(tests->scratch_space, tests->scratch_space_cap * 2);
-            cursor = tests->scratch_space + tests->scratch_space_cap - 1;
-            tests->scratch_space_cap *= 2;
+        scratch_space->len += strlen(scratch_space->data + scratch_space->len);
+        if (scratch_space->len + 1 == scratch_space->capacity) {
+            string_reserve(scratch_space, scratch_space->len + 1);
             continue;  // Didn't finish reading the line, continue reading.
         }
         // Tokenize the line to scan header dependencies
-        while (cursor != tests->scratch_space && (*(cursor - 1) == ' ' || *(cursor - 1) == '\\' || *(cursor - 1) == '\n')) {
-            *(--cursor) = '\0';
+        while (scratch_space->len > 0
+               && (scratch_space->data[scratch_space->len - 1] == ' '
+                   || scratch_space->data[scratch_space->len - 1] == '\\'
+                   || scratch_space->data[scratch_space->len - 1] == '\n')) {
+            scratch_space->data[--scratch_space->len] = '\0';
         }
-        *cursor = ' ';
-        cursor++;
-        *cursor = '\0';
-        char* start = strchr(tests->scratch_space, ':');
-        char* p = strtok(start == NULL ? tests->scratch_space : start + 1, " ");
+        scratch_space->data[scratch_space->len++] = ' ';
+        scratch_space->data[scratch_space->len] = '\0';
+        char* start = strchr(scratch_space->data, ':');
+        char* p = strtok(start == NULL ? scratch_space->data : start + 1, " ");
         for (; p != NULL; p = strtok(NULL, " ")) {
             if (*p != '\0') {  // non-empty tokens only
                 bool exists, is_dir;
@@ -1133,13 +1156,13 @@ static bool find_header_dep_with_lmt_gt(struct tests_db* tests, struct timespec 
                 }
             }
         }
-        cursor = tests->scratch_space;
+        string_clear(scratch_space);
     }
     fclose(dep_file);
     return false;
 }
 
-static bool check_test_requires_re_compile(struct tests_db* tests, struct test* test) {
+static bool check_test_requires_re_compile(struct string* scratch_space, struct test* test) {
     if (test->expect_no_compile_num_runs > 0) {
         // A negative compile test is never compiled (running the test involves doing the compilation).
         return false;
@@ -1164,7 +1187,7 @@ static bool check_test_requires_re_compile(struct tests_db* tests, struct test* 
         return true;
     }
     // Source file did not change. Check header dependencies now.
-    return find_header_dep_with_lmt_gt(tests, test->obj_file_lmt, test->dep_file_path);
+    return find_header_dep_with_lmt_gt(scratch_space, test->obj_file_lmt, test->dep_file_path);
 }
 
 static bool check_test_requires_re_link(struct test* test, struct timespec libs_lmt) {
@@ -1214,7 +1237,7 @@ static void tests_db_prepare(struct tests_db* db) {
     db->num_tests_to_link = 0;
     db->num_neg_compile_tests = 0;
     for (size_t i = 0; i < db->num_tests; i++) {
-        db->tests[i].requires_re_compile = check_test_requires_re_compile(db, db->tests + i);
+        db->tests[i].requires_re_compile = check_test_requires_re_compile(&db->test_runs[0].scratch_space, db->tests + i);
         db->num_tests_to_compile += db->tests[i].requires_re_compile;
 
         db->tests[i].requires_re_link = check_test_requires_re_link(db->tests + i, libs_lmt);
@@ -1225,18 +1248,11 @@ static void tests_db_prepare(struct tests_db* db) {
 }
 
 static void test_run_print(struct test_run* test_run) {
-    if (test_run->step == s_done && !test_run->failed && !flag_print_on_success) {
-        if (flag_interactive) {
-            printf("\r\033[K");
-            fflush(stdout);
-        }
+    if (test_run->step == s_success && !flag_print_on_success) {
         return;
     }
-    if (test_run->step != s_done && !flag_interactive) {
+    if (test_run->step != s_success && !test_run->failed && !flag_interactive) {
         return;  // Don't print anything until we're done if not in interactive mode.
-    }
-    if (flag_interactive) {
-        printf("\r\033[K");
     }
     printf("(%zu/%zu) %s", test_run->id, test_run->num_tests, test_run->test->test_name);
     if (test_run->test->requires_re_compile && test_run->step >= s_compiling) {
@@ -1249,33 +1265,40 @@ static void test_run_print(struct test_run* test_run) {
         printf(" running...");
     }
     if (test_run->test->expect_no_compile_num_runs > 0) {
-        for (int i = 0; i < test_run->non_compile_index; i++) {
+        for (int i = 0; i <= test_run->no_compile_run_id; i++) {
             printf("#%d..", i);
         }
     }
-    if (test_run->step >= s_done) {
-        if (test_run->failed) {
-            printf("%sfailed%s\n", color_error_begin(), color_reset());
-        } else {
-            printf("%ssuccess%s\n", color_success_begin(), color_reset());
-        }
+    if (test_run->step >= s_success) {
+        printf("%ssuccess%s", color_success_begin(), color_reset());
     }
-    fflush(stdout);
+    if (test_run->failed) {
+        printf("%sfailed%s", color_error_begin(), color_reset());
+    }
+    if (test_run->step != s_success && !test_run->failed) {
+        // This is an interactive line, don't print an EOL.
+        num_lines_interactive += 1;
+    } else {
+        printf("\n");
+    }
 }
 
+// returns true, to mark that the execution is done.
 static __attribute__((format(printf, 2, 3))) bool test_fail(struct test_run* test_run, const char* fmt, ...) {
-    test_run->step = s_done;
+    interactive_clear();
     test_run->failed = true;
     test_run_print(test_run);
     va_list args;
     va_start(args, fmt);
     vprintf(fmt, args);
     va_end(args);
+    interactive_flush();
     if (flag_die_on_fail) {
-        printf("\nAborting early...\n");
-        abort();
+        printf("\n%sExiting early...%s\n", color_error_begin(), color_reset());
+        // TODO: Wait all other test_run processes!
+        exit(EXIT_FAILURE);
     }
-    return false;
+    return true;
 }
 
 static void test_run_set_test(struct tests_db* tests, struct test_run* test_run, size_t i) {
@@ -1284,7 +1307,7 @@ static void test_run_set_test(struct tests_db* tests, struct test_run* test_run,
     test_run->test = tests->tests + i;
     test_run->failed = false;
     test_run->step = s_starting;
-    test_run->non_compile_index = 0;
+    test_run->no_compile_run_id = 0;
 
     // Last arguments of compile command are -o obj_file -MF dep_file source_file
     test_run->compile_command.argv[test_run->compile_command.argc - 4] = test_run->test->obj_file_path;
@@ -1297,31 +1320,55 @@ static void test_run_set_test(struct tests_db* tests, struct test_run* test_run,
     test_run->negative_compile_command.argv[test_run->negative_compile_command.argc - 1] = test_run->test->file_path;
 }
 
-static bool compile_test(struct tests_db* tests, struct test_run* test_run) {
-    subprocess_start(&test_run->proc, &test_run->compile_command, fail_exit_abort);
-    subprocess_poll(&test_run->proc, true);
-    if (WIFEXITED(test_run->proc.exit_status) == 0 || WEXITSTATUS(test_run->proc.exit_status) != 0) {
-        return test_fail(test_run,
-                         "Compile command: %s\n" COMPILER_OUTPUT_FORMAT,
-                         cmd_line_to_str(&test_run->compile_command, &tests->scratch_space, &tests->scratch_space_cap),
-                         test_run->proc.output_buf);
-    }
-    return true;
+static void test_run_start_execute_no_compile(struct test_run* test_run) {
+    sprintf(test_run->negative_compile_command.argv[test_run->negative_compile_command.argc - 2], "-DNEGATIVE_COMPILE_ITERATION=%d", test_run->no_compile_run_id);
+    subprocess_start(&test_run->proc, &test_run->negative_compile_command, fail_exit_code_0);
 }
 
-static bool link_test(struct tests_db* tests, struct test_run* test_run) {
-    subprocess_start(&test_run->proc, &test_run->link_command, fail_exit_abort);
-    subprocess_poll(&test_run->proc, true);
-    if (WIFEXITED(test_run->proc.exit_status) == 0 || WEXITSTATUS(test_run->proc.exit_status) != 0) {
+static bool test_run_check_execute_no_compile(struct test_run* test_run) {
+    struct test* test = test_run->test;
+    if (WIFSIGNALED(test_run->proc.exit_status)) {
         return test_fail(test_run,
-                         "Link command: %s\n" COMPILER_OUTPUT_FORMAT,
-                         cmd_line_to_str(&test_run->link_command, &tests->scratch_space, &tests->scratch_space_cap),
-                         test_run->proc.output_buf);
+                         "Compiler killed by signal %d.\n"
+                         "Compiler command: %s\n" COMPILER_OUTPUT_FORMAT,
+                         (int)(WTERMSIG(test_run->proc.exit_status)),
+                         cmd_line_to_str(&test_run->negative_compile_command, &test_run->scratch_space),
+                         test_run->proc.output_buf.data);
     }
-    return true;
+    if (WEXITSTATUS(test_run->proc.exit_status) == 0) {
+        return test_fail(test_run,
+                         "Compiler exited with code 0.\n"
+                         "Compiler command: %s\n" COMPILER_OUTPUT_FORMAT,
+                         cmd_line_to_str(&test_run->negative_compile_command, &test_run->scratch_space),
+                         test_run->proc.output_buf.data);
+    }
+
+    if (test->expect_no_compile_has_pattern) {
+        int regexec_status = regexec(&test->expect_no_compile_pattern, test_run->proc.output_buf.data, 0, NULL, 0);
+        if (regexec_status == REG_NOMATCH) {
+            return test_fail(test_run,
+                             "Expected pattern not found in compiler output.\n"
+                             "Compiler command: %s\n" COMPILER_OUTPUT_FORMAT,
+                             cmd_line_to_str(&test_run->negative_compile_command, &test_run->scratch_space),
+                             test_run->proc.output_buf.data);
+        }
+    }
+    test_run->no_compile_run_id++;
+    if (test_run->no_compile_run_id == test->expect_no_compile_num_runs) {
+        test_run->step = s_success;
+        return true;
+    }
+    test_run_start_execute_no_compile(test_run);
+    return false;
 }
 
-static bool run_test(struct tests_db* tests, struct test_run* test_run) {
+static void test_run_start_execute(struct test_run* test_run) {
+    test_run->step = s_running;
+    if (test_run->test->expect_no_compile_num_runs > 0) {
+        test_run->no_compile_run_id = 0;
+        test_run_start_execute_no_compile(test_run);
+        return;
+    }
     char* argv[2];
     argv[0] = test_run->test->exe_file_path;
     argv[1] = NULL;
@@ -1329,12 +1376,16 @@ static bool run_test(struct tests_db* tests, struct test_run* test_run) {
     test_cmd_line.argc = 1;
     test_cmd_line.argv = argv;
     subprocess_start(&test_run->proc, &test_cmd_line, test_run->test->expect_exit_signal ? fail_exit_code_0 : fail_exit_abort);
-    subprocess_poll(&test_run->proc, true);
+}
 
-    if (strstr(test_run->proc.output_buf, "EXPECTATION FAILED") != NULL) {
+static bool test_run_check_execute(struct test_run* test_run) {
+    if (test_run->test->expect_no_compile_num_runs > 0) {
+        return test_run_check_execute_no_compile(test_run);
+    }
+    if (strstr(test_run->proc.output_buf.data, "EXPECTATION FAILED") != NULL) {
         return test_fail(test_run,
                          "Found 'EXPECTATION FAILED' in output, test failed regardless of child exit code / signal.\n" TEST_OUTPUT_FORMAT,
-                         test_run->proc.output_buf);
+                         test_run->proc.output_buf.data);
     }
     if (WIFSIGNALED(test_run->proc.exit_status)) {
         if (test_run->test->expect_exit_code != 0) {
@@ -1357,9 +1408,9 @@ static bool run_test(struct tests_db* tests, struct test_run* test_run) {
         }
     }
 
-    char* output_steps = tests->scratch_space;
+    char* output_steps = test_run->scratch_space.data;
     size_t output_steps_size = 0;
-    const char* output_cursor = test_run->proc.output_buf;
+    const char* output_cursor = test_run->proc.output_buf.data;
     while (1) {
         char* next = strstr(output_cursor, "STEP: ");
         if (next == NULL) {
@@ -1367,20 +1418,14 @@ static bool run_test(struct tests_db* tests, struct test_run* test_run) {
         }
         char* step_end = strchr(next, '\n');
         if (step_end == NULL) {
-            return test_fail(test_run, "Found unfinished step line in output!\n" TEST_OUTPUT_FORMAT, test_run->proc.output_buf);
+            return test_fail(test_run, "Found unfinished step line in output!\n" TEST_OUTPUT_FORMAT, test_run->proc.output_buf.data);
         }
         if (output_steps_size > 0) {
-            if (output_steps_size + 1 >= tests->scratch_space_cap) {
-                tests->scratch_space = realloc(tests->scratch_space, tests->scratch_space_cap * 2);
-                tests->scratch_space_cap *= 2;
-            }
+            string_reserve(&test_run->scratch_space, output_steps_size + 1);
             output_steps[output_steps_size++] = ',';
         }
         size_t step_size = (size_t)(step_end - (next + 6));
-        while (output_steps_size + step_size >= tests->scratch_space_cap) {
-            test_run->test->file_path = realloc(tests->scratch_space, tests->scratch_space_cap * 2);
-            tests->scratch_space_cap *= 2;
-        }
+        string_reserve(&test_run->scratch_space, output_steps_size + step_size);
         memcpy(output_steps + output_steps_size, next + 6, step_size);
         output_steps_size += step_size;
         output_cursor = step_end;
@@ -1392,89 +1437,134 @@ static bool run_test(struct tests_db* tests, struct test_run* test_run) {
                              "Steps checking failed!\n"
                              "Expected steps: %s\n"
                              "Actual   steps: %s\n" TEST_OUTPUT_FORMAT,
-                             test_run->test->expect_steps, output_steps, test_run->proc.output_buf);
+                             test_run->test->expect_steps, output_steps, test_run->proc.output_buf.data);
         }
     } else {
         if (output_steps_size > 0) {
             return test_fail(test_run,
                              "Output includes unexpected steps: %s\n"
                              "Did you forget to add // EXPECT:STEPS comment to the test?" TEST_OUTPUT_FORMAT,
-                             output_steps, test_run->proc.output_buf);
+                             output_steps, test_run->proc.output_buf.data);
         }
     }
-
+    test_run->step = s_success;
     return true;
 }
 
-static bool run_negative_compile_test(struct tests_db* tests, struct test_run* test_run) {
-    struct test* test = test_run->test;
-    for (int test_id = 0; test_id < test->expect_no_compile_num_runs; test_id++) {
-        sprintf(test_run->negative_compile_command.argv[test_run->negative_compile_command.argc - 2], "-DNEGATIVE_COMPILE_ITERATION=%d", test_id);
-        test_run->non_compile_index = test_id;
-        test_run_print(test_run);
-        subprocess_start(&test_run->proc, &test_run->negative_compile_command, fail_exit_code_0);
-        subprocess_poll(&test_run->proc, true);
+static void test_run_start_link(struct test_run* test_run) {
+    test_run->step = s_linking;
+    subprocess_start(&test_run->proc, &test_run->link_command, fail_exit_abort);
+}
 
-        if (WIFSIGNALED(test_run->proc.exit_status)) {
-            return test_fail(test_run,
-                             "Compiler killed by signal %d.\n"
-                             "Compiler command: %s\n" COMPILER_OUTPUT_FORMAT,
-                             (int)(WTERMSIG(test_run->proc.exit_status)),
-                             cmd_line_to_str(&test_run->negative_compile_command, &tests->scratch_space, &tests->scratch_space_cap),
-                             test_run->proc.output_buf);
-        }
-        if (WEXITSTATUS(test_run->proc.exit_status) == 0) {
-            return test_fail(test_run,
-                             "Compiler exited with code 0.\n"
-                             "Compiler command: %s\n" COMPILER_OUTPUT_FORMAT,
-                             cmd_line_to_str(&test_run->negative_compile_command, &tests->scratch_space, &tests->scratch_space_cap),
-                             test_run->proc.output_buf);
-        }
+static bool test_run_check_link(struct test_run* test_run) {
+    if (WIFEXITED(test_run->proc.exit_status) == 0 || WEXITSTATUS(test_run->proc.exit_status) != 0) {
+        return test_fail(test_run,
+                         "Link command: %s\n" COMPILER_OUTPUT_FORMAT,
+                         cmd_line_to_str(&test_run->link_command, &test_run->scratch_space),
+                         test_run->proc.output_buf.data);
+    }
+    test_run_start_execute(test_run);
+    return false;
+}
 
-        if (test->expect_no_compile_has_pattern) {
-            int regexec_status = regexec(&test->expect_no_compile_pattern, test_run->proc.output_buf, 0, NULL, 0);
-            if (regexec_status == REG_NOMATCH) {
-                return test_fail(test_run,
-                                 "Expected pattern not found in compiler output.\n"
-                                 "Compiler command: %s\n" COMPILER_OUTPUT_FORMAT,
-                                 cmd_line_to_str(&test_run->negative_compile_command, &tests->scratch_space, &tests->scratch_space_cap),
-                                 test_run->proc.output_buf);
+static void test_run_start_compile(struct test_run* test_run) {
+    test_run->step = s_compiling;
+    subprocess_start(&test_run->proc, &test_run->compile_command, fail_exit_abort);
+}
+
+static bool test_run_check_compile(struct test_run* test_run) {
+    if (WIFEXITED(test_run->proc.exit_status) == 0 || WEXITSTATUS(test_run->proc.exit_status) != 0) {
+        return test_fail(test_run,
+                         "Compile command: %s\n" COMPILER_OUTPUT_FORMAT,
+                         cmd_line_to_str(&test_run->compile_command, &test_run->scratch_space),
+                         test_run->proc.output_buf.data);
+    }
+    if (test_run->test->requires_re_link) {
+        test_run_start_link(test_run);
+    } else {
+        test_run_start_execute(test_run);
+    }
+    return false;
+}
+
+// Returns whether the running test is done.
+static bool test_run_poll(struct test_run* test_run, bool* did_state_change) {
+    *did_state_change = false;
+    if (test_run->step == s_starting) {
+        if (test_run->test->requires_re_compile) {
+            test_run_start_compile(test_run);
+        } else if (test_run->test->requires_re_link) {
+            test_run_start_link(test_run);
+        } else {
+            test_run_start_execute(test_run);
+        }
+        *did_state_change = true;
+        return false;
+    }
+    if (test_run->step == s_success || test_run->failed) {
+        return true;
+    }
+    // If we're not either just starting out or done, there's always a subprocess running.
+    if (!subprocess_poll(&test_run->proc)) {
+        return false;
+    }
+    *did_state_change = true;
+    switch (test_run->step) {
+        case s_compiling: return test_run_check_compile(test_run);
+        case s_linking: return test_run_check_link(test_run);
+        case s_running: return test_run_check_execute(test_run);
+        default:
+            fatal_error("Internal error: unexpected test_run step = %d\n", (int)test_run->step);
+    }
+}
+
+static void test_run_poll_all(struct test_run* test_runs, size_t* num_test_runs, size_t* num_tests_succeeded) {
+    bool did_state_change = false;
+    for (size_t i = 0; i < *num_test_runs;) {
+        if (test_run_poll(&test_runs[i], &did_state_change)) {
+            if (!test_runs[i].failed) {
+                *num_tests_succeeded += 1;
+                interactive_clear();
+                test_run_print(&test_runs[i]);
             }
+            did_state_change = true;
+            if (i + 1 < *num_test_runs) {
+                struct test_run run = test_runs[i];
+                memmove(test_runs + i, test_runs + i + 1, sizeof(struct test_run) * (*num_test_runs - i - 1));
+                test_runs[*num_test_runs - 1] = run;
+            }
+            *num_test_runs -= 1;
+        } else {
+            i++;
         }
     }
-    return true;
+    if (did_state_change) {
+        interactive_clear();
+        for (size_t i = 0; i < *num_test_runs; i++) {
+            test_run_print(test_runs + i);
+            if (i + 1 != *num_test_runs && flag_interactive) {
+                printf("\n");
+            }
+        }
+        interactive_flush();
+    }
 }
 
 static size_t tests_db_execute(struct tests_db* tests) {
     size_t num_tests_succeeded = 0;
+    size_t num_tests_running = 0;
     for (size_t i = 0; i < tests->num_tests; i++) {
-        test_run_set_test(tests, &tests->test_run, i);
-        if (!tests->test_run.failed && tests->test_run.test->requires_re_compile) {
-            tests->test_run.step = s_compiling;
-            test_run_print(&tests->test_run);
-            compile_test(tests, &tests->test_run);
+        while (num_tests_running == tests->num_test_runs) {
+            // Poll all test runs until one is free.
+            test_run_poll_all(tests->test_runs, &num_tests_running, &num_tests_succeeded);
         }
-        if (!tests->test_run.failed && tests->test_run.test->requires_re_link) {
-            tests->test_run.step = s_linking;
-            test_run_print(&tests->test_run);
-            link_test(tests, &tests->test_run);
-        }
-        if (!tests->test_run.failed) {
-            if (tests->test_run.test->expect_no_compile_num_runs > 0) {
-                tests->test_run.step = s_non_compile_running;
-                test_run_print(&tests->test_run);
-                run_negative_compile_test(tests, &tests->test_run);
-            } else {
-                tests->test_run.step = s_running;
-                test_run_print(&tests->test_run);
-                run_test(tests, &tests->test_run);
-            }
-        }
-        tests->test_run.step = s_done;
-        if (!tests->test_run.failed) {
-            num_tests_succeeded += 1;
-            test_run_print(&tests->test_run);
-        }
+        struct test_run* test_run = tests->test_runs + (num_tests_running++);
+        test_run_set_test(tests, test_run, i);
+        test_run_poll_all(tests->test_runs, &num_tests_running, &num_tests_succeeded);
+    }
+    while (num_tests_running > 0) {
+        // Poll all test runs until all are done.
+        test_run_poll_all(tests->test_runs, &num_tests_running, &num_tests_succeeded);
     }
     return num_tests_succeeded;
 }
@@ -1489,6 +1579,17 @@ int main(int argc, char** argv) {
     flag_colors = get_flag_bool("c", "TEST_COLORS", is_term_output, &argc, &argv);
     flag_interactive = get_flag_bool("i", "TEST_INTERACTIVE", is_term_output, &argc, &argv);
     const char* cache_dir = get_flag_string("cache-dir", "TEST_CACHE_DIR", DEFAULT_CACHE_DIR, &argc, &argv);
+    int num_jobs = get_flag_int("j", "TEST_JOBS", "1", &argc, &argv);
+    if (num_jobs <= 0 || num_jobs > 256) {
+        fatal_error("Invalid num jobs. Expected number between 1 and 256.\n");
+    }
+
+    if (flag_interactive && BUFSIZ < 65536) {
+        // For interactive mode, output looks smoother if we control
+        // exact flushing with interactive_flush(). If this fails, we
+        // don't really care as it's an optional enhancement.
+        setvbuf(stdout, NULL, _IOFBF, 65536);
+    }
 
     if (argc > 2) {
         printf("Usage: %s [options] [<tests-directory/test-file>]\n"
@@ -1504,6 +1605,7 @@ int main(int argc, char** argv) {
     printf("Testing %s\n\n", test_dir);
 
     struct tests_db tests;
+    tests_db_init(&tests, num_jobs);
     tests_db_scan(&tests, test_dir, cache_dir);
     tests_db_prepare(&tests);
 
@@ -1546,11 +1648,10 @@ int main(int argc, char** argv) {
                color_reset());
     }
     if (num_tests_succeeded < tests.num_tests) {
-        printf("%s%zu test%s of %zu failed.%s\n",
+        printf("%s%zu test%s failed.%s\n",
                color_error_begin(),
                tests.num_tests - num_tests_succeeded,
                tests.num_tests - num_tests_succeeded > 1 ? "s" : "",
-               tests.num_tests,
                color_reset());
     }
 
