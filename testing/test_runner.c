@@ -723,6 +723,7 @@ static void tests_db_destroy(struct tests_db* tests) {
     for (size_t i = 0; i < tests->num_test_runs; i++) {
         test_run_destroy(tests->test_runs + i);
     }
+    free(tests->test_runs);
     for (size_t i = 0; i < tests->num_tests; i++) {
         free(tests->tests[i].file_path);
         if (tests->tests[i].expect_no_compile_has_pattern) {
