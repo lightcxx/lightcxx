@@ -47,7 +47,7 @@ extern char* const* environ;
 enum {
     NUM_EXPECTATION_CLAUSES_SUPPORTED = 4,  // EXPECT:NO_COMPILE, EXPECT:STEPS, EXPECT:EXIT and REQUEST:SKIP
     TESTS_INITIAL_CAPACITY = 8,
-    STR_BUF_INITIAL_CAPACITY = 128,
+    STRING_INITIAL_CAPACITY = 128,
     ALWAYS_ERROR_EXIT_CODE = 7,  // Tests are NOT allowed to expect to exit with code 7, so this will always be a test fail.
     MAX_NEGATIVE_COMPILE_RUNS = 999,
 };
@@ -255,55 +255,83 @@ static bool timespec_before(struct timespec a, struct timespec b) {
     return a.tv_sec < b.tv_sec;
 }
 
-struct path {
+struct string_view {
+    const char* start;
+    const char* end;
+};
+
+static size_t sv_len(struct string_view view) {
+    return (size_t)(view.end - view.start);
+}
+
+struct string {
     char* data;
     size_t len;
     size_t capacity;
 };
 
+static void string_clear(struct string* str) {
+    str->len = 0;
+    str->data[str->len] = '\0';
+}
+
+static void string_init(struct string* str) {
+    str->capacity = STRING_INITIAL_CAPACITY;
+    str->data = malloc(str->capacity);
+    string_clear(str);
+}
+
+static void string_destroy(struct string* str) {
+    free(str->data);
+}
+
+static void string_reserve(struct string* str, size_t sz) {
+    if (str->capacity <= sz) {
+        while (str->capacity <= sz) {
+            str->capacity *= 2;
+        }
+        str->data = realloc(str->data, str->capacity);
+    }
+}
+
+struct path {
+    struct string str;
+};
+
 static void path_init_realpath(struct path* path, const char* from) {
-    path->data = realpath(from, NULL);
-    path->len = strlen(path->data);
-    path->capacity = path->len + 1;
+    path->str.data = realpath(from, NULL);
+    path->str.len = strlen(path->str.data);
+    path->str.capacity = path->str.len + 1;
 }
 
 static void path_ensure_trailing_slash(struct path* path) {
-    if (path->data[path->len - 1] != PATH_SEP) {
-        if (path->len + 1 >= path->capacity) {
-            path->capacity *= 2;
-            path->data = realloc(path->data, path->capacity);
-        }
-        path->data[path->len] = PATH_SEP;
-        path->len++;
-        path->data[path->len] = '\0';
+    if (path->str.data[path->str.len - 1] != PATH_SEP) {
+        string_reserve(&path->str, path->str.len + 1);
+        path->str.data[path->str.len++] = PATH_SEP;
+        path->str.data[path->str.len] = '\0';
     }
 }
 
 static void path_append(struct path* path, const char* part) {
-    if (part[0] == PATH_SEP && path->data[path->len - 1] == PATH_SEP) {
+    if (part[0] == PATH_SEP && path->str.data[path->str.len - 1] == PATH_SEP) {
         part++;
-    } else if (part[0] != PATH_SEP && path->data[path->len - 1] != PATH_SEP) {
+    } else if (part[0] != PATH_SEP) {
         path_ensure_trailing_slash(path);
     }
     const size_t part_len = strlen(part);
-    if (path->len + part_len >= path->capacity) {
-        while (path->len + part_len >= path->capacity) {
-            path->capacity *= 2;
-        }
-        path->data = realloc(path->data, path->capacity);
-    }
-    memcpy(path->data + path->len, part, part_len + 1);
-    path->len += part_len;
+    string_reserve(&path->str, path->str.len + part_len);
+    memcpy(path->str.data + path->str.len, part, part_len + 1);
+    path->str.len += part_len;
 }
 
 static void path_pop(struct path* path) {
-    if (path->data[path->len - 1] == PATH_SEP) {
-        path->len--;
+    if (path->str.data[path->str.len - 1] == PATH_SEP) {
+        path->str.len--;
     }
-    while (path->data[path->len - 1] != PATH_SEP) {
-        path->len--;
+    while (path->str.data[path->str.len - 1] != PATH_SEP) {
+        path->str.len--;
     }
-    path->data[path->len--] = '\0';
+    path->str.data[path->str.len--] = '\0';
 }
 
 static void path_stat(const char* path, bool* exists, struct timespec* last_touch_ts, bool* is_dir) {
@@ -396,10 +424,10 @@ static void cmd_line_destroy(struct cmd_line* cmd_line) {
     free(cmd_line->argv);
 }
 
-static const char* cmd_line_to_str(struct cmd_line* cmd_line, char** buf, size_t* buf_capacity) {
+static const char* cmd_line_to_str(struct cmd_line* cmd_line, struct string* str) {
     if (cmd_line->argc == 0) {
-        **buf = '\0';
-        return *buf;
+        string_clear(str);
+        return str->data;
     }
     size_t argv0_size = strlen(cmd_line->argv[0]);
     size_t size = argv0_size + (size_t)(cmd_line->argc - 1) /* spaces */;
@@ -417,33 +445,29 @@ static const char* cmd_line_to_str(struct cmd_line* cmd_line, char** buf, size_t
             size += 2;
         }
     }
-    if (*buf_capacity <= size) {
-        while (*buf_capacity <= size) {
-            *buf_capacity *= 2;
-        }
-        *buf = realloc(*buf, *buf_capacity);
-    }
-    memcpy(*buf, cmd_line->argv[0], argv0_size);
+    string_reserve(str, size);
+    memcpy(str->data, cmd_line->argv[0], argv0_size);
     size = argv0_size;
     for (int i = 1; i < cmd_line->argc; i++) {
-        (*buf)[size++] = ' ';
+        str->data[size++] = ' ';
         bool escape = false;
-        char* start = *buf + size;
+        char* start = str->data + size;
         for (char* p = cmd_line->argv[i]; *p; p++) {
             if (*p == '"' || *p == '\\') {
-                (*buf)[size++] = '\\';
+                str->data[size++] = '\\';
                 escape = true;
             }
-            (*buf)[size++] = *p;
+            str->data[size++] = *p;
         }
         if (escape) {
-            memmove(start + 1, start, (size_t)((*buf + size) - start));
+            memmove(start + 1, start, (size_t)((str->data + size) - start));
             *start = '"';
-            (*buf)[size++] = '"';
+            str->data[size++] = '"';
         }
     }
-    (*buf)[size] = '\0';
-    return *buf;
+    str->len = size;
+    str->data[str->len] = '\0';
+    return str->data;
 }
 
 struct subprocess {
@@ -452,9 +476,7 @@ struct subprocess {
     int child_stderr_fd;
     bool is_done;
     int exit_status;
-    char* output_buf;
-    size_t output_buf_size;
-    size_t output_buf_capacity;
+    struct string output_buf;
 };
 
 static void subprocess_init(struct subprocess* result) {
@@ -463,13 +485,11 @@ static void subprocess_init(struct subprocess* result) {
     result->child_stderr_fd = 0;
     result->is_done = false;
     result->exit_status = 0;
-    result->output_buf_size = 0;
-    result->output_buf_capacity = STR_BUF_INITIAL_CAPACITY;
-    result->output_buf = malloc(result->output_buf_capacity);
+    string_init(&result->output_buf);
 }
 
 static void subprocess_destroy(struct subprocess* result) {
-    free(result->output_buf);
+    string_destroy(&result->output_buf);
 }
 
 enum subprocess_fail_exit {
@@ -538,21 +558,15 @@ static void subprocess_start(struct subprocess* result, struct cmd_line* cmd, en
 
     result->is_done = false;
     result->exit_status = 0;
-    result->output_buf_size = 0;
+    string_clear(&result->output_buf);
 }
 
 static void subprocess_poll_output(struct subprocess* result, int fd, bool to_eof) {
     while (1) {
-        size_t remaining_cap = result->output_buf_capacity - result->output_buf_size;
-        if (remaining_cap < 512) {
-            while (remaining_cap < 512) {
-                result->output_buf_capacity *= 2;
-                remaining_cap = result->output_buf_capacity - result->output_buf_size;
-            }
-            result->output_buf = realloc(result->output_buf, result->output_buf_capacity);
-        }
+        // Ensure at least 512 bytes can be read from the subprocess output in one call to read().
+        string_reserve(&result->output_buf, result->output_buf.len + 512);
         errno = 0;
-        ssize_t num_bytes = read(fd, result->output_buf + result->output_buf_size, remaining_cap);
+        ssize_t num_bytes = read(fd, result->output_buf.data + result->output_buf.len, result->output_buf.capacity - result->output_buf.len);
         if (num_bytes < 0) {
             if (errno == EAGAIN) {
                 if (to_eof) {
@@ -565,7 +579,7 @@ static void subprocess_poll_output(struct subprocess* result, int fd, bool to_eo
         if (num_bytes == 0) {
             break;
         }
-        result->output_buf_size += (size_t)num_bytes;
+        result->output_buf.len += (size_t)num_bytes;
     }
 }
 
@@ -599,7 +613,7 @@ static bool subprocess_poll(struct subprocess* result, bool blocking) {
     }
     subprocess_poll_output(result, result->child_stdout_fd, true);
     subprocess_poll_output(result, result->child_stderr_fd, true);
-    result->output_buf[result->output_buf_size] = '\0';
+    result->output_buf.data[result->output_buf.len] = '\0';
     close(result->child_stdout_fd);
     close(result->child_stderr_fd);
     return true;
@@ -629,8 +643,7 @@ enum test_run_step {
     s_compiling = 1,
     s_linking = 2,
     s_running = 3,
-    s_non_compile_running = 4,
-    s_done = 5,
+    s_done = 4,
 };
 struct test_run {
     size_t id;
@@ -638,24 +651,27 @@ struct test_run {
     struct test* test;
     bool failed;
     enum test_run_step step;
-    int non_compile_index;
+    int no_compile_run_id;
     struct subprocess proc;
     struct cmd_line compile_command;
     struct cmd_line link_command;
     struct cmd_line negative_compile_command;
+    struct string scratch_space;
 };
 
 static void test_run_init(struct test_run* test_run) {
-    cmd_line_init(&test_run->compile_command, 3, cmd_line_base, cmd_line_include, cmd_line_compile);
-    cmd_line_init(&test_run->negative_compile_command, 3, cmd_line_base, cmd_line_include, cmd_line_neg_compile);
-    cmd_line_init(&test_run->link_command, 2, cmd_line_base, cmd_line_link);
     subprocess_init(&test_run->proc);
+    cmd_line_init(&test_run->compile_command, 3, cmd_line_base, cmd_line_include, cmd_line_compile);
+    cmd_line_init(&test_run->link_command, 2, cmd_line_base, cmd_line_link);
+    cmd_line_init(&test_run->negative_compile_command, 3, cmd_line_base, cmd_line_include, cmd_line_neg_compile);
+    string_init(&test_run->scratch_space);
 }
 
 static void test_run_destroy(struct test_run* test_run) {
-    cmd_line_destroy(&test_run->compile_command);
+    string_destroy(&test_run->scratch_space);
     cmd_line_destroy(&test_run->negative_compile_command);
     cmd_line_destroy(&test_run->link_command);
+    cmd_line_destroy(&test_run->compile_command);
     subprocess_destroy(&test_run->proc);
 }
 
@@ -666,11 +682,7 @@ struct tests_db {
     size_t capacity;
 
     // Test run
-    struct test_run test_run;
-
-    // Buffer for reading test expectations
-    char* scratch_space;
-    size_t scratch_space_cap;
+    struct test_run test_run[1];
 
     // Stats
     size_t num_mis_configured_tests;
@@ -683,16 +695,14 @@ static void tests_db_init(struct tests_db* tests) {
     tests->num_tests = 0;
     tests->capacity = TESTS_INITIAL_CAPACITY;
     tests->tests = malloc(sizeof(struct test) * tests->capacity);
-    tests->scratch_space_cap = STR_BUF_INITIAL_CAPACITY;
-    tests->scratch_space = malloc(tests->scratch_space_cap);
     tests->num_mis_configured_tests = 0;
     tests->num_tests_to_compile = 0;
     tests->num_tests_to_link = 0;
-    test_run_init(&tests->test_run);
+    test_run_init(tests->test_run);
 }
 
 static void tests_db_destroy(struct tests_db* tests) {
-    test_run_destroy(&tests->test_run);
+    test_run_destroy(tests->test_run);
     for (size_t i = 0; i < tests->num_tests; i++) {
         free(tests->tests[i].file_path);
         if (tests->tests[i].expect_no_compile_has_pattern) {
@@ -700,16 +710,6 @@ static void tests_db_destroy(struct tests_db* tests) {
         }
     }
     free(tests->tests);
-    free(tests->scratch_space);
-}
-
-struct string_view {
-    const char* start;
-    const char* end;
-};
-
-static size_t sv_len(struct string_view view) {
-    return (size_t)(view.end - view.start);
 }
 
 static bool parse_test_single_expectation(const char* file_contents, const char* pattern, struct string_view* result) {
@@ -858,7 +858,7 @@ static bool parse_test_expectations(struct tests_db* tests,
                                     bool* expect_no_compile_has_pattern,
                                     regex_t* expect_no_compile_pattern) {
     // Parse the test path to discover section and test name stem.
-    test_file_stem->end = test_path->data + test_path->len - 4;
+    test_file_stem->end = test_path->str.data + test_path->str.len - 4;
     section->end = test_file_stem->end;
     while (*section->end != PATH_SEP) {
         section->end--;
@@ -871,37 +871,36 @@ static bool parse_test_expectations(struct tests_db* tests,
     section->start++;
 
     errno = 0;
-    FILE* test_source_file = fopen(test_path->data, "r");
+    FILE* test_source_file = fopen(test_path->str.data, "r");
     if (test_source_file == NULL) {
-        fatal_error("Failed to fopen() test source file %s: error: %d %s", test_path->data, errno, strerror(errno));
+        fatal_error("Failed to fopen() test source file %s: error: %d %s", test_path->str.data, errno, strerror(errno));
     }
     if (ferror(test_source_file)) {
         fatal_error("Failed to read expectations from test file %s: fopen failed error: %d %s\n",
-                    test_path->data, ferror(test_source_file), strerror(ferror(test_source_file)));
+                    test_path->str.data, ferror(test_source_file), strerror(ferror(test_source_file)));
     }
-    char* cursor = tests->scratch_space;
-    *cursor = '\0';
+
+    struct string* scratch_space = &tests->test_run[0].scratch_space;
+    string_clear(scratch_space);
     for (int i = 0; i < NUM_EXPECTATION_CLAUSES_SUPPORTED;) {
-        char* result = fgets(cursor, (int)(tests->scratch_space_cap - (size_t)(cursor - tests->scratch_space)), test_source_file);
+        char* result = fgets(scratch_space->data + scratch_space->len, (int)(scratch_space->capacity - scratch_space->len), test_source_file);
         if (result == NULL || ferror(test_source_file)) {
             if (feof(test_source_file)) {
                 break;
             }
             fatal_error("Failed to read expectations from test file %s: fgets failed error: %d %s\n",
-                        test_path->data, ferror(test_source_file), strerror(ferror(test_source_file)));
+                        test_path->str.data, ferror(test_source_file), strerror(ferror(test_source_file)));
         }
-        cursor = cursor + strlen(cursor);
-        if (cursor + 1 >= tests->scratch_space + tests->scratch_space_cap) {
-            tests->scratch_space = realloc(tests->scratch_space, tests->scratch_space_cap * 2);
-            cursor = tests->scratch_space + tests->scratch_space_cap;
-            tests->scratch_space_cap *= 2;
+        scratch_space->len += strlen(scratch_space->data + scratch_space->len);
+        if (scratch_space->len + 1 == scratch_space->capacity) {
+            string_reserve(scratch_space, scratch_space->len + 1);
             continue;  // Didn't finish reading the line, skip incrementing loop counter.
         }
         i++;
     }
     fclose(test_source_file);
 
-    parse_test_single_expectation(tests->scratch_space, "// REQUEST:SKIP", skip_reason);
+    parse_test_single_expectation(scratch_space->data, "// REQUEST:SKIP", skip_reason);
     if (skip_reason->start != NULL) {
         print_todo("skipped test [%.*s].%.*s : %.*s\n",
                    (int)sv_len(*section), section->start,
@@ -910,18 +909,18 @@ static bool parse_test_expectations(struct tests_db* tests,
         return false;
     }
 
-    parse_test_single_expectation(tests->scratch_space, "// EXPECT:STEPS", expect_steps);
+    parse_test_single_expectation(scratch_space->data, "// EXPECT:STEPS", expect_steps);
 
     struct string_view expect_exit;
-    parse_test_single_expectation(tests->scratch_space, "// EXPECT:EXIT", &expect_exit);
-    if (!parse_exit_expectation(test_path->data, expect_exit, expect_exit_code, expect_exit_signal)) {
+    parse_test_single_expectation(scratch_space->data, "// EXPECT:EXIT", &expect_exit);
+    if (!parse_exit_expectation(test_path->str.data, expect_exit, expect_exit_code, expect_exit_signal)) {
         tests->num_mis_configured_tests += 1;
         return false;
     }
 
     struct string_view expect_no_compile;
-    parse_test_single_expectation(tests->scratch_space, "// EXPECT:NO_COMPILE", &expect_no_compile);
-    if (!parse_no_compile_expectation(test_path->data, expect_no_compile, expect_no_compile_num_runs, expect_no_compile_has_pattern, expect_no_compile_pattern)) {
+    parse_test_single_expectation(scratch_space->data, "// EXPECT:NO_COMPILE", &expect_no_compile);
+    if (!parse_no_compile_expectation(test_path->str.data, expect_no_compile, expect_no_compile_num_runs, expect_no_compile_has_pattern, expect_no_compile_pattern)) {
         tests->num_mis_configured_tests += 1;
         return false;
     }
@@ -959,11 +958,11 @@ static void tests_db_add_test(struct tests_db* tests, struct path* test_path, st
     struct test* test = tests->tests + tests->num_tests;
     tests->num_tests++;
 
-    const size_t file_path_len = test_path->len;
+    const size_t file_path_len = test_path->str.len;
     const size_t test_name_len = 1 /*[*/ + sv_len(section) + 2 /*].*/ + sv_len(test_file_stem);
-    const size_t dep_file_path_len = build_cache_dir_path->len + sv_len(section) + 1 /*.*/ + sv_len(test_file_stem) + 2 /*.d*/;
-    const size_t obj_file_path_len = build_cache_dir_path->len + sv_len(section) + 1 /*.*/ + sv_len(test_file_stem) + 2 /*.o*/;
-    const size_t exe_file_path_len = build_cache_dir_path->len + sv_len(section) + 1 /*.*/ + sv_len(test_file_stem);
+    const size_t dep_file_path_len = build_cache_dir_path->str.len + sv_len(section) + 1 /*.*/ + sv_len(test_file_stem) + 2 /*.d*/;
+    const size_t obj_file_path_len = build_cache_dir_path->str.len + sv_len(section) + 1 /*.*/ + sv_len(test_file_stem) + 2 /*.o*/;
+    const size_t exe_file_path_len = build_cache_dir_path->str.len + sv_len(section) + 1 /*.*/ + sv_len(test_file_stem);
 
     test->source_file_lmt = lmt;
     // Total memory required is sum of all of the above, plus null terminators.
@@ -973,9 +972,9 @@ static void tests_db_add_test(struct tests_db* tests, struct path* test_path, st
                              + obj_file_path_len + 1
                              + exe_file_path_len + 1
                              + sv_len(expect_steps) + 1);
-    memcpy(test->file_path, test_path->data, test_path->len + 1);  // Include the null terminator.
+    memcpy(test->file_path, test_path->str.data, test_path->str.len + 1);  // Include the null terminator.
 
-    test->test_name = test->file_path + test_path->len + 1;
+    test->test_name = test->file_path + test_path->str.len + 1;
     test->test_name[0] = '[';
     memcpy(test->test_name + 1, section.start, sv_len(section));
     test->test_name[sv_len(section) + 1] = ']';
@@ -984,29 +983,29 @@ static void tests_db_add_test(struct tests_db* tests, struct path* test_path, st
     test->test_name[test_name_len] = '\0';
 
     test->dep_file_path = test->test_name + test_name_len + 1;
-    memcpy(test->dep_file_path, build_cache_dir_path->data, build_cache_dir_path->len);
-    memcpy(test->dep_file_path + build_cache_dir_path->len, section.start, sv_len(section));
-    test->dep_file_path[build_cache_dir_path->len + sv_len(section)] = '.';
-    memcpy(test->dep_file_path + build_cache_dir_path->len + sv_len(section) + 1, test_file_stem.start, sv_len(test_file_stem));
-    test->dep_file_path[build_cache_dir_path->len + sv_len(section) + 1 + sv_len(test_file_stem)] = '.';
-    test->dep_file_path[build_cache_dir_path->len + sv_len(section) + 1 + sv_len(test_file_stem) + 1] = 'd';
+    memcpy(test->dep_file_path, build_cache_dir_path->str.data, build_cache_dir_path->str.len);
+    memcpy(test->dep_file_path + build_cache_dir_path->str.len, section.start, sv_len(section));
+    test->dep_file_path[build_cache_dir_path->str.len + sv_len(section)] = '.';
+    memcpy(test->dep_file_path + build_cache_dir_path->str.len + sv_len(section) + 1, test_file_stem.start, sv_len(test_file_stem));
+    test->dep_file_path[build_cache_dir_path->str.len + sv_len(section) + 1 + sv_len(test_file_stem)] = '.';
+    test->dep_file_path[build_cache_dir_path->str.len + sv_len(section) + 1 + sv_len(test_file_stem) + 1] = 'd';
     test->dep_file_path[dep_file_path_len] = '\0';
 
     test->obj_file_path = test->dep_file_path + dep_file_path_len + 1;
-    memcpy(test->obj_file_path, build_cache_dir_path->data, build_cache_dir_path->len);
-    memcpy(test->obj_file_path + build_cache_dir_path->len, section.start, sv_len(section));
-    test->obj_file_path[build_cache_dir_path->len + sv_len(section)] = '.';
-    memcpy(test->obj_file_path + build_cache_dir_path->len + sv_len(section) + 1, test_file_stem.start, sv_len(test_file_stem));
-    test->obj_file_path[build_cache_dir_path->len + sv_len(section) + 1 + sv_len(test_file_stem)] = '.';
-    test->obj_file_path[build_cache_dir_path->len + sv_len(section) + 1 + sv_len(test_file_stem) + 1] = 'o';
+    memcpy(test->obj_file_path, build_cache_dir_path->str.data, build_cache_dir_path->str.len);
+    memcpy(test->obj_file_path + build_cache_dir_path->str.len, section.start, sv_len(section));
+    test->obj_file_path[build_cache_dir_path->str.len + sv_len(section)] = '.';
+    memcpy(test->obj_file_path + build_cache_dir_path->str.len + sv_len(section) + 1, test_file_stem.start, sv_len(test_file_stem));
+    test->obj_file_path[build_cache_dir_path->str.len + sv_len(section) + 1 + sv_len(test_file_stem)] = '.';
+    test->obj_file_path[build_cache_dir_path->str.len + sv_len(section) + 1 + sv_len(test_file_stem) + 1] = 'o';
     test->obj_file_path[obj_file_path_len] = '\0';
 
     test->exe_file_path = test->obj_file_path + obj_file_path_len + 1;
-    memcpy(test->exe_file_path, build_cache_dir_path->data, build_cache_dir_path->len);
-    memcpy(test->exe_file_path + build_cache_dir_path->len, section.start, sv_len(section));
-    test->exe_file_path[build_cache_dir_path->len + sv_len(section)] = '.';
-    memcpy(test->exe_file_path + build_cache_dir_path->len + sv_len(section) + 1, test_file_stem.start, sv_len(test_file_stem));
-    test->exe_file_path[build_cache_dir_path->len + sv_len(section) + 1 + sv_len(test_file_stem)] = '\0';
+    memcpy(test->exe_file_path, build_cache_dir_path->str.data, build_cache_dir_path->str.len);
+    memcpy(test->exe_file_path + build_cache_dir_path->str.len, section.start, sv_len(section));
+    test->exe_file_path[build_cache_dir_path->str.len + sv_len(section)] = '.';
+    memcpy(test->exe_file_path + build_cache_dir_path->str.len + sv_len(section) + 1, test_file_stem.start, sv_len(test_file_stem));
+    test->exe_file_path[build_cache_dir_path->str.len + sv_len(section) + 1 + sv_len(test_file_stem)] = '\0';
 
     test->expect_steps = test->exe_file_path + exe_file_path_len + 1;
     if (sv_len(expect_steps)) {
@@ -1025,21 +1024,21 @@ static void tests_db_add_test(struct tests_db* tests, struct path* test_path, st
 static void tests_db_scan_dir(struct tests_db* tests, struct path* test_path, struct path* build_cache_dir_path) {
     bool exists, is_dir;
     struct timespec lmt;
-    path_stat(test_path->data, &exists, &lmt, &is_dir);
+    path_stat(test_path->str.data, &exists, &lmt, &is_dir);
     if (!exists) {
-        fatal_error("%s: No such file or directory.\n", test_path->data);
+        fatal_error("%s: No such file or directory.\n", test_path->str.data);
     }
     if (is_dir) {
-        DIR* dir = opendir(test_path->data);
+        DIR* dir = opendir(test_path->str.data);
         if (dir == NULL) {
-            fatal_error("Failed to opendir() directory %s: error=%d %s\n", test_path->data, errno, strerror(errno));
+            fatal_error("Failed to opendir() directory %s: error=%d %s\n", test_path->str.data, errno, strerror(errno));
         }
         while (true) {
             errno = 0;
             struct dirent* entry = readdir(dir);
             if (entry == NULL) {
                 if (errno != 0) {
-                    fatal_error("Failed to readdir() directory %s: error=%d %s\n", test_path->data, errno, strerror(errno));
+                    fatal_error("Failed to readdir() directory %s: error=%d %s\n", test_path->str.data, errno, strerror(errno));
                 }
                 break;
             }
@@ -1050,7 +1049,7 @@ static void tests_db_scan_dir(struct tests_db* tests, struct path* test_path, st
             }
         }
         closedir(dir);
-    } else if (test_path->len > 4 && memcmp(test_path->data + test_path->len - 4, ".cpp", 4) == 0) {
+    } else if (test_path->str.len > 4 && memcmp(test_path->str.data + test_path->str.len - 4, ".cpp", 4) == 0) {
         tests_db_add_test(tests, test_path, lmt, build_cache_dir_path);
     }
 }
@@ -1077,8 +1076,8 @@ static void tests_db_scan(struct tests_db* tests, const char* test_dir, const ch
 
     tests_db_scan_dir(tests, &test_path, &build_cache_dir_path);
 
-    free(build_cache_dir_path.data);
-    free(test_path.data);
+    string_destroy(&build_cache_dir_path.str);
+    string_destroy(&test_path.str);
 }
 
 static bool find_header_dep_with_lmt_gt(struct tests_db* tests, struct timespec lmt, const char* dep_file_path) {
@@ -1090,34 +1089,34 @@ static bool find_header_dep_with_lmt_gt(struct tests_db* tests, struct timespec 
         fatal_error("Failed to read test header dependencies from file %s: fopen failed error: %d %s\n",
                     dep_file_path, ferror(dep_file), strerror(ferror(dep_file)));
     }
-    char* cursor = tests->scratch_space;
-    *cursor = '\0';
+    struct string* scratch_space = &tests->test_run[0].scratch_space;
+    string_clear(scratch_space);
     while (!feof(dep_file)) {
-        char* result = fgets(cursor, (int)(tests->scratch_space_cap - (size_t)(cursor - tests->scratch_space) - 1), dep_file);
+        char* result = fgets(scratch_space->data + scratch_space->len, (int)(scratch_space->capacity - scratch_space->len), dep_file);
         if (result == NULL || ferror(dep_file)) {
             if (feof(dep_file)) {
                 fclose(dep_file);
                 return false;
             }
-            fatal_error("Failed to read expectations from test file %s: fgets failed error: %d %s\n",
+            fatal_error("Failed to read test header dependencies from file %s: fgets failed error: %d %s\n",
                         dep_file_path, ferror(dep_file), strerror(ferror(dep_file)));
         }
-        cursor = cursor + strlen(cursor);
-        if (cursor + 1 >= tests->scratch_space + tests->scratch_space_cap) {
-            tests->scratch_space = realloc(tests->scratch_space, tests->scratch_space_cap * 2);
-            cursor = tests->scratch_space + tests->scratch_space_cap - 1;
-            tests->scratch_space_cap *= 2;
+        scratch_space->len += strlen(scratch_space->data + scratch_space->len);
+        if (scratch_space->len + 1 == scratch_space->capacity) {
+            string_reserve(scratch_space, scratch_space->len + 1);
             continue;  // Didn't finish reading the line, continue reading.
         }
         // Tokenize the line to scan header dependencies
-        while (cursor != tests->scratch_space && (*(cursor - 1) == ' ' || *(cursor - 1) == '\\' || *(cursor - 1) == '\n')) {
-            *(--cursor) = '\0';
+        while (scratch_space->len > 0
+               && (scratch_space->data[scratch_space->len - 1] == ' '
+                   || scratch_space->data[scratch_space->len - 1] == '\\'
+                   || scratch_space->data[scratch_space->len - 1] == '\n')) {
+            scratch_space->data[--scratch_space->len] = '\0';
         }
-        *cursor = ' ';
-        cursor++;
-        *cursor = '\0';
-        char* start = strchr(tests->scratch_space, ':');
-        char* p = strtok(start == NULL ? tests->scratch_space : start + 1, " ");
+        scratch_space->data[scratch_space->len++] = ' ';
+        scratch_space->data[scratch_space->len] = '\0';
+        char* start = strchr(scratch_space->data, ':');
+        char* p = strtok(start == NULL ? scratch_space->data : start + 1, " ");
         for (; p != NULL; p = strtok(NULL, " ")) {
             if (*p != '\0') {  // non-empty tokens only
                 bool exists, is_dir;
@@ -1133,7 +1132,7 @@ static bool find_header_dep_with_lmt_gt(struct tests_db* tests, struct timespec 
                 }
             }
         }
-        cursor = tests->scratch_space;
+        string_clear(scratch_space);
     }
     fclose(dep_file);
     return false;
@@ -1249,7 +1248,7 @@ static void test_run_print(struct test_run* test_run) {
         printf(" running...");
     }
     if (test_run->test->expect_no_compile_num_runs > 0) {
-        for (int i = 0; i < test_run->non_compile_index; i++) {
+        for (int i = 0; i < test_run->no_compile_run_id; i++) {
             printf("#%d..", i);
         }
     }
@@ -1263,6 +1262,7 @@ static void test_run_print(struct test_run* test_run) {
     fflush(stdout);
 }
 
+// returns true, to mark that the execution is done.
 static __attribute__((format(printf, 2, 3))) bool test_fail(struct test_run* test_run, const char* fmt, ...) {
     test_run->step = s_done;
     test_run->failed = true;
@@ -1272,10 +1272,11 @@ static __attribute__((format(printf, 2, 3))) bool test_fail(struct test_run* tes
     vprintf(fmt, args);
     va_end(args);
     if (flag_die_on_fail) {
-        printf("\nAborting early...\n");
-        abort();
+        printf("\n%sExiting early...%s\n", color_error_begin(), color_reset());
+        // TODO: Wait all other test_run processes!
+        exit(EXIT_FAILURE);
     }
-    return false;
+    return true;
 }
 
 static void test_run_set_test(struct tests_db* tests, struct test_run* test_run, size_t i) {
@@ -1284,7 +1285,7 @@ static void test_run_set_test(struct tests_db* tests, struct test_run* test_run,
     test_run->test = tests->tests + i;
     test_run->failed = false;
     test_run->step = s_starting;
-    test_run->non_compile_index = 0;
+    test_run->no_compile_run_id = 0;
 
     // Last arguments of compile command are -o obj_file -MF dep_file source_file
     test_run->compile_command.argv[test_run->compile_command.argc - 4] = test_run->test->obj_file_path;
@@ -1297,31 +1298,57 @@ static void test_run_set_test(struct tests_db* tests, struct test_run* test_run,
     test_run->negative_compile_command.argv[test_run->negative_compile_command.argc - 1] = test_run->test->file_path;
 }
 
-static bool compile_test(struct tests_db* tests, struct test_run* test_run) {
-    subprocess_start(&test_run->proc, &test_run->compile_command, fail_exit_abort);
-    subprocess_poll(&test_run->proc, true);
-    if (WIFEXITED(test_run->proc.exit_status) == 0 || WEXITSTATUS(test_run->proc.exit_status) != 0) {
-        return test_fail(test_run,
-                         "Compile command: %s\n" COMPILER_OUTPUT_FORMAT,
-                         cmd_line_to_str(&test_run->compile_command, &tests->scratch_space, &tests->scratch_space_cap),
-                         test_run->proc.output_buf);
-    }
-    return true;
+static void test_run_start_execute_no_compile(struct test_run* test_run) {
+    test_run_print(test_run);
+    sprintf(test_run->negative_compile_command.argv[test_run->negative_compile_command.argc - 2], "-DNEGATIVE_COMPILE_ITERATION=%d", test_run->no_compile_run_id);
+    subprocess_start(&test_run->proc, &test_run->negative_compile_command, fail_exit_code_0);
 }
 
-static bool link_test(struct tests_db* tests, struct test_run* test_run) {
-    subprocess_start(&test_run->proc, &test_run->link_command, fail_exit_abort);
-    subprocess_poll(&test_run->proc, true);
-    if (WIFEXITED(test_run->proc.exit_status) == 0 || WEXITSTATUS(test_run->proc.exit_status) != 0) {
+static bool test_run_check_execute_no_compile(struct test_run* test_run) {
+    struct test* test = test_run->test;
+    if (WIFSIGNALED(test_run->proc.exit_status)) {
         return test_fail(test_run,
-                         "Link command: %s\n" COMPILER_OUTPUT_FORMAT,
-                         cmd_line_to_str(&test_run->link_command, &tests->scratch_space, &tests->scratch_space_cap),
-                         test_run->proc.output_buf);
+                         "Compiler killed by signal %d.\n"
+                         "Compiler command: %s\n" COMPILER_OUTPUT_FORMAT,
+                         (int)(WTERMSIG(test_run->proc.exit_status)),
+                         cmd_line_to_str(&test_run->negative_compile_command, &test_run->scratch_space),
+                         test_run->proc.output_buf.data);
     }
-    return true;
+    if (WEXITSTATUS(test_run->proc.exit_status) == 0) {
+        return test_fail(test_run,
+                         "Compiler exited with code 0.\n"
+                         "Compiler command: %s\n" COMPILER_OUTPUT_FORMAT,
+                         cmd_line_to_str(&test_run->negative_compile_command, &test_run->scratch_space),
+                         test_run->proc.output_buf.data);
+    }
+
+    if (test->expect_no_compile_has_pattern) {
+        int regexec_status = regexec(&test->expect_no_compile_pattern, test_run->proc.output_buf.data, 0, NULL, 0);
+        if (regexec_status == REG_NOMATCH) {
+            return test_fail(test_run,
+                             "Expected pattern not found in compiler output.\n"
+                             "Compiler command: %s\n" COMPILER_OUTPUT_FORMAT,
+                             cmd_line_to_str(&test_run->negative_compile_command, &test_run->scratch_space),
+                             test_run->proc.output_buf.data);
+        }
+    }
+    test_run->no_compile_run_id++;
+    if (test_run->no_compile_run_id == test->expect_no_compile_num_runs) {
+        test_run->step = s_done;
+        return true;
+    }
+    test_run_start_execute_no_compile(test_run);
+    return false;
 }
 
-static bool run_test(struct tests_db* tests, struct test_run* test_run) {
+static void test_run_start_execute(struct test_run* test_run) {
+    test_run->step = s_running;
+    test_run_print(test_run);
+    if (test_run->test->expect_no_compile_num_runs > 0) {
+        test_run->no_compile_run_id = 0;
+        test_run_start_execute_no_compile(test_run);
+        return;
+    }
     char* argv[2];
     argv[0] = test_run->test->exe_file_path;
     argv[1] = NULL;
@@ -1329,12 +1356,16 @@ static bool run_test(struct tests_db* tests, struct test_run* test_run) {
     test_cmd_line.argc = 1;
     test_cmd_line.argv = argv;
     subprocess_start(&test_run->proc, &test_cmd_line, test_run->test->expect_exit_signal ? fail_exit_code_0 : fail_exit_abort);
-    subprocess_poll(&test_run->proc, true);
+}
 
-    if (strstr(test_run->proc.output_buf, "EXPECTATION FAILED") != NULL) {
+static bool test_run_check_execute(struct test_run* test_run) {
+    if (test_run->test->expect_no_compile_num_runs > 0) {
+        return test_run_check_execute_no_compile(test_run);
+    }
+    if (strstr(test_run->proc.output_buf.data, "EXPECTATION FAILED") != NULL) {
         return test_fail(test_run,
                          "Found 'EXPECTATION FAILED' in output, test failed regardless of child exit code / signal.\n" TEST_OUTPUT_FORMAT,
-                         test_run->proc.output_buf);
+                         test_run->proc.output_buf.data);
     }
     if (WIFSIGNALED(test_run->proc.exit_status)) {
         if (test_run->test->expect_exit_code != 0) {
@@ -1357,9 +1388,9 @@ static bool run_test(struct tests_db* tests, struct test_run* test_run) {
         }
     }
 
-    char* output_steps = tests->scratch_space;
+    char* output_steps = test_run->scratch_space.data;
     size_t output_steps_size = 0;
-    const char* output_cursor = test_run->proc.output_buf;
+    const char* output_cursor = test_run->proc.output_buf.data;
     while (1) {
         char* next = strstr(output_cursor, "STEP: ");
         if (next == NULL) {
@@ -1367,20 +1398,14 @@ static bool run_test(struct tests_db* tests, struct test_run* test_run) {
         }
         char* step_end = strchr(next, '\n');
         if (step_end == NULL) {
-            return test_fail(test_run, "Found unfinished step line in output!\n" TEST_OUTPUT_FORMAT, test_run->proc.output_buf);
+            return test_fail(test_run, "Found unfinished step line in output!\n" TEST_OUTPUT_FORMAT, test_run->proc.output_buf.data);
         }
         if (output_steps_size > 0) {
-            if (output_steps_size + 1 >= tests->scratch_space_cap) {
-                tests->scratch_space = realloc(tests->scratch_space, tests->scratch_space_cap * 2);
-                tests->scratch_space_cap *= 2;
-            }
+            string_reserve(&test_run->scratch_space, output_steps_size + 1);
             output_steps[output_steps_size++] = ',';
         }
         size_t step_size = (size_t)(step_end - (next + 6));
-        while (output_steps_size + step_size >= tests->scratch_space_cap) {
-            test_run->test->file_path = realloc(tests->scratch_space, tests->scratch_space_cap * 2);
-            tests->scratch_space_cap *= 2;
-        }
+        string_reserve(&test_run->scratch_space, output_steps_size + step_size);
         memcpy(output_steps + output_steps_size, next + 6, step_size);
         output_steps_size += step_size;
         output_cursor = step_end;
@@ -1392,88 +1417,96 @@ static bool run_test(struct tests_db* tests, struct test_run* test_run) {
                              "Steps checking failed!\n"
                              "Expected steps: %s\n"
                              "Actual   steps: %s\n" TEST_OUTPUT_FORMAT,
-                             test_run->test->expect_steps, output_steps, test_run->proc.output_buf);
+                             test_run->test->expect_steps, output_steps, test_run->proc.output_buf.data);
         }
     } else {
         if (output_steps_size > 0) {
             return test_fail(test_run,
                              "Output includes unexpected steps: %s\n"
                              "Did you forget to add // EXPECT:STEPS comment to the test?" TEST_OUTPUT_FORMAT,
-                             output_steps, test_run->proc.output_buf);
+                             output_steps, test_run->proc.output_buf.data);
         }
     }
-
+    test_run->step = s_done;
     return true;
 }
 
-static bool run_negative_compile_test(struct tests_db* tests, struct test_run* test_run) {
-    struct test* test = test_run->test;
-    for (int test_id = 0; test_id < test->expect_no_compile_num_runs; test_id++) {
-        sprintf(test_run->negative_compile_command.argv[test_run->negative_compile_command.argc - 2], "-DNEGATIVE_COMPILE_ITERATION=%d", test_id);
-        test_run->non_compile_index = test_id;
-        test_run_print(test_run);
-        subprocess_start(&test_run->proc, &test_run->negative_compile_command, fail_exit_code_0);
-        subprocess_poll(&test_run->proc, true);
+static void test_run_start_link(struct test_run* test_run) {
+    test_run->step = s_linking;
+    test_run_print(test_run);
+    subprocess_start(&test_run->proc, &test_run->link_command, fail_exit_abort);
+}
 
-        if (WIFSIGNALED(test_run->proc.exit_status)) {
-            return test_fail(test_run,
-                             "Compiler killed by signal %d.\n"
-                             "Compiler command: %s\n" COMPILER_OUTPUT_FORMAT,
-                             (int)(WTERMSIG(test_run->proc.exit_status)),
-                             cmd_line_to_str(&test_run->negative_compile_command, &tests->scratch_space, &tests->scratch_space_cap),
-                             test_run->proc.output_buf);
-        }
-        if (WEXITSTATUS(test_run->proc.exit_status) == 0) {
-            return test_fail(test_run,
-                             "Compiler exited with code 0.\n"
-                             "Compiler command: %s\n" COMPILER_OUTPUT_FORMAT,
-                             cmd_line_to_str(&test_run->negative_compile_command, &tests->scratch_space, &tests->scratch_space_cap),
-                             test_run->proc.output_buf);
-        }
-
-        if (test->expect_no_compile_has_pattern) {
-            int regexec_status = regexec(&test->expect_no_compile_pattern, test_run->proc.output_buf, 0, NULL, 0);
-            if (regexec_status == REG_NOMATCH) {
-                return test_fail(test_run,
-                                 "Expected pattern not found in compiler output.\n"
-                                 "Compiler command: %s\n" COMPILER_OUTPUT_FORMAT,
-                                 cmd_line_to_str(&test_run->negative_compile_command, &tests->scratch_space, &tests->scratch_space_cap),
-                                 test_run->proc.output_buf);
-            }
-        }
+static bool test_run_check_link(struct test_run* test_run) {
+    if (WIFEXITED(test_run->proc.exit_status) == 0 || WEXITSTATUS(test_run->proc.exit_status) != 0) {
+        return test_fail(test_run,
+                         "Link command: %s\n" COMPILER_OUTPUT_FORMAT,
+                         cmd_line_to_str(&test_run->link_command, &test_run->scratch_space),
+                         test_run->proc.output_buf.data);
     }
-    return true;
+    test_run_start_execute(test_run);
+    return false;
+}
+
+static void test_run_start_compile(struct test_run* test_run) {
+    test_run->step = s_compiling;
+    test_run_print(test_run);
+    subprocess_start(&test_run->proc, &test_run->compile_command, fail_exit_abort);
+}
+
+static bool test_run_check_compile(struct test_run* test_run) {
+    if (WIFEXITED(test_run->proc.exit_status) == 0 || WEXITSTATUS(test_run->proc.exit_status) != 0) {
+        return test_fail(test_run,
+                         "Compile command: %s\n" COMPILER_OUTPUT_FORMAT,
+                         cmd_line_to_str(&test_run->compile_command, &test_run->scratch_space),
+                         test_run->proc.output_buf.data);
+    }
+    if (test_run->test->requires_re_link) {
+        test_run_start_link(test_run);
+    } else {
+        test_run_start_execute(test_run);
+    }
+    return false;
+}
+
+// Returns whether the running test is done.
+static bool test_run_poll(struct test_run* test_run) {
+    if (test_run->step == s_starting) {
+        if (test_run->test->requires_re_compile) {
+            test_run_start_compile(test_run);
+        } else if (test_run->test->requires_re_link) {
+            test_run_start_link(test_run);
+        } else {
+            test_run_start_execute(test_run);
+        }
+        return false;
+    }
+    if (test_run->step == s_done) {
+        return true;
+    }
+    // If we're not either just starting out or done, there's always a subprocess running.
+    if (!subprocess_poll(&test_run->proc, false)) {
+        return false;
+    }
+    switch (test_run->step) {
+        case s_compiling: return test_run_check_compile(test_run);
+        case s_linking: return test_run_check_link(test_run);
+        case s_running: return test_run_check_execute(test_run);
+        default:
+            fatal_error("Internal error: unexpected test_run step = %d\n", (int)test_run->step);
+    }
 }
 
 static size_t tests_db_execute(struct tests_db* tests) {
     size_t num_tests_succeeded = 0;
     for (size_t i = 0; i < tests->num_tests; i++) {
-        test_run_set_test(tests, &tests->test_run, i);
-        if (!tests->test_run.failed && tests->test_run.test->requires_re_compile) {
-            tests->test_run.step = s_compiling;
-            test_run_print(&tests->test_run);
-            compile_test(tests, &tests->test_run);
+        test_run_set_test(tests, tests->test_run, i);
+        while (!test_run_poll(tests->test_run)) {
+            usleep(2);
         }
-        if (!tests->test_run.failed && tests->test_run.test->requires_re_link) {
-            tests->test_run.step = s_linking;
-            test_run_print(&tests->test_run);
-            link_test(tests, &tests->test_run);
-        }
-        if (!tests->test_run.failed) {
-            if (tests->test_run.test->expect_no_compile_num_runs > 0) {
-                tests->test_run.step = s_non_compile_running;
-                test_run_print(&tests->test_run);
-                run_negative_compile_test(tests, &tests->test_run);
-            } else {
-                tests->test_run.step = s_running;
-                test_run_print(&tests->test_run);
-                run_test(tests, &tests->test_run);
-            }
-        }
-        tests->test_run.step = s_done;
-        if (!tests->test_run.failed) {
+        if (!tests->test_run->failed) {
             num_tests_succeeded += 1;
-            test_run_print(&tests->test_run);
+            test_run_print(tests->test_run);
         }
     }
     return num_tests_succeeded;
