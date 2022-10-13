@@ -133,7 +133,7 @@ static char cmd_line_link[]
     "@path_to_exe_file@\0"
     "" LIB_DIR PATH_SEP_STR "liblightcxx_static.a\0"
     "" LIB_DIR PATH_SEP_STR "libtesting.a\0"
-#if !__APPLE__ && COMPILER_IS_GCC
+#if COMPILER_IS_GCC
     "-lgcc\0"
     "-lgcc_eh\0"
 #endif
@@ -145,12 +145,16 @@ static char cmd_line_link[]
 #if __APPLE__
     "-L/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib\0"
 #endif
+#if __APPLE__ && COMPILER_IS_GCC
+    "-lSystem\0"
+#endif
   ;
 
-static bool flag_die_on_fail = false;
-static bool flag_print_on_success = false;
-static bool flag_colors = true;
-static bool flag_interactive = true;
+static bool flag_die_on_fail;
+static bool flag_print_on_success;
+static bool flag_todos;
+static bool flag_colors;
+static bool flag_interactive;
 static int num_lines_interactive = 0;
 
 static const char* color_error_begin(void) {
@@ -197,6 +201,9 @@ static void interactive_flush(void) {
 }
 
 static __attribute__((format(printf, 1, 2))) void print_todo(const char* fmt, ...) {
+    if (!flag_todos) {
+        return;
+    }
     printf("%sTODO%s: ", color_warning_begin(), color_reset());
     va_list args;
     va_start(args, fmt);
@@ -223,7 +230,7 @@ static __attribute__((__noreturn__)) __attribute__((format(printf, 1, 2))) void 
     exit(EXIT_FAILURE);
 }
 
-static const char* get_flag_string(const char* flag, const char* env_var, const char* default_val, int* argc_ptr, char*** argv_ptr) {
+static const char* get_flag_raw(const char* flag, const char* env_var, const char* default_val, int* argc_ptr, char*** argv_ptr, bool take_next) {
     const char* val = NULL;
     char** argv = *argv_ptr;
     size_t flag_len = strlen(flag);
@@ -233,21 +240,25 @@ static const char* get_flag_string(const char* flag, const char* env_var, const 
             if (argv[i][1] == '-') {
                 flag_start++;
             }
-            if (!strncmp(flag_start, flag, flag_len)) {
-                if (flag_start[flag_len] != '\0' && flag_start[flag_len] != '=') {
-                    continue;
-                }
-                memmove(argv + i, argv + i + 1, sizeof(char*) * (size_t)((*argc_ptr) - i - 1));
-                (*argc_ptr)--;
-                if (flag_start[flag_len] == '\0') {
-                    val = flag_start + flag_len;
-                    break;
-                }
-                if (flag_start[flag_len] == '=') {
-                    val = flag_start + flag_len + 1;
-                    break;
-                }
+            if (strncmp(flag_start, flag, flag_len)) {
+                continue;
             }
+            memmove(argv + i, argv + i + 1, sizeof(char*) * (size_t)((*argc_ptr) - i - 1));
+            (*argc_ptr)--;
+            if (flag_start[flag_len] == '\0') {
+                if (take_next && i != *argc_ptr && argv[i][0] != '-') {
+                    val = argv[i];  // take the next argument
+                    memmove(argv + i, argv + i + 1, sizeof(char*) * (size_t)((*argc_ptr) - i - 1));
+                    (*argc_ptr)--;
+                } else {
+                    val = flag_start + flag_len;
+                }
+            } else if (flag_start[flag_len] == '=') {
+                val = flag_start + flag_len + 1;
+            } else {
+                val = flag_start + flag_len;
+            }
+            break;
         }
     }
     if (val == NULL) {
@@ -256,8 +267,12 @@ static const char* get_flag_string(const char* flag, const char* env_var, const 
     return val != NULL ? val : default_val;
 }
 
+static const char* get_flag_string(const char* flag, const char* env_var, const char* default_val, int* argc_ptr, char*** argv_ptr) {
+    return get_flag_raw(flag, env_var, default_val, argc_ptr, argv_ptr, true);
+}
+
 static bool get_flag_bool(const char* flag, const char* env_var, bool default_val, int* argc_ptr, char*** argv_ptr) {
-    const char* val = get_flag_string(flag, env_var, default_val ? "1" : "0", argc_ptr, argv_ptr);
+    const char* val = get_flag_raw(flag, env_var, default_val ? "1" : "0", argc_ptr, argv_ptr, false);
     return val[0] == '\0'
            || (strcasecmp(val, "no")
                && strcasecmp(val, "false")
@@ -268,7 +283,7 @@ static bool get_flag_bool(const char* flag, const char* env_var, bool default_va
 }
 
 static int get_flag_int(const char* flag, const char* env_var, const char* default_val, int* argc_ptr, char*** argv_ptr) {
-    const char* raw_val = get_flag_string(flag, env_var, default_val, argc_ptr, argv_ptr);
+    const char* raw_val = get_flag_raw(flag, env_var, default_val, argc_ptr, argv_ptr, true);
     return atoi(raw_val);
 }
 
@@ -1091,6 +1106,10 @@ static void tests_db_scan(struct tests_db* tests, const char* test_dir, const ch
     if (!is_dir) {
         fatal_error("Cache directory %s is not a directory.\n", build_cache_dir);
     }
+    path_stat(test_dir, &exists, &lmt, &is_dir);
+    if (!exists) {
+        fatal_error("Tests path %s does not exist.\n", test_dir);
+    }
 
     struct string build_cache_dir_path;
     path_init_realpath(&build_cache_dir_path, build_cache_dir);
@@ -1248,12 +1267,6 @@ static void tests_db_prepare(struct tests_db* db) {
 }
 
 static void test_run_print(struct test_run* test_run) {
-    if (test_run->step == s_success && !flag_print_on_success) {
-        return;
-    }
-    if (test_run->step != s_success && !test_run->failed && !flag_interactive) {
-        return;  // Don't print anything until we're done if not in interactive mode.
-    }
     printf("(%zu/%zu) %s", test_run->id, test_run->num_tests, test_run->test->test_name);
     if (test_run->test->requires_re_compile && test_run->step >= s_compiling) {
         printf(" compiling...");
@@ -1275,19 +1288,14 @@ static void test_run_print(struct test_run* test_run) {
     if (test_run->failed) {
         printf("%sfailed%s", color_error_begin(), color_reset());
     }
-    if (test_run->step != s_success && !test_run->failed) {
-        // This is an interactive line, don't print an EOL.
-        num_lines_interactive += 1;
-    } else {
-        printf("\n");
-    }
 }
 
 // returns true, to mark that the execution is done.
 static __attribute__((format(printf, 2, 3))) bool test_fail(struct test_run* test_run, const char* fmt, ...) {
-    interactive_clear();
     test_run->failed = true;
+    interactive_clear();
     test_run_print(test_run);
+    printf("\n");
     va_list args;
     va_start(args, fmt);
     vprintf(fmt, args);
@@ -1295,7 +1303,7 @@ static __attribute__((format(printf, 2, 3))) bool test_fail(struct test_run* tes
     interactive_flush();
     if (flag_die_on_fail) {
         printf("\n%sExiting early...%s\n", color_error_begin(), color_reset());
-        // TODO: Wait all other test_run processes!
+        // TODO: Wait/kill all other test_run processes!
         exit(EXIT_FAILURE);
     }
     return true;
@@ -1388,7 +1396,7 @@ static bool test_run_check_execute(struct test_run* test_run) {
                          test_run->proc.output_buf.data);
     }
     if (WIFSIGNALED(test_run->proc.exit_status)) {
-        if (test_run->test->expect_exit_code != 0) {
+        if (test_run->test->expect_exit_signal == 0) {
             return test_fail(test_run, "Test process killed by signal %d (expected exit with code = %d)\n",
                              (int)(WTERMSIG(test_run->proc.exit_status)), test_run->test->expect_exit_code);
         }
@@ -1487,34 +1495,40 @@ static bool test_run_check_compile(struct test_run* test_run) {
     return false;
 }
 
+static void test_run_start(struct test_run* test_run) {
+    if (test_run->test->requires_re_compile) {
+        test_run_start_compile(test_run);
+    } else if (test_run->test->requires_re_link) {
+        test_run_start_link(test_run);
+    } else {
+        test_run_start_execute(test_run);
+    }
+}
+
 // Returns whether the running test is done.
 static bool test_run_poll(struct test_run* test_run, bool* did_state_change) {
-    *did_state_change = false;
-    if (test_run->step == s_starting) {
-        if (test_run->test->requires_re_compile) {
-            test_run_start_compile(test_run);
-        } else if (test_run->test->requires_re_link) {
-            test_run_start_link(test_run);
-        } else {
-            test_run_start_execute(test_run);
-        }
-        *did_state_change = true;
+    if (!(*did_state_change = subprocess_poll(&test_run->proc))) {
         return false;
     }
-    if (test_run->step == s_success || test_run->failed) {
-        return true;
-    }
-    // If we're not either just starting out or done, there's always a subprocess running.
-    if (!subprocess_poll(&test_run->proc)) {
-        return false;
-    }
-    *did_state_change = true;
     switch (test_run->step) {
         case s_compiling: return test_run_check_compile(test_run);
         case s_linking: return test_run_check_link(test_run);
         case s_running: return test_run_check_execute(test_run);
-        default:
-            fatal_error("Internal error: unexpected test_run step = %d\n", (int)test_run->step);
+        default: fatal_error("Internal error: unexpected test_run step = %d\n", (int)test_run->step);
+    }
+}
+
+static void test_run_print_interactive(struct test_run* test_runs, size_t num_test_runs) {
+    if (flag_interactive) {
+        interactive_clear();
+        for (size_t i = 0; i < num_test_runs; i++) {
+            test_run_print(test_runs + i);
+            if (i + 1 != num_test_runs) {
+                printf("\n");
+            }
+        }
+        num_lines_interactive = (int)num_test_runs;
+        interactive_flush();
     }
 }
 
@@ -1522,12 +1536,15 @@ static void test_run_poll_all(struct test_run* test_runs, size_t* num_test_runs,
     bool did_state_change = false;
     for (size_t i = 0; i < *num_test_runs;) {
         if (test_run_poll(&test_runs[i], &did_state_change)) {
+            did_state_change = true;
             if (!test_runs[i].failed) {
                 *num_tests_succeeded += 1;
-                interactive_clear();
-                test_run_print(&test_runs[i]);
+                if (flag_print_on_success) {
+                    interactive_clear();
+                    test_run_print(&test_runs[i]);
+                    printf("\n");
+                }
             }
-            did_state_change = true;
             if (i + 1 < *num_test_runs) {
                 struct test_run run = test_runs[i];
                 memmove(test_runs + i, test_runs + i + 1, sizeof(struct test_run) * (*num_test_runs - i - 1));
@@ -1539,14 +1556,7 @@ static void test_run_poll_all(struct test_run* test_runs, size_t* num_test_runs,
         }
     }
     if (did_state_change) {
-        interactive_clear();
-        for (size_t i = 0; i < *num_test_runs; i++) {
-            test_run_print(test_runs + i);
-            if (i + 1 != *num_test_runs && flag_interactive) {
-                printf("\n");
-            }
-        }
-        interactive_flush();
+        test_run_print_interactive(test_runs, *num_test_runs);
     }
 }
 
@@ -1555,12 +1565,13 @@ static size_t tests_db_execute(struct tests_db* tests) {
     size_t num_tests_running = 0;
     for (size_t i = 0; i < tests->num_tests; i++) {
         while (num_tests_running == tests->num_test_runs) {
-            // Poll all test runs until one is free.
+            // Poll all test runners until one is free.
             test_run_poll_all(tests->test_runs, &num_tests_running, &num_tests_succeeded);
         }
         struct test_run* test_run = tests->test_runs + (num_tests_running++);
         test_run_set_test(tests, test_run, i);
-        test_run_poll_all(tests->test_runs, &num_tests_running, &num_tests_succeeded);
+        test_run_start(test_run);
+        test_run_print_interactive(tests->test_runs, num_tests_running);
     }
     while (num_tests_running > 0) {
         // Poll all test runs until all are done.
@@ -1574,17 +1585,25 @@ int main(int argc, char** argv) {
 
     bool is_term_output = isatty(STDOUT_FILENO);
 
+    const char* cache_dir = get_flag_string("cache-dir", "TEST_CACHE_DIR", DEFAULT_CACHE_DIR, &argc, &argv);
+    flag_todos = get_flag_bool("T", "TEST_TODOS", false, &argc, &argv);
     flag_die_on_fail = get_flag_bool("x", "TEST_DIE_ON_FAIL", false, &argc, &argv);
     flag_print_on_success = get_flag_bool("v", "TEST_PRINT_ON_SUCCESS", !is_term_output, &argc, &argv);
     flag_colors = get_flag_bool("c", "TEST_COLORS", is_term_output, &argc, &argv);
     flag_interactive = get_flag_bool("i", "TEST_INTERACTIVE", is_term_output, &argc, &argv);
-    const char* cache_dir = get_flag_string("cache-dir", "TEST_CACHE_DIR", DEFAULT_CACHE_DIR, &argc, &argv);
-    int num_jobs = get_flag_int("j", "TEST_JOBS", "1", &argc, &argv);
-    if (num_jobs <= 0 || num_jobs > 256) {
-        fatal_error("Invalid num jobs. Expected number between 1 and 256.\n");
+    bool num_jobs_all = get_flag_bool("ja", "TEST_JOBS_ALL", false, &argc, &argv);
+    int num_jobs;
+    if (num_jobs_all) {
+        num_jobs = (int)sysconf(_SC_NPROCESSORS_ONLN);
+        printf("Running at most %d parallel jobs\n", num_jobs);
+    } else {
+        num_jobs = get_flag_int("j", "TEST_JOBS", "1", &argc, &argv);
+        if (num_jobs <= 0 || num_jobs > 256) {
+            fatal_error("Invalid num jobs. Expected number between 1 and 256.\n");
+        }
     }
 
-    if (flag_interactive && BUFSIZ < 65536) {
+    if (flag_interactive && (BUFSIZ < 65536)) {
         // For interactive mode, output looks smoother if we control
         // exact flushing with interactive_flush(). If this fails, we
         // don't really care as it's an optional enhancement.
@@ -1602,7 +1621,10 @@ int main(int argc, char** argv) {
     if (argc == 2) {
         test_dir = argv[1];
     }
-    printf("Testing %s\n\n", test_dir);
+    printf("Testing %s\n", test_dir);
+    if (flag_todos) {
+        printf("\n");
+    }
 
     struct tests_db tests;
     tests_db_init(&tests, num_jobs);

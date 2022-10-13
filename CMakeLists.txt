@@ -172,7 +172,7 @@ if (LIGHTCXX_ENABLE_TESTS)
     file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/tests)
 
     add_custom_target(test
-            COMMAND test_runner
+            COMMAND $<TARGET_FILE:test_runner> -i=no -v -ja
             DEPENDS lightcxx_static testing test_runner)
 
     if ($ENV{CLION_IDE})
