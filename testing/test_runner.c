@@ -867,9 +867,10 @@ static bool parse_no_compile_expectation(const char* test_path, struct string_vi
 }
 
 // Parse the test source file to discover expectations.
-// Results are pointing inside tests_db->test_expectations_buf.
-static bool parse_test_expectations(struct tests_db* tests,
-                                    struct string* test_path,
+// Results are pointing inside scratch_space. scratch_space may be resized, according to needs.
+static bool parse_test_expectations(struct string* scratch_space,
+                                    bool* misconfigured,
+                                    const struct string* test_path,
                                     struct string_view* section,
                                     struct string_view* test_file_stem,
                                     struct string_view* skip_reason,
@@ -879,6 +880,8 @@ static bool parse_test_expectations(struct tests_db* tests,
                                     int* expect_no_compile_num_runs,
                                     bool* expect_no_compile_has_pattern,
                                     regex_t* expect_no_compile_pattern) {
+    *misconfigured = false;
+
     // Parse the test path to discover section and test name stem.
     test_file_stem->end = test_path->data + test_path->len - 4;
     section->end = test_file_stem->end;
@@ -902,7 +905,6 @@ static bool parse_test_expectations(struct tests_db* tests,
                     test_path->data, ferror(test_source_file), strerror(ferror(test_source_file)));
     }
 
-    struct string* scratch_space = &tests->test_runs[0].scratch_space;
     string_clear(scratch_space);
     for (int i = 0; i < NUM_EXPECTATION_CLAUSES_SUPPORTED;) {
         char* result = fgets(scratch_space->data + scratch_space->len, (int)(scratch_space->capacity - scratch_space->len), test_source_file);
@@ -936,20 +938,21 @@ static bool parse_test_expectations(struct tests_db* tests,
     struct string_view expect_exit;
     parse_test_single_expectation(scratch_space->data, "// EXPECT:EXIT", &expect_exit);
     if (!parse_exit_expectation(test_path->data, expect_exit, expect_exit_code, expect_exit_signal)) {
-        tests->num_mis_configured_tests += 1;
+        *misconfigured = true;
         return false;
     }
 
     struct string_view expect_no_compile;
     parse_test_single_expectation(scratch_space->data, "// EXPECT:NO_COMPILE", &expect_no_compile);
     if (!parse_no_compile_expectation(test_path->data, expect_no_compile, expect_no_compile_num_runs, expect_no_compile_has_pattern, expect_no_compile_pattern)) {
-        tests->num_mis_configured_tests += 1;
+        *misconfigured = true;
         return false;
     }
     return true;
 }
 
 static void tests_db_add_test(struct tests_db* tests, struct string* test_path, struct timespec lmt, struct string* build_cache_dir_path) {
+    bool misconfigured;
     struct string_view section;
     struct string_view test_file_stem;
     struct string_view reason_skip;
@@ -959,7 +962,8 @@ static void tests_db_add_test(struct tests_db* tests, struct string* test_path, 
     int expect_no_compile_num_runs;
     bool expect_no_compile_has_pattern;
     regex_t expect_no_compile_pattern;
-    if (!parse_test_expectations(tests,
+    if (!parse_test_expectations(&tests->test_runs[0].scratch_space,
+                                 &misconfigured,
                                  test_path,
                                  &section,
                                  &test_file_stem,
@@ -970,6 +974,7 @@ static void tests_db_add_test(struct tests_db* tests, struct string* test_path, 
                                  &expect_no_compile_num_runs,
                                  &expect_no_compile_has_pattern,
                                  &expect_no_compile_pattern)) {
+        tests->num_mis_configured_tests += misconfigured;
         return;
     }
 
@@ -1100,7 +1105,7 @@ static void tests_db_scan(struct tests_db* tests, const char* test_dir, const ch
     string_destroy(&test_path);
 }
 
-static bool find_header_dep_with_lmt_gt(struct tests_db* tests, struct timespec lmt, const char* dep_file_path) {
+static bool find_header_dep_with_lmt_gt(struct string* scratch_space, struct timespec lmt, const char* dep_file_path) {
     FILE* dep_file = fopen(dep_file_path, "r");
     if (dep_file == NULL) {
         fatal_error("Failed to fopen() dependencies file %s: error: %d %s", dep_file_path, errno, strerror(errno));
@@ -1109,7 +1114,6 @@ static bool find_header_dep_with_lmt_gt(struct tests_db* tests, struct timespec 
         fatal_error("Failed to read test header dependencies from file %s: fopen failed error: %d %s\n",
                     dep_file_path, ferror(dep_file), strerror(ferror(dep_file)));
     }
-    struct string* scratch_space = &tests->test_runs[0].scratch_space;
     string_clear(scratch_space);
     while (!feof(dep_file)) {
         char* result = fgets(scratch_space->data + scratch_space->len, (int)(scratch_space->capacity - scratch_space->len), dep_file);
@@ -1158,7 +1162,7 @@ static bool find_header_dep_with_lmt_gt(struct tests_db* tests, struct timespec 
     return false;
 }
 
-static bool check_test_requires_re_compile(struct tests_db* tests, struct test* test) {
+static bool check_test_requires_re_compile(struct string* scratch_space, struct test* test) {
     if (test->expect_no_compile_num_runs > 0) {
         // A negative compile test is never compiled (running the test involves doing the compilation).
         return false;
@@ -1183,7 +1187,7 @@ static bool check_test_requires_re_compile(struct tests_db* tests, struct test* 
         return true;
     }
     // Source file did not change. Check header dependencies now.
-    return find_header_dep_with_lmt_gt(tests, test->obj_file_lmt, test->dep_file_path);
+    return find_header_dep_with_lmt_gt(scratch_space, test->obj_file_lmt, test->dep_file_path);
 }
 
 static bool check_test_requires_re_link(struct test* test, struct timespec libs_lmt) {
@@ -1233,7 +1237,7 @@ static void tests_db_prepare(struct tests_db* db) {
     db->num_tests_to_link = 0;
     db->num_neg_compile_tests = 0;
     for (size_t i = 0; i < db->num_tests; i++) {
-        db->tests[i].requires_re_compile = check_test_requires_re_compile(db, db->tests + i);
+        db->tests[i].requires_re_compile = check_test_requires_re_compile(&db->test_runs[0].scratch_space, db->tests + i);
         db->num_tests_to_compile += db->tests[i].requires_re_compile;
 
         db->tests[i].requires_re_link = check_test_requires_re_link(db->tests + i, libs_lmt);
