@@ -294,44 +294,40 @@ static void string_reserve(struct string* str, size_t sz) {
     }
 }
 
-struct path {
-    struct string str;
-};
-
-static void path_init_realpath(struct path* path, const char* from) {
-    path->str.data = realpath(from, NULL);
-    path->str.len = strlen(path->str.data);
-    path->str.capacity = path->str.len + 1;
+static void path_init_realpath(struct string* path, const char* from) {
+    path->data = realpath(from, NULL);
+    path->len = strlen(path->data);
+    path->capacity = path->len + 1;
 }
 
-static void path_ensure_trailing_slash(struct path* path) {
-    if (path->str.data[path->str.len - 1] != PATH_SEP) {
-        string_reserve(&path->str, path->str.len + 1);
-        path->str.data[path->str.len++] = PATH_SEP;
-        path->str.data[path->str.len] = '\0';
+static void path_ensure_trailing_slash(struct string* path) {
+    if (path->data[path->len - 1] != PATH_SEP) {
+        string_reserve(path, path->len + 1);
+        path->data[path->len++] = PATH_SEP;
+        path->data[path->len] = '\0';
     }
 }
 
-static void path_append(struct path* path, const char* part) {
-    if (part[0] == PATH_SEP && path->str.data[path->str.len - 1] == PATH_SEP) {
+static void path_append(struct string* path, const char* part) {
+    if (part[0] == PATH_SEP && path->data[path->len - 1] == PATH_SEP) {
         part++;
     } else if (part[0] != PATH_SEP) {
         path_ensure_trailing_slash(path);
     }
     const size_t part_len = strlen(part);
-    string_reserve(&path->str, path->str.len + part_len);
-    memcpy(path->str.data + path->str.len, part, part_len + 1);
-    path->str.len += part_len;
+    string_reserve(path, path->len + part_len);
+    memcpy(path->data + path->len, part, part_len + 1);
+    path->len += part_len;
 }
 
-static void path_pop(struct path* path) {
-    if (path->str.data[path->str.len - 1] == PATH_SEP) {
-        path->str.len--;
+static void path_pop(struct string* path) {
+    if (path->data[path->len - 1] == PATH_SEP) {
+        path->len--;
     }
-    while (path->str.data[path->str.len - 1] != PATH_SEP) {
-        path->str.len--;
+    while (path->data[path->len - 1] != PATH_SEP) {
+        path->len--;
     }
-    path->str.data[path->str.len--] = '\0';
+    path->data[path->len--] = '\0';
 }
 
 static void path_stat(const char* path, bool* exists, struct timespec* last_touch_ts, bool* is_dir) {
@@ -847,7 +843,7 @@ static bool parse_no_compile_expectation(const char* test_path, struct string_vi
 // Parse the test source file to discover expectations.
 // Results are pointing inside tests_db->test_expectations_buf.
 static bool parse_test_expectations(struct tests_db* tests,
-                                    struct path* test_path,
+                                    struct string* test_path,
                                     struct string_view* section,
                                     struct string_view* test_file_stem,
                                     struct string_view* skip_reason,
@@ -858,7 +854,7 @@ static bool parse_test_expectations(struct tests_db* tests,
                                     bool* expect_no_compile_has_pattern,
                                     regex_t* expect_no_compile_pattern) {
     // Parse the test path to discover section and test name stem.
-    test_file_stem->end = test_path->str.data + test_path->str.len - 4;
+    test_file_stem->end = test_path->data + test_path->len - 4;
     section->end = test_file_stem->end;
     while (*section->end != PATH_SEP) {
         section->end--;
@@ -871,13 +867,13 @@ static bool parse_test_expectations(struct tests_db* tests,
     section->start++;
 
     errno = 0;
-    FILE* test_source_file = fopen(test_path->str.data, "r");
+    FILE* test_source_file = fopen(test_path->data, "r");
     if (test_source_file == NULL) {
-        fatal_error("Failed to fopen() test source file %s: error: %d %s", test_path->str.data, errno, strerror(errno));
+        fatal_error("Failed to fopen() test source file %s: error: %d %s", test_path->data, errno, strerror(errno));
     }
     if (ferror(test_source_file)) {
         fatal_error("Failed to read expectations from test file %s: fopen failed error: %d %s\n",
-                    test_path->str.data, ferror(test_source_file), strerror(ferror(test_source_file)));
+                    test_path->data, ferror(test_source_file), strerror(ferror(test_source_file)));
     }
 
     struct string* scratch_space = &tests->test_run[0].scratch_space;
@@ -889,7 +885,7 @@ static bool parse_test_expectations(struct tests_db* tests,
                 break;
             }
             fatal_error("Failed to read expectations from test file %s: fgets failed error: %d %s\n",
-                        test_path->str.data, ferror(test_source_file), strerror(ferror(test_source_file)));
+                        test_path->data, ferror(test_source_file), strerror(ferror(test_source_file)));
         }
         scratch_space->len += strlen(scratch_space->data + scratch_space->len);
         if (scratch_space->len + 1 == scratch_space->capacity) {
@@ -913,21 +909,21 @@ static bool parse_test_expectations(struct tests_db* tests,
 
     struct string_view expect_exit;
     parse_test_single_expectation(scratch_space->data, "// EXPECT:EXIT", &expect_exit);
-    if (!parse_exit_expectation(test_path->str.data, expect_exit, expect_exit_code, expect_exit_signal)) {
+    if (!parse_exit_expectation(test_path->data, expect_exit, expect_exit_code, expect_exit_signal)) {
         tests->num_mis_configured_tests += 1;
         return false;
     }
 
     struct string_view expect_no_compile;
     parse_test_single_expectation(scratch_space->data, "// EXPECT:NO_COMPILE", &expect_no_compile);
-    if (!parse_no_compile_expectation(test_path->str.data, expect_no_compile, expect_no_compile_num_runs, expect_no_compile_has_pattern, expect_no_compile_pattern)) {
+    if (!parse_no_compile_expectation(test_path->data, expect_no_compile, expect_no_compile_num_runs, expect_no_compile_has_pattern, expect_no_compile_pattern)) {
         tests->num_mis_configured_tests += 1;
         return false;
     }
     return true;
 }
 
-static void tests_db_add_test(struct tests_db* tests, struct path* test_path, struct timespec lmt, struct path* build_cache_dir_path) {
+static void tests_db_add_test(struct tests_db* tests, struct string* test_path, struct timespec lmt, struct string* build_cache_dir_path) {
     struct string_view section;
     struct string_view test_file_stem;
     struct string_view reason_skip;
@@ -958,11 +954,11 @@ static void tests_db_add_test(struct tests_db* tests, struct path* test_path, st
     struct test* test = tests->tests + tests->num_tests;
     tests->num_tests++;
 
-    const size_t file_path_len = test_path->str.len;
+    const size_t file_path_len = test_path->len;
     const size_t test_name_len = 1 /*[*/ + sv_len(section) + 2 /*].*/ + sv_len(test_file_stem);
-    const size_t dep_file_path_len = build_cache_dir_path->str.len + sv_len(section) + 1 /*.*/ + sv_len(test_file_stem) + 2 /*.d*/;
-    const size_t obj_file_path_len = build_cache_dir_path->str.len + sv_len(section) + 1 /*.*/ + sv_len(test_file_stem) + 2 /*.o*/;
-    const size_t exe_file_path_len = build_cache_dir_path->str.len + sv_len(section) + 1 /*.*/ + sv_len(test_file_stem);
+    const size_t dep_file_path_len = build_cache_dir_path->len + sv_len(section) + 1 /*.*/ + sv_len(test_file_stem) + 2 /*.d*/;
+    const size_t obj_file_path_len = build_cache_dir_path->len + sv_len(section) + 1 /*.*/ + sv_len(test_file_stem) + 2 /*.o*/;
+    const size_t exe_file_path_len = build_cache_dir_path->len + sv_len(section) + 1 /*.*/ + sv_len(test_file_stem);
 
     test->source_file_lmt = lmt;
     // Total memory required is sum of all of the above, plus null terminators.
@@ -972,9 +968,9 @@ static void tests_db_add_test(struct tests_db* tests, struct path* test_path, st
                              + obj_file_path_len + 1
                              + exe_file_path_len + 1
                              + sv_len(expect_steps) + 1);
-    memcpy(test->file_path, test_path->str.data, test_path->str.len + 1);  // Include the null terminator.
+    memcpy(test->file_path, test_path->data, test_path->len + 1);  // Include the null terminator.
 
-    test->test_name = test->file_path + test_path->str.len + 1;
+    test->test_name = test->file_path + test_path->len + 1;
     test->test_name[0] = '[';
     memcpy(test->test_name + 1, section.start, sv_len(section));
     test->test_name[sv_len(section) + 1] = ']';
@@ -983,29 +979,29 @@ static void tests_db_add_test(struct tests_db* tests, struct path* test_path, st
     test->test_name[test_name_len] = '\0';
 
     test->dep_file_path = test->test_name + test_name_len + 1;
-    memcpy(test->dep_file_path, build_cache_dir_path->str.data, build_cache_dir_path->str.len);
-    memcpy(test->dep_file_path + build_cache_dir_path->str.len, section.start, sv_len(section));
-    test->dep_file_path[build_cache_dir_path->str.len + sv_len(section)] = '.';
-    memcpy(test->dep_file_path + build_cache_dir_path->str.len + sv_len(section) + 1, test_file_stem.start, sv_len(test_file_stem));
-    test->dep_file_path[build_cache_dir_path->str.len + sv_len(section) + 1 + sv_len(test_file_stem)] = '.';
-    test->dep_file_path[build_cache_dir_path->str.len + sv_len(section) + 1 + sv_len(test_file_stem) + 1] = 'd';
+    memcpy(test->dep_file_path, build_cache_dir_path->data, build_cache_dir_path->len);
+    memcpy(test->dep_file_path + build_cache_dir_path->len, section.start, sv_len(section));
+    test->dep_file_path[build_cache_dir_path->len + sv_len(section)] = '.';
+    memcpy(test->dep_file_path + build_cache_dir_path->len + sv_len(section) + 1, test_file_stem.start, sv_len(test_file_stem));
+    test->dep_file_path[build_cache_dir_path->len + sv_len(section) + 1 + sv_len(test_file_stem)] = '.';
+    test->dep_file_path[build_cache_dir_path->len + sv_len(section) + 1 + sv_len(test_file_stem) + 1] = 'd';
     test->dep_file_path[dep_file_path_len] = '\0';
 
     test->obj_file_path = test->dep_file_path + dep_file_path_len + 1;
-    memcpy(test->obj_file_path, build_cache_dir_path->str.data, build_cache_dir_path->str.len);
-    memcpy(test->obj_file_path + build_cache_dir_path->str.len, section.start, sv_len(section));
-    test->obj_file_path[build_cache_dir_path->str.len + sv_len(section)] = '.';
-    memcpy(test->obj_file_path + build_cache_dir_path->str.len + sv_len(section) + 1, test_file_stem.start, sv_len(test_file_stem));
-    test->obj_file_path[build_cache_dir_path->str.len + sv_len(section) + 1 + sv_len(test_file_stem)] = '.';
-    test->obj_file_path[build_cache_dir_path->str.len + sv_len(section) + 1 + sv_len(test_file_stem) + 1] = 'o';
+    memcpy(test->obj_file_path, build_cache_dir_path->data, build_cache_dir_path->len);
+    memcpy(test->obj_file_path + build_cache_dir_path->len, section.start, sv_len(section));
+    test->obj_file_path[build_cache_dir_path->len + sv_len(section)] = '.';
+    memcpy(test->obj_file_path + build_cache_dir_path->len + sv_len(section) + 1, test_file_stem.start, sv_len(test_file_stem));
+    test->obj_file_path[build_cache_dir_path->len + sv_len(section) + 1 + sv_len(test_file_stem)] = '.';
+    test->obj_file_path[build_cache_dir_path->len + sv_len(section) + 1 + sv_len(test_file_stem) + 1] = 'o';
     test->obj_file_path[obj_file_path_len] = '\0';
 
     test->exe_file_path = test->obj_file_path + obj_file_path_len + 1;
-    memcpy(test->exe_file_path, build_cache_dir_path->str.data, build_cache_dir_path->str.len);
-    memcpy(test->exe_file_path + build_cache_dir_path->str.len, section.start, sv_len(section));
-    test->exe_file_path[build_cache_dir_path->str.len + sv_len(section)] = '.';
-    memcpy(test->exe_file_path + build_cache_dir_path->str.len + sv_len(section) + 1, test_file_stem.start, sv_len(test_file_stem));
-    test->exe_file_path[build_cache_dir_path->str.len + sv_len(section) + 1 + sv_len(test_file_stem)] = '\0';
+    memcpy(test->exe_file_path, build_cache_dir_path->data, build_cache_dir_path->len);
+    memcpy(test->exe_file_path + build_cache_dir_path->len, section.start, sv_len(section));
+    test->exe_file_path[build_cache_dir_path->len + sv_len(section)] = '.';
+    memcpy(test->exe_file_path + build_cache_dir_path->len + sv_len(section) + 1, test_file_stem.start, sv_len(test_file_stem));
+    test->exe_file_path[build_cache_dir_path->len + sv_len(section) + 1 + sv_len(test_file_stem)] = '\0';
 
     test->expect_steps = test->exe_file_path + exe_file_path_len + 1;
     if (sv_len(expect_steps)) {
@@ -1021,24 +1017,24 @@ static void tests_db_add_test(struct tests_db* tests, struct path* test_path, st
     test->expect_exit_signal = expect_exit_signal;
 }
 
-static void tests_db_scan_dir(struct tests_db* tests, struct path* test_path, struct path* build_cache_dir_path) {
+static void tests_db_scan_dir(struct tests_db* tests, struct string* test_path, struct string* build_cache_dir_path) {
     bool exists, is_dir;
     struct timespec lmt;
-    path_stat(test_path->str.data, &exists, &lmt, &is_dir);
+    path_stat(test_path->data, &exists, &lmt, &is_dir);
     if (!exists) {
-        fatal_error("%s: No such file or directory.\n", test_path->str.data);
+        fatal_error("%s: No such file or directory.\n", test_path->data);
     }
     if (is_dir) {
-        DIR* dir = opendir(test_path->str.data);
+        DIR* dir = opendir(test_path->data);
         if (dir == NULL) {
-            fatal_error("Failed to opendir() directory %s: error=%d %s\n", test_path->str.data, errno, strerror(errno));
+            fatal_error("Failed to opendir() directory %s: error=%d %s\n", test_path->data, errno, strerror(errno));
         }
         while (true) {
             errno = 0;
             struct dirent* entry = readdir(dir);
             if (entry == NULL) {
                 if (errno != 0) {
-                    fatal_error("Failed to readdir() directory %s: error=%d %s\n", test_path->str.data, errno, strerror(errno));
+                    fatal_error("Failed to readdir() directory %s: error=%d %s\n", test_path->data, errno, strerror(errno));
                 }
                 break;
             }
@@ -1049,7 +1045,7 @@ static void tests_db_scan_dir(struct tests_db* tests, struct path* test_path, st
             }
         }
         closedir(dir);
-    } else if (test_path->str.len > 4 && memcmp(test_path->str.data + test_path->str.len - 4, ".cpp", 4) == 0) {
+    } else if (test_path->len > 4 && memcmp(test_path->data + test_path->len - 4, ".cpp", 4) == 0) {
         tests_db_add_test(tests, test_path, lmt, build_cache_dir_path);
     }
 }
@@ -1067,17 +1063,17 @@ static void tests_db_scan(struct tests_db* tests, const char* test_dir, const ch
 
     tests_db_init(tests);
 
-    struct path build_cache_dir_path;
+    struct string build_cache_dir_path;
     path_init_realpath(&build_cache_dir_path, build_cache_dir);
     path_ensure_trailing_slash(&build_cache_dir_path);
 
-    struct path test_path;
+    struct string test_path;
     path_init_realpath(&test_path, test_dir);
 
     tests_db_scan_dir(tests, &test_path, &build_cache_dir_path);
 
-    string_destroy(&build_cache_dir_path.str);
-    string_destroy(&test_path.str);
+    string_destroy(&build_cache_dir_path);
+    string_destroy(&test_path);
 }
 
 static bool find_header_dep_with_lmt_gt(struct tests_db* tests, struct timespec lmt, const char* dep_file_path) {
