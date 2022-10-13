@@ -180,7 +180,9 @@ static const char* color_reset(void) {
 
 static void interactive_clear(void) {
     if (flag_interactive && num_lines_interactive > 0) {
-        for (int i = 0; i < num_lines_interactive; i++) {
+        // Move to the start of the current line and clear it.
+        printf("\r\033[K");
+        for (int i = 1; i < num_lines_interactive; i++) {
             // move to the start of the previous line and clear it.
             printf("\033[F\033[K");
         }
@@ -1269,10 +1271,11 @@ static void test_run_print(struct test_run* test_run) {
     if (test_run->failed) {
         printf("%sfailed%s", color_error_begin(), color_reset());
     }
-    printf("\n");
     if (test_run->step != s_success && !test_run->failed) {
-        // This is an interactive line.
+        // This is an interactive line, don't print an EOL.
         num_lines_interactive += 1;
+    } else {
+        printf("\n");
     }
 }
 
@@ -1533,8 +1536,11 @@ static void test_run_poll_all(struct test_run* test_runs, size_t* num_test_runs,
     }
     if (did_state_change) {
         interactive_clear();
-        for (size_t i = 0; i < *num_test_runs;i ++) {
+        for (size_t i = 0; i < *num_test_runs; i++) {
             test_run_print(test_runs + i);
+            if (i + 1 != *num_test_runs && flag_interactive) {
+                printf("\n");
+            }
         }
         interactive_flush();
     }
@@ -1572,6 +1578,13 @@ int main(int argc, char** argv) {
     int num_jobs = get_flag_int("j", "TEST_JOBS", "1", &argc, &argv);
     if (num_jobs <= 0 || num_jobs > 256) {
         fatal_error("Invalid num jobs. Expected number between 1 and 256.\n");
+    }
+
+    if (flag_interactive && BUFSIZ < 65536) {
+        // For interactive mode, output looks smoother if we control
+        // exact flushing with interactive_flush(). If this fails, we
+        // don't really care as it's an optional enhancement.
+        setvbuf(stdout, NULL, _IOFBF, 65536);
     }
 
     if (argc > 2) {
