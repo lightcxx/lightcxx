@@ -1,0 +1,150 @@
+#ifndef _LIGHTCXX_GUARD_RATIO
+#define _LIGHTCXX_GUARD_RATIO
+
+#include <cstdint>
+#include <type_traits>
+
+namespace std {
+
+template<intmax_t _N, intmax_t _D>
+    requires(_N != INTMAX_MIN && _D != INTMAX_MIN && _D != 0)
+class ratio;
+
+namespace _Light {
+
+// TODO: Make consteval on clang 15.
+constexpr intmax_t __gcd(intmax_t __a, intmax_t __b) {
+    __a = (__a > 0 ? __a : -__a);
+    __b = (__b > 0 ? __b : -__b);
+    while (__b) {
+        auto __r = __a % __b;
+        __a = __b;
+        __b = __r;
+    }
+    return __a;
+}
+
+// Returns __a/__b < __c/__d in an overflow-safe way.
+// Assumes __a/__b and __c/__d are normalized.
+// The algorithm:
+//   1. take the quotients of the two fractions.
+//   2. if they are not equal, compare them and return the result.
+//   3. if they are equal, reduce them (__a = __a % __b, __c = __c % __d)
+//   4. reverse the fractions:  __a/__b < __c/__d   <=>   __d/__c < __b/__a
+//   5. if one of the denominators becomes 0, both will be 0 at once,
+//       meaning the fractions are equal.
+//   6. if no denominator is 0, repeat from step 1.
+// TODO: Make consteval on clang 15.
+constexpr bool __ratio_less(intmax_t __a, intmax_t __b, intmax_t __c, intmax_t __d) {
+    if ((__a < 0) != (__c < 0)) {
+        return __a < 0;
+    }
+    if (__a < 0) {
+        swap(__b, __d);
+        swap(__a, __c);
+        __a = -__a;
+        __c = -__c;
+    }
+    while (__b != 0 && __d != 0) {
+        const auto __quot_a_b = __a / __b;
+        const auto __quot_c_d = __c / __d;
+        if (__quot_a_b != __quot_c_d) {
+            return __quot_a_b < __quot_c_d;
+        }
+        const auto __rem_a_b = __a % __b;
+        const auto __rem_c_d = __c % __d;
+        __a = __d;
+        __d = __rem_a_b;
+        __c = __b;
+        __b = __rem_c_d;
+    }
+    return false;  // Equal
+}
+
+template<class _R>
+inline constexpr bool __is_ratio = false;
+
+template<intmax_t _N, intmax_t _D>
+inline constexpr bool __is_ratio<ratio<_N, _D>> = true;
+
+template<class _R>
+concept __ratio = __is_ratio<_R>;
+
+}  // namespace _Light
+
+template<intmax_t _N, intmax_t _D = 1>
+    requires(_N != INTMAX_MIN && _D != INTMAX_MIN && _D != 0)
+class ratio {
+    static constexpr intmax_t __gcd = _Light::__gcd(_N, _D);
+
+  public:
+    static constexpr intmax_t num = (_D > 0 ? 1 : -1) * _N / __gcd;
+    static constexpr intmax_t den = (_D > 0 ? _D : -_D) / __gcd;
+    using type = ratio<num, den>;
+};
+
+template<_Light::__ratio _R1, _Light::__ratio _R2>
+using ratio_add = ratio<_R1::num * _R2::den + _R2::num * _R1::den, _R1::den * _R2::den>;  // TODO: Not properly implemented
+
+template<_Light::__ratio _R1, _Light::__ratio _R2>
+using ratio_subtract = ratio<_R1::num * _R2::den - _R2::num * _R1::den, _R1::den * _R2::den>;  // TODO: Not properly implemented
+
+template<_Light::__ratio _R1, _Light::__ratio _R2>
+using ratio_multiply = ratio<_R1::num * _R2::num, _R1::den * _R2::den>;  // TODO: Not properly implemented
+
+template<_Light::__ratio _R1, _Light::__ratio _R2>
+using ratio_divide = ratio<_R1::num * _R2::den, _R1::den * _R2::num>;  // TODO: Not properly implemented
+
+template<_Light::__ratio _R1, _Light::__ratio _R2>
+struct ratio_equal : bool_constant<_R1::num == _R2::num && _R1::den == _R2::den> {};
+template<_Light::__ratio _R1, _Light::__ratio _R2>
+inline constexpr bool ratio_equal_v = (_R1::num == _R2::num && _R1::den == _R2::den);
+
+template<_Light::__ratio _R1, _Light::__ratio _R2>
+struct ratio_not_equal : bool_constant<_R1::num != _R2::num || _R1::den != _R2::den> {};
+template<_Light::__ratio _R1, _Light::__ratio _R2>
+inline constexpr bool ratio_not_equal_v = _R1::num != _R2::num || _R1::den != _R2::den;
+
+template<_Light::__ratio _R1, _Light::__ratio _R2>
+struct ratio_less : bool_constant<_Light::__ratio_less(_R1::num, _R1::den, _R2::num, _R2::den)> {};
+template<_Light::__ratio _R1, _Light::__ratio _R2>
+inline constexpr bool ratio_less_v = _Light::__ratio_less(_R1::num, _R1::den, _R2::num, _R2::den);
+
+template<_Light::__ratio _R1, _Light::__ratio _R2>
+struct ratio_less_equal : bool_constant<!_Light::__ratio_less(_R2::num, _R2::den, _R1::num, _R1::den)> {};
+
+template<_Light::__ratio _R1, _Light::__ratio _R2>
+inline constexpr bool ratio_less_equal_v = !_Light::__ratio_less(_R2::num, _R2::den, _R1::num, _R1::den);
+
+template<_Light::__ratio _R1, _Light::__ratio _R2>
+struct ratio_greater : bool_constant<_Light::__ratio_less(_R2::num, _R2::den, _R1::num, _R1::den)> {};
+template<_Light::__ratio _R1, _Light::__ratio _R2>
+inline constexpr bool ratio_greater_v = _Light::__ratio_less(_R2::num, _R2::den, _R1::num, _R1::den);
+
+template<_Light::__ratio _R1, _Light::__ratio _R2>
+struct ratio_greater_equal : bool_constant<!_Light::__ratio_less(_R1::num, _R1::den, _R2::num, _R2::den)> {};
+template<_Light::__ratio _R1, _Light::__ratio _R2>
+inline constexpr bool ratio_greater_equal_v = !_Light::__ratio_less(_R1::num, _R1::den, _R2::num, _R2::den);
+
+using atto = ratio<1, 1'000'000'000'000'000'000>;
+using femto = ratio<1, 1'000'000'000'000'000>;
+using pico = ratio<1, 1'000'000'000'000>;
+using nano = ratio<1, 1'000'000'000>;
+using micro = ratio<1, 1'000'000>;
+using milli = ratio<1, 1'000>;
+using centi = ratio<1, 100>;
+using deci = ratio<1, 10>;
+using deca = ratio<10, 1>;
+using hecto = ratio<100, 1>;
+using kilo = ratio<1'000, 1>;
+using mega = ratio<1'000'000, 1>;
+using giga = ratio<1'000'000'000, 1>;
+using tera = ratio<1'000'000'000'000, 1>;
+using peta = ratio<1'000'000'000'000'000, 1>;
+using exa = ratio<1'000'000'000'000'000'000, 1>;
+
+// TODO: Handle yocto, zepto, zetta, and yotta.
+
+}  // namespace std
+
+#endif

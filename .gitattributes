@@ -1,1 +1,2 @@
 /include/* linguist-detectable=true linguist-language=C++
+/third_party/* linguist-vendored

@@ -32,14 +32,14 @@ class bitset {
             uint64_t,
             unsigned long long>>>>;
 
-    static inline constexpr size_t __repr_bits = _Light::__n_bits<__repr_t>();
-    static inline constexpr __repr_t __full_mask = __repr_t(~__repr_t(0));
+    static constexpr size_t __repr_bits = _Light::__n_bits<__repr_t>();
+    static constexpr __repr_t __full_mask = __repr_t(~__repr_t(0));
 
     using __iter_t = make_signed_t<size_t>;
-    static inline constexpr __iter_t __extent = (_N + __repr_bits - 1) / __repr_bits;
+    static constexpr __iter_t __extent = (_N + __repr_bits - 1) / __repr_bits;
 
     // Last entry in __storage might be shorter.
-    static inline constexpr __repr_t __last_mask = _N % __repr_bits == 0 ? __full_mask : ((__repr_t(1) << (_N % __repr_bits)) - 1);
+    static constexpr __repr_t __last_mask = _N % __repr_bits == 0 ? __full_mask : ((__repr_t(1) << (_N % __repr_bits)) - 1);
 
     __repr_t __storage[static_cast<size_t>(__extent)];
 
