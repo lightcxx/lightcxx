@@ -12,10 +12,19 @@ class ratio;
 
 namespace _Light {
 
-// TODO: Make consteval on clang 15.
+constexpr intmax_t __sign(intmax_t __x) {
+    return __x < 0 ? -1 : 1;
+}
+
+// TODO: Use std::abs() once implemented and constexpr (C++23).
+constexpr intmax_t __abs(intmax_t __x) {
+    return __sign(__x) * __x;
+}
+
+// TODO: Use std::gcd() once implemented.
 constexpr intmax_t __gcd(intmax_t __a, intmax_t __b) {
-    __a = (__a > 0 ? __a : -__a);
-    __b = (__b > 0 ? __b : -__b);
+    __a = __abs(__a);
+    __b = __abs(__b);
     while (__b) {
         auto __r = __a % __b;
         __a = __b;
@@ -24,17 +33,8 @@ constexpr intmax_t __gcd(intmax_t __a, intmax_t __b) {
     return __a;
 }
 
-// Returns __a/__b < __c/__d in an overflow-safe way.
-// Assumes __a/__b and __c/__d are normalized.
-// The algorithm:
-//   1. take the quotients of the two fractions.
-//   2. if they are not equal, compare them and return the result.
-//   3. if they are equal, reduce them (__a = __a % __b, __c = __c % __d)
-//   4. reverse the fractions:  __a/__b < __c/__d   <=>   __d/__c < __b/__a
-//   5. if one of the denominators becomes 0, both will be 0 at once,
-//       meaning the fractions are equal.
-//   6. if no denominator is 0, repeat from step 1.
-// TODO: Make consteval on clang 15.
+// Returns a/b < c/d in an overflow-safe way.
+// Assumes a/b and c/d are normalized.
 constexpr bool __ratio_less(intmax_t __a, intmax_t __b, intmax_t __c, intmax_t __d) {
     if (__a == __c && __b == __d) {
         return false;
@@ -79,30 +79,89 @@ inline constexpr bool __is_ratio<ratio<_N, _D>> = true;
 template<class _R>
 concept __ratio = __is_ratio<_R>;
 
+// TODO: Use std::pair once implemented?
+struct __intmax_t_pair {
+    intmax_t __first;
+    intmax_t __second;
+};
+
+// Returns a/b * c/d in an overflow-safe way (only overflow if the result itself cannot be stored).
+// Assumes a/b and c/d are normalized.
+constexpr __intmax_t_pair __ratio_multiply(intmax_t __a, intmax_t __b, intmax_t __c, intmax_t __d) {
+    // gcd(a, b) == 1 && gcd(c, d) == 1   =>   gcd(a * c, b * d) = gcd(a, d) * gcd(c, b);
+    const auto __g1 = __gcd(__a, __d);
+    if (__g1 != 0) {
+        __a /= __g1;
+        __d /= __g1;
+    }
+    const auto __g2 = __gcd(__c, __b);
+    if (__g2 != 0) {
+        __b /= __g2;
+        __c /= __g2;
+    }
+    return {__a * __c, __b * __d};
+}
+
+// Returns a/b + c/d in an overflow-safe way (only overflow if the result itself cannot be stored).
+// Assumes a/b and c/d are normalized.
+constexpr __intmax_t_pair __ratio_add(intmax_t __a, intmax_t __b, intmax_t __c, intmax_t __d) {
+    const auto __g1 = __gcd(__b, __d);
+    if (__g1 != 0) {
+        __b /= __g1;
+        __d /= __g1;
+    }
+    const auto __g2 = __gcd(__a, __c);
+    if (__g2 != 0) {
+        __a /= __g2;
+        __c /= __g2;
+    }
+    auto __x = __a * __d + __b * __c;
+    auto __y = __b * __d;
+    const auto __g = __gcd(__x, __y);
+    if (__g != 0) {
+        __x /= __g;
+        __y /= __g;
+    }
+    return __ratio_multiply(__g2, __g1, __x, __y);
+}
+
+template<intmax_t __a, intmax_t __b, intmax_t __c, intmax_t __d>
+struct __ratio_multiply_t {
+    static constexpr __intmax_t_pair __result = __ratio_multiply(__a, __b, __c, __d);
+    using __type = ratio<__result.__first, __result.__second>;
+};
+
+template<intmax_t __a, intmax_t __b, intmax_t __c, intmax_t __d>
+struct __ratio_add_t {
+    static constexpr __intmax_t_pair __result = __ratio_add(__a, __b, __c, __d);
+    using __type = ratio<__result.__first, __result.__second>;
+};
+
 }  // namespace _Light
 
 template<intmax_t _N, intmax_t _D = 1>
     requires(_N != INTMAX_MIN && _D != INTMAX_MIN && _D != 0)
 class ratio {
-    static constexpr intmax_t __gcd = _Light::__gcd(_N, _D);
+    static constexpr intmax_t __g = _Light::__gcd(_N, _D);
 
   public:
-    static constexpr intmax_t num = (_D > 0 ? 1 : -1) * _N / __gcd;
-    static constexpr intmax_t den = (_D > 0 ? _D : -_D) / __gcd;
+    static constexpr intmax_t num = _Light::__sign(_D) * _N / __g;
+    static constexpr intmax_t den = _Light::__abs(_D) / __g;
     using type = ratio<num, den>;
 };
 
 template<_Light::__ratio _R1, _Light::__ratio _R2>
-using ratio_add = ratio<_R1::num * _R2::den + _R2::num * _R1::den, _R1::den * _R2::den>;  // TODO: Not properly implemented
+using ratio_add = typename _Light::__ratio_add_t<_R1::num, _R1::den, _R2::num, _R2::den>::__type;
 
 template<_Light::__ratio _R1, _Light::__ratio _R2>
-using ratio_subtract = ratio<_R1::num * _R2::den - _R2::num * _R1::den, _R1::den * _R2::den>;  // TODO: Not properly implemented
+using ratio_subtract = typename _Light::__ratio_add_t<_R1::num, _R1::den, -_R2::num, _R2::den>::__type;
 
 template<_Light::__ratio _R1, _Light::__ratio _R2>
-using ratio_multiply = ratio<_R1::num * _R2::num, _R1::den * _R2::den>;  // TODO: Not properly implemented
+using ratio_multiply = typename _Light::__ratio_multiply_t<_R1::num, _R1::den, _R2::num, _R2::den>::__type;
 
 template<_Light::__ratio _R1, _Light::__ratio _R2>
-using ratio_divide = ratio<_R1::num * _R2::den, _R1::den * _R2::num>;  // TODO: Not properly implemented
+    requires(_R2::num != 0)
+using ratio_divide = typename _Light::__ratio_multiply_t<_R1::num, _R1::den, _Light::__sign(_R2::num) * _R2::den, _Light::__abs(_R2::num)>::__type;
 
 template<_Light::__ratio _R1, _Light::__ratio _R2>
 struct ratio_equal : bool_constant<_R1::num == _R2::num && _R1::den == _R2::den> {};

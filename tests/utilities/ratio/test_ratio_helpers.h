@@ -26,13 +26,9 @@ inline constexpr std::intmax_t ratio_template_param<std::ratio<A, B>, get_num> =
 
 template<class R, std::intmax_t A, std::intmax_t B>
 constexpr bool check_ratio_strict() {
-    static_assert(is_ratio<R>);
     static_assert(ratio_template_param<R, true> == A);
     static_assert(ratio_template_param<R, false> == B);
-    static_assert(R::num == A);
-    static_assert(R::den == B);
-    static_assert(std::is_same_v<typename R::type, std::ratio<A, B>>);
-    return true;
+    return check_ratio<R, A, B>();
 }
 
 #endif
