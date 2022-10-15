@@ -127,7 +127,7 @@ struct bitset_members_tests {
         expect_shl(bit_a, I);
     }
 
-    static inline constexpr std::size_t offsets[] = {0, 1, 5, 7, 8, 9, 15, 16, 17, 31, 32, 33, 63, 64, 65, 127, 128, 129, 255, 256, 257, std::size_t(-1)};
+    static constexpr std::size_t offsets[] = {0, 1, 5, 7, 8, 9, 15, 16, 17, 31, 32, 33, 63, 64, 65, 127, 128, 129, 255, 256, 257, std::size_t(-1)};
 
     static void test_shift_left() {
         for (int i = 0; offsets[i] <= N; i++) {

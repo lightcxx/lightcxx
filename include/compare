@@ -263,22 +263,22 @@ namespace _Light {
 
 template<class _C>
 struct _CmpToNum {
-    static inline constexpr int __value = 0;
+    static constexpr int __value = 0;
 };
 
 template<>
 struct _CmpToNum<partial_ordering> {
-    static inline constexpr int __value = 1;
+    static constexpr int __value = 1;
 };
 
 template<>
 struct _CmpToNum<weak_ordering> {
-    static inline constexpr int __value = 2;
+    static constexpr int __value = 2;
 };
 
 template<>
 struct _CmpToNum<strong_ordering> {
-    static inline constexpr int __value = 3;
+    static constexpr int __value = 3;
 };
 
 template<class... _Ts>

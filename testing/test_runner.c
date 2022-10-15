@@ -1361,11 +1361,11 @@ static bool test_run_check_execute_no_compile(struct test_run* test_run) {
                              test_run->proc.output_buf.data);
         }
     }
-    test_run->no_compile_run_id++;
-    if (test_run->no_compile_run_id == test->expect_no_compile_num_runs) {
+    if (test_run->no_compile_run_id + 1 == test->expect_no_compile_num_runs) {
         test_run->step = s_success;
         return true;
     }
+    test_run->no_compile_run_id++;
     test_run_start_execute_no_compile(test_run);
     return false;
 }

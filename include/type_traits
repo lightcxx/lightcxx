@@ -10,7 +10,7 @@ using nullptr_t = decltype(nullptr);
 
 template<class _T, _T _V>
 struct integral_constant {
-    static inline constexpr _T value = _V;
+    static constexpr _T value = _V;
 
     using value_type = _T;
 
@@ -2395,7 +2395,7 @@ template<size_t _Len, class... _Ts>
 struct aligned_union {
     static_assert(sizeof...(_Ts) > 0, "At least one type is required for std::aligned_union.");
     static_assert(((sizeof(_Ts) > 0 && is_object_v<_Ts>)&&...), "All types must be complete object types for std::aligned_union.");
-    static inline constexpr size_t alignment_value = _Light::_Max<alignof(_Ts)...>::value;
+    static constexpr size_t alignment_value = _Light::_Max<alignof(_Ts)...>::value;
 
     struct type {
         alignas(alignment_value) unsigned char __data[_Light::_Max<_Len, sizeof(_Ts)...>::value];
