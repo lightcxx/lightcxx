@@ -36,6 +36,9 @@ constexpr intmax_t __gcd(intmax_t __a, intmax_t __b) {
 //   6. if no denominator is 0, repeat from step 1.
 // TODO: Make consteval on clang 15.
 constexpr bool __ratio_less(intmax_t __a, intmax_t __b, intmax_t __c, intmax_t __d) {
+    if (__a == __c && __b == __d) {
+        return false;
+    }
     if ((__a < 0) != (__c < 0)) {
         return __a < 0;
     }
@@ -45,7 +48,7 @@ constexpr bool __ratio_less(intmax_t __a, intmax_t __b, intmax_t __c, intmax_t _
         __a = -__a;
         __c = -__c;
     }
-    while (__b != 0 && __d != 0) {
+    while (true) {
         const auto __quot_a_b = __a / __b;
         const auto __quot_c_d = __c / __d;
         if (__quot_a_b != __quot_c_d) {
@@ -53,6 +56,12 @@ constexpr bool __ratio_less(intmax_t __a, intmax_t __b, intmax_t __c, intmax_t _
         }
         const auto __rem_a_b = __a % __b;
         const auto __rem_c_d = __c % __d;
+        if (__rem_a_b == 0) {
+            return __rem_c_d != 0;
+        }
+        if (__rem_c_d == 0) {
+            return false;
+        }
         __a = __d;
         __d = __rem_a_b;
         __c = __b;
@@ -143,7 +152,7 @@ using tera = ratio<1'000'000'000'000, 1>;
 using peta = ratio<1'000'000'000'000'000, 1>;
 using exa = ratio<1'000'000'000'000'000'000, 1>;
 
-// TODO: Handle yocto, zepto, zetta, and yotta.
+// TODO: Handle yocto, zepto, zetta, and yotta?
 
 }  // namespace std
 

@@ -60,6 +60,7 @@ static void push_int(size_t* current_sz, int i) {
         output_line[pos--] = (char)('0' + j % 10);
         j /= 10;
     } while (j > 0);
+    *current_sz += num_digits;
 }
 
 static void write_output_line(size_t sz) {
@@ -82,7 +83,7 @@ void testing_fail_impl(const char* func, const char* file, int line) {
     size_t sz = 0;
     push_string(&sz, "EXPECTATION FAILED: IN FUNCTION ");
     push_string(&sz, func);
-    push_string(&sz, "( ");
+    push_string(&sz, " (");
     push_string(&sz, file);
     push_char(&sz, ':');
     push_int(&sz, line);

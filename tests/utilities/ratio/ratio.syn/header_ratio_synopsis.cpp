@@ -26,50 +26,19 @@ static_assert(std::ratio_greater_v<std::ratio<3, 4>, std::ratio<3, 8>>);
 static_assert(std::ratio_greater_equal<std::ratio<3, 4>, std::ratio<3, 8>>::value);
 static_assert(std::ratio_greater_equal_v<std::ratio<3, 4>, std::ratio<3, 8>>);
 
-static_assert(std::atto::num == 1);
-static_assert(std::atto::den == 1'000'000'000'000'000'000);
-
-static_assert(std::femto::num == 1);
-static_assert(std::femto::den == 1'000'000'000'000'000);
-
-static_assert(std::pico::num == 1);
-static_assert(std::pico::den == 1'000'000'000'000);
-
-static_assert(std::nano::num == 1);
-static_assert(std::nano::den == 1'000'000'000);
-
-static_assert(std::micro::num == 1);
-static_assert(std::micro::den == 1'000'000);
-
-static_assert(std::milli::num == 1);
-static_assert(std::milli::den == 1'000);
-
-static_assert(std::centi::num == 1);
-static_assert(std::centi::den == 100);
-
-static_assert(std::deci::num == 1);
-static_assert(std::deci::den == 10);
-
-static_assert(std::deca::num == 10);
-static_assert(std::deca::den == 1);
-
-static_assert(std::hecto::num == 100);
-static_assert(std::hecto::den == 1);
-
-static_assert(std::kilo::num == 1'000);
-static_assert(std::kilo::den == 1);
-
-static_assert(std::mega::num == 1'000'000);
-static_assert(std::mega::den == 1);
-
-static_assert(std::giga::num == 1'000'000'000);
-static_assert(std::giga::den == 1);
-
-static_assert(std::tera::num == 1'000'000'000'000);
-static_assert(std::tera::den == 1);
-
-static_assert(std::peta::num == 1'000'000'000'000'000);
-static_assert(std::peta::den == 1);
-
-static_assert(std::exa::num == 1'000'000'000'000'000'000);
-static_assert(std::exa::den == 1);
+static_assert(std::is_object_v<std::atto>);
+static_assert(std::is_object_v<std::femto>);
+static_assert(std::is_object_v<std::pico>);
+static_assert(std::is_object_v<std::nano>);
+static_assert(std::is_object_v<std::micro>);
+static_assert(std::is_object_v<std::milli>);
+static_assert(std::is_object_v<std::centi>);
+static_assert(std::is_object_v<std::deci>);
+static_assert(std::is_object_v<std::deca>);
+static_assert(std::is_object_v<std::hecto>);
+static_assert(std::is_object_v<std::kilo>);
+static_assert(std::is_object_v<std::mega>);
+static_assert(std::is_object_v<std::giga>);
+static_assert(std::is_object_v<std::tera>);
+static_assert(std::is_object_v<std::peta>);
+static_assert(std::is_object_v<std::exa>);
