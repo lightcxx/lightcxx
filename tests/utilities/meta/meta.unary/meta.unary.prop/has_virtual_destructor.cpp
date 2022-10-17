@@ -1,6 +1,7 @@
 #include <type_traits>
 
 #include "meta/test_unary_trait.h"
+#include "warnings.h"
 
 DECLARE_TRAIT_V_READER(has_virtual_destructor_v);
 
@@ -18,8 +19,7 @@ TEST_UNARY_TRAIT_AGAINST_ENUM(false, has_virtual_destructor, EVERY_CV);
 TEST_UNARY_TRAIT_AGAINST_UNION(false, has_virtual_destructor, EVERY_CV);
 TEST_UNARY_TRAIT_AGAINST_FUNCTION(false, has_virtual_destructor);
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wnon-virtual-dtor"
+WARNINGS_IGNORE_NON_VIRTUAL_DTOR()
 class VirtualBase : virtual Class {};
 
 class VirtualMethod {
@@ -62,7 +62,7 @@ class PublicVirtualDtorBase : public VirtualDtor {};
 class ProtectedVirtualDtorBase : protected VirtualDtor {};
 class PrivateVirtualDtorBase : private VirtualDtor {};
 class VirtualVirtualDtorBase : virtual VirtualDtor {};
-#pragma GCC diagnostic pop
+WARNINGS_POP()
 
 TEST_UNARY_TRAIT_AGAINST_TYPES(false, has_virtual_destructor, EVERY_CV, Class, VirtualBase, VirtualMethod, PublicPolymorphicBase, ProtectedPolymorphicBase,
                                PrivatePolymorphicBase, VirtualPolymorphicBase, PureVirtualMethod, PublicAbstractBase, ProtectedAbstractBase,

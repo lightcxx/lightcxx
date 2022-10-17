@@ -1,11 +1,11 @@
 cmake_minimum_required(VERSION 3.22)
 project(lightcxx VERSION 1.0.0)
 
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_C_STANDARD 17)
-set(CMAKE_CXX_EXTENSIONS OFF)
-
 option(LIGHTCXX_ENABLE_TESTS "Build lightcxx tests" OFF)
+
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_C_STANDARD 17)
 
 # TODO: Move these warnings to a text file, shared with the test runner.
 set(COMMON_CLANG_GCC_C_CXX_WARNINGS
@@ -40,7 +40,7 @@ set(GCC_CXX_WARNINGS
         )
 set(CLANG_CXX_WARNINGS
         ${COMMON_CLANG_GCC_CXX_WARNINGS}
-        -Wno-unknown-warning-option
+        -Wno-deprecated-volatile
         )
 
 if (CMAKE_CXX_COMPILER_ID MATCHES ".*Clang")
@@ -176,6 +176,7 @@ if (LIGHTCXX_ENABLE_TESTS)
         file(GLOB_RECURSE TEST_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/tests/*.cpp)
         add_library(test_sources EXCLUDE_FROM_ALL OBJECT ${TEST_SOURCES})
         AddTargetCompileWarnings(test_sources)
-        target_link_libraries(test_sources PUBLIC testing)
+        target_link_libraries(test_sources PUBLIC lightcxx_static testing)
+        target_include_directories(test_sources PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/testing)
     endif ()
 endif ()

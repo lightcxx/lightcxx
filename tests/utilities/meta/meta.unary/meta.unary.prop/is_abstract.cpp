@@ -1,6 +1,7 @@
 #include <type_traits>
 
 #include "meta/test_unary_trait.h"
+#include "warnings.h"
 
 DECLARE_TRAIT_V_READER(is_abstract_v);
 
@@ -18,8 +19,7 @@ TEST_UNARY_TRAIT_AGAINST_ENUM(false, is_abstract, EVERY_CV);
 TEST_UNARY_TRAIT_AGAINST_UNION(false, is_abstract, EVERY_CV);
 TEST_UNARY_TRAIT_AGAINST_FUNCTION(false, is_abstract);
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wnon-virtual-dtor"
+WARNINGS_IGNORE_NON_VIRTUAL_DTOR()
 class VirtualBase : virtual Class {};
 
 class VirtualDtor {
@@ -57,7 +57,7 @@ class ProtectedAbstractBase : protected PureVirtualMethod {};
 class PrivateAbstractBase : private PureVirtualMethod {};
 
 class VirtualAbstractBase : virtual PureVirtualMethod {};
-#pragma GCC diagnostic pop
+WARNINGS_POP()
 
 TEST_UNARY_TRAIT_AGAINST_TYPES(false, is_abstract, EVERY_CV, Class, VirtualBase, VirtualDtor, VirtualMethod, PublicPolymorphicBase, ProtectedPolymorphicBase,
                                PrivatePolymorphicBase, VirtualPolymorphicBase);

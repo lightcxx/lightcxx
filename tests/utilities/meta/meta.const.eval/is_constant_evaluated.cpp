@@ -1,6 +1,7 @@
 #include <type_traits>
 
 #include "testing.h"
+#include "warnings.h"
 
 constexpr int f() {
     if (std::is_constant_evaluated()) {
@@ -10,8 +11,7 @@ constexpr int f() {
     }
 }
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wconstant-evaluated"
+CLANG_DIAGNOSTIC_PUSH("clang diagnostic ignored \"-Wconstant-evaluated\"")
 TEST() {
     expect(!std::is_constant_evaluated());
     static_assert(std::is_constant_evaluated());
@@ -23,4 +23,4 @@ TEST() {
     expect_is_noexcept(std::is_constant_evaluated());
     expect_type(bool, std::is_constant_evaluated());
 }
-#pragma clang diagnostic pop
+CLANG_DIAGNOSTIC_POP()
