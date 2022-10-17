@@ -98,7 +98,6 @@ static char cmd_line_compile[]
     "-Wcast-align\0"
     "-Woverloaded-virtual\0"
 #if COMPILER_IS_CLANG
-    "-Wno-unknown-warning-option\0"  // TODO: fix this flag.
     "-Wno-deprecated-volatile\0"     // TODO: fix this flag.
 #endif
 #if COMPILER_IS_GCC

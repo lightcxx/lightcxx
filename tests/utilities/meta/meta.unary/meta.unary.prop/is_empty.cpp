@@ -1,6 +1,7 @@
 #include <type_traits>
 
 #include "meta/test_unary_trait.h"
+#include "warnings.h"
 
 DECLARE_TRAIT_V_READER(is_empty_v);
 
@@ -58,8 +59,7 @@ class Bits {
     char : 4;
 };
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wnon-virtual-dtor"
+WARNINGS_IGNORE_NON_VIRTUAL_DTOR()
 class VirtualDtor {
   public:
     virtual ~VirtualDtor();
@@ -80,7 +80,7 @@ class VirtualBase : virtual Empty {};
 class VirtualPolymorphicBase : virtual PureVirtualMethod {};
 
 class PolymorphicBase : public VirtualMethod {};
-#pragma GCC diagnostic pop
+WARNINGS_POP()
 
 TEST_UNARY_TRAIT_AGAINST_TYPES(false, is_empty, EVERY_CV, NonEmpty, VirtualDtor, VirtualMethod, PureVirtualMethod, VirtualBase, VirtualPolymorphicBase,
                                PolymorphicBase);

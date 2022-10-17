@@ -5,6 +5,7 @@
 
 #include <exception>
 
+#include "warnings.h"
 #include "testing.h"
 #include <stdlib.h>
 
@@ -22,8 +23,7 @@ struct NonCompliantException : public std::exception {
     NonCompliantException& operator=(NonCompliantException&&) = delete;
 };
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wcatch-value"
+GCC_DIAGNOSTIC_PUSH("GCC diagnostic ignored \"-Wcatch-value\"")
 TEST() {
     std::set_terminate([]() {
         step("terminate");
@@ -36,4 +36,4 @@ TEST() {
         fail();
     }
 }
-#pragma GCC diagnostic pop
+GCC_DIAGNOSTIC_POP()

@@ -1,6 +1,7 @@
 #include <type_traits>
 
 #include "meta/test_unary_trait.h"
+#include "warnings.h"
 
 DECLARE_TRAIT_V_READER(is_standard_layout_v);
 
@@ -101,8 +102,7 @@ class Mixed4 {
     [[maybe_unused]] int z;
 };
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wnon-virtual-dtor"
+WARNINGS_IGNORE_NON_VIRTUAL_DTOR()
 class Virtual1 {
     virtual void f();
 };
@@ -122,7 +122,7 @@ class Virtual4 {
 class VirtualBase1 : virtual Virtual2 {};
 
 class VirtualBase2 : virtual Empty {};
-#pragma GCC diagnostic pop
+WARNINGS_POP()
 
 class Ref1 {
   public:
