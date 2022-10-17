@@ -40,7 +40,7 @@ set(GCC_CXX_WARNINGS
         )
 set(CLANG_CXX_WARNINGS
         ${COMMON_CLANG_GCC_CXX_WARNINGS}
-        -Wno-unknown-warning-option
+        -Wno-deprecated-volatile
         )
 
 if (CMAKE_CXX_COMPILER_ID MATCHES ".*Clang")
