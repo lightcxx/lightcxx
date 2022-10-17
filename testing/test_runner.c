@@ -105,7 +105,6 @@ static char cmd_line_compile[]
     "-Wduplicated-cond\0"
     "-Wduplicated-branches\0"
     "-Wlogical-op\0"
-    "-Wno-unknown-pragmas\0"     // TODO: fix this flag.
     "-Wno-attributes\0"          // TODO: fix this flag.
     "-Wno-ignored-qualifiers\0"  // TODO: fix this flag.
 #endif
