@@ -5,14 +5,14 @@
 struct Incomplete;
 
 TEST() {
-    expect_type(int&&, std::declval<int>());
-    expect_type(int&, std::declval<int&>());
-    expect_type(int&&, std::declval<int&&>());
-    expect_is_noexcept(std::declval<int>());
-    expect_type(Incomplete&&, std::declval<Incomplete&&>());
-    expect_type(Incomplete&, std::declval<Incomplete&>());
-    expect_type(Incomplete&&, std::declval<Incomplete>());
-    expect_is_noexcept(std::declval<Incomplete>());
+    ASSERT_TYPE(int&&, std::declval<int>());
+    ASSERT_TYPE(int&, std::declval<int&>());
+    ASSERT_TYPE(int&&, std::declval<int&&>());
+    ASSERT_NOEXCEPT(std::declval<int>());
+    ASSERT_TYPE(Incomplete&&, std::declval<Incomplete&&>());
+    ASSERT_TYPE(Incomplete&, std::declval<Incomplete&>());
+    ASSERT_TYPE(Incomplete&&, std::declval<Incomplete>());
+    ASSERT_NOEXCEPT(std::declval<Incomplete>());
 }
 
 // Example from standard.

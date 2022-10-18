@@ -9,18 +9,18 @@
 TEST() {
     std::jmp_buf jb;
     auto&& ret = setjmp(jb);
-    expect_type_and_value(ret, int&, 0);
-    expect_type(void, std::longjmp(jb, 0));
+    ASSERT_TYPE_AND_VALUE(ret, int&, 0);
+    ASSERT_TYPE(void, std::longjmp(jb, 0));
 }
 
 bool jumped = false;
 
 void func(std::jmp_buf& jb, int ret) {
     if (jumped) {
-        expect(ret == 1);
+        ASSERT(ret == 1);
         return;
     }
-    expect(ret == 0);
+    ASSERT(ret == 0);
     jumped = true;
     std::longjmp(jb, 1);
 }

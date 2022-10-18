@@ -4,14 +4,14 @@
 
 TEST() {
     constexpr void* null = NULL;
-    expect_ct_and_rt(null == nullptr);
+    ASSERT_CT_RT(null == nullptr);
 
     auto n = nullptr;
-    expect_type_and_value(n, ::std::nullptr_t&, null);
+    ASSERT_TYPE_AND_VALUE(n, ::std::nullptr_t&, null);
 
     // The type nullptr_t is a synonym for the type of a nullptr expression
-    expect_type(::std::nullptr_t, nullptr);
+    ASSERT_TYPE(::std::nullptr_t, nullptr);
 
     // [Note: the address of another nullptr_t object that is an lvalue can be taken. — end note]
-    expect_type(::std::nullptr_t*, &n);
+    ASSERT_TYPE(::std::nullptr_t*, &n);
 }

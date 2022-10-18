@@ -86,6 +86,7 @@ static char cmd_line_compile[]
     "-Wall\0"
     "-Wextra\0"
     "-Wunused\0"
+    "-Wshadow\0"
     "-Wpedantic\0"
     "-Wconversion\0"
     "-Wsign-conversion\0"

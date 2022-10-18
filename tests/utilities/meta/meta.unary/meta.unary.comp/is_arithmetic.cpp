@@ -1,6 +1,6 @@
 #include <type_traits>
 
-#include "meta/test_unary_trait.h"
+#include "test_unary_trait.h"
 
 DECLARE_TRAIT_V_READER(is_arithmetic_v);
 

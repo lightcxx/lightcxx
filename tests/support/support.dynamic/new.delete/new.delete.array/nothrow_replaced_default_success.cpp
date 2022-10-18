@@ -21,9 +21,9 @@ void operator delete[](void* ptr, std::size_t) noexcept {
 }
 
 TEST() {
-    std::set_new_handler([]() { fail(); });
+    std::set_new_handler([]() { FAIL(); });
 
     auto ptr = ::operator new[](256, std::nothrow);
-    expect_type(void*&, ptr);
+    ASSERT_TYPE(void*&, ptr);
     ::operator delete[](ptr);
 }

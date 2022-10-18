@@ -13,6 +13,6 @@ TEST() {
     });
 
     std::nested_exception exc;
-    expect(exc.nested_ptr() == nullptr);
+    ASSERT(exc.nested_ptr() == nullptr);
     exc.rethrow_nested();
 }

@@ -9,7 +9,7 @@ struct FailPrinter {
     const char* name;
 
     ~FailPrinter() {
-        fail();
+        FAIL();
     }
 };
 
@@ -31,7 +31,7 @@ TEST() {
 
     ::std::atexit([] { step("atexit"); });
 
-    ::std::at_quick_exit([] { fail(); });
+    ::std::at_quick_exit([] { FAIL(); });
 
     ::std::exit(4);
 

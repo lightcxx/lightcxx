@@ -51,7 +51,7 @@ class WithOverrideForAddressOfOperator : public std::exception {
     ~WithOverrideForAddressOfOperator() override = default;
 
     WithOverrideForAddressOfOperator* operator&() {
-        fail();
+        FAIL();
         return nullptr;
     }
 };
@@ -65,11 +65,11 @@ TEST(rethrow_nested_exception) {
     } catch (...) {
         try {
             std::rethrow_if_nested(std::nested_exception());
-            fail();
+            FAIL();
         } catch (int& v) {
-            expect(v == 3);
+            ASSERT(v == 3);
         } catch (...) {
-            fail();
+            FAIL();
         }
     }
 }
@@ -87,11 +87,11 @@ TEST(rethrow_derived_from_nested_exception) {
     } catch (...) {
         try {
             std::rethrow_if_nested(ExceptionWithNested());
-            fail();
+            FAIL();
         } catch (int& v) {
-            expect(v == 3);
+            ASSERT(v == 3);
         } catch (...) {
-            fail();
+            FAIL();
         }
     }
 }
@@ -104,11 +104,11 @@ TEST(rethrow_value_with_dynamic_type_derived_from_nested_exception) {
             auto exc = ExceptionWithNested();
             std::exception& e = exc;
             std::rethrow_if_nested(e);
-            fail();
+            FAIL();
         } catch (int& v) {
-            expect(v == 3);
+            ASSERT(v == 3);
         } catch (...) {
-            fail();
+            FAIL();
         }
     }
 }

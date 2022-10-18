@@ -37,7 +37,7 @@ static void sum_and_product(long long* sum, long long* product, const char* form
                 break;
             }
             default: {
-                fail();
+                FAIL();
             }
         }
     }
@@ -48,9 +48,9 @@ static void sum_and_product(long long* sum, long long* product, const char* form
 TEST() {
     long long s, p;
     sum_and_product(&s, &p, "Lld", 1LL, 2l, 3);
-    expect(s == 6 && p == 6);
+    ASSERT(s == 6 && p == 6);
     sum_and_product(&s, &p, "uLLd", 2u, 2LL, 2LL, 2);
-    expect(s == 8 && p == 16);
+    ASSERT(s == 8 && p == 16);
     sum_and_product(&s, &p, "dddd", 2, 2, 2, 2);
-    expect(s == 8 && p == 16);
+    ASSERT(s == 8 && p == 16);
 }

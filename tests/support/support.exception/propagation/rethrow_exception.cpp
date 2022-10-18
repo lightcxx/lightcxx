@@ -32,19 +32,19 @@ TEST(common_case) {
         p = std::current_exception();
     }
 
-    expect(num_exception_instances == 1);
+    ASSERT(num_exception_instances == 1);
 
     try {
         std::rethrow_exception(p);
     } catch (const CountedException& a) {
-        expect(num_exception_instances == 1);
-        expect(p != nullptr);
+        ASSERT(num_exception_instances == 1);
+        ASSERT(p != nullptr);
         p = nullptr;
-        expect(p == nullptr);
-        expect(a.data == 3);
-        expect(num_exception_instances == 1);
+        ASSERT(p == nullptr);
+        ASSERT(a.data == 3);
+        ASSERT(num_exception_instances == 1);
     }
-    expect(num_exception_instances == 0);
+    ASSERT(num_exception_instances == 0);
 }
 
 TEST(keep_exception_ptr_instance) {
@@ -54,23 +54,23 @@ TEST(keep_exception_ptr_instance) {
     } catch (const CountedException&) {
         p = std::current_exception();
     } catch (...) {
-        fail();
+        FAIL();
     }
 
-    expect(num_exception_instances == 1);
+    ASSERT(num_exception_instances == 1);
 
     try {
         std::rethrow_exception(p);
     } catch (const CountedException& a) {
-        expect(num_exception_instances == 1);
-        expect(p != nullptr);
-        expect(a.data == 3);
-        expect(num_exception_instances == 1);
+        ASSERT(num_exception_instances == 1);
+        ASSERT(p != nullptr);
+        ASSERT(a.data == 3);
+        ASSERT(num_exception_instances == 1);
     } catch (...) {
-        fail();
+        FAIL();
     }
 
-    expect(num_exception_instances == 1);
+    ASSERT(num_exception_instances == 1);
     p = nullptr;
-    expect(num_exception_instances == 0);
+    ASSERT(num_exception_instances == 0);
 }

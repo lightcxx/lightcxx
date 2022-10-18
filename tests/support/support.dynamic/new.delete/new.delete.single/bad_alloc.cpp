@@ -7,17 +7,17 @@
 
 TEST() {
     libc.malloc.replace([](std::size_t size) -> void* {
-        expect(size == 256);
+        ASSERT(size == 256);
         step("malloc");
         return nullptr;
     });
 
     try {
         [[maybe_unused]] const auto const_ptr = ::operator new(256);
-        fail();
+        FAIL();
     } catch (std::bad_alloc& exception) {
         step("throw");
     } catch (...) {
-        fail();
+        FAIL();
     }
 }

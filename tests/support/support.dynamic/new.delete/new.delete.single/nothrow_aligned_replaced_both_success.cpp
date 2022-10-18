@@ -31,12 +31,12 @@ void operator delete(void* ptr, std::size_t) noexcept {
 
 TEST() {
     std::set_new_handler([]() {
-        fail();
+        FAIL();
         ::abort();
     });
 
     auto ptr = ::operator new(256, std::align_val_t{128}, std::nothrow);
-    expect_type(void*&, ptr);
+    ASSERT_TYPE(void*&, ptr);
 
     compiler_forget(ptr);
     ::operator delete(ptr);

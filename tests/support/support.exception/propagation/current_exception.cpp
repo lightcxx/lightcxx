@@ -19,47 +19,47 @@ struct CountedException {
 
 TEST(throwing_CountedException_helper) {
     try {
-        expect(num_exception_instances == 0);
+        ASSERT(num_exception_instances == 0);
         throw CountedException();
     } catch (...) {
-        expect(num_exception_instances == 1);
+        ASSERT(num_exception_instances == 1);
     }
-    expect(num_exception_instances == 0);
+    ASSERT(num_exception_instances == 0);
 }
 
 TEST(rethrowing_CountedException_helper) {
     try {
-        expect(num_exception_instances == 0);
+        ASSERT(num_exception_instances == 0);
         throw CountedException();
     } catch (...) {
-        expect(num_exception_instances == 1);
+        ASSERT(num_exception_instances == 1);
         try {
-            expect(num_exception_instances == 1);
+            ASSERT(num_exception_instances == 1);
             throw;
         } catch (...) {
-            expect(num_exception_instances == 1);
+            ASSERT(num_exception_instances == 1);
         }
-        expect(num_exception_instances == 1);
+        ASSERT(num_exception_instances == 1);
     }
-    expect(num_exception_instances == 0);
+    ASSERT(num_exception_instances == 0);
 }
 
 TEST(before_eh_clauses) {
-    expect_type_and_value(std::current_exception(), std::exception_ptr, nullptr);
+    ASSERT_TYPE_AND_VALUE(std::current_exception(), std::exception_ptr, nullptr);
 
     std::exception_ptr exc;
-    expect(exc == nullptr);
+    ASSERT(exc == nullptr);
     exc = std::current_exception();
-    expect(exc == nullptr);
+    ASSERT(exc == nullptr);
 }
 
 TEST(inside_try_clause) {
     try {
-        expect_type_and_value(std::current_exception(), std::exception_ptr, nullptr);
+        ASSERT_TYPE_AND_VALUE(std::current_exception(), std::exception_ptr, nullptr);
         std::exception_ptr exc;
-        expect(exc == nullptr);
+        ASSERT(exc == nullptr);
         exc = std::current_exception();
-        expect(exc == nullptr);
+        ASSERT(exc == nullptr);
 
         throw 5;
     } catch (...) {}
@@ -71,14 +71,14 @@ TEST(inside_catch_by_ellipsis_clause) {
         throw CountedException();
     } catch (...) {
         std::exception_ptr p = std::current_exception();
-        expect(num_exception_instances == 1);
-        expect(p != nullptr);
+        ASSERT(num_exception_instances == 1);
+        ASSERT(p != nullptr);
         p_copy = std::current_exception();
-        expect(p == p_copy);
+        ASSERT(p == p_copy);
     }
-    expect(num_exception_instances == 1);
+    ASSERT(num_exception_instances == 1);
     p_copy = nullptr;
-    expect(num_exception_instances == 0);
+    ASSERT(num_exception_instances == 0);
 }
 
 TEST(inside_catch_by_reference_clause) {
@@ -87,14 +87,14 @@ TEST(inside_catch_by_reference_clause) {
         throw CountedException();
     } catch (CountedException&) {
         std::exception_ptr p = std::current_exception();
-        expect(num_exception_instances == 1);
-        expect(p != nullptr);
+        ASSERT(num_exception_instances == 1);
+        ASSERT(p != nullptr);
         p_copy = std::current_exception();
-        expect(p == p_copy);
+        ASSERT(p == p_copy);
     }
-    expect(num_exception_instances == 1);
+    ASSERT(num_exception_instances == 1);
     p_copy = nullptr;
-    expect(num_exception_instances == 0);
+    ASSERT(num_exception_instances == 0);
 }
 
 TEST(inside_catch_by_value_clause) {
@@ -102,16 +102,16 @@ TEST(inside_catch_by_value_clause) {
     try {
         throw CountedException();
     } catch (CountedException) {
-        expect(num_exception_instances == 2);
+        ASSERT(num_exception_instances == 2);
         std::exception_ptr p = std::current_exception();
-        expect(num_exception_instances == 2);
-        expect(p != nullptr);
+        ASSERT(num_exception_instances == 2);
+        ASSERT(p != nullptr);
         p_copy = std::current_exception();
-        expect(p == p_copy);
+        ASSERT(p == p_copy);
     }
-    expect(num_exception_instances == 1);
+    ASSERT(num_exception_instances == 1);
     p_copy = nullptr;
-    expect(num_exception_instances == 0);
+    ASSERT(num_exception_instances == 0);
 }
 
 TEST(inside_try_clause_nested_in_rethrow_catch_clause) {
@@ -120,15 +120,15 @@ TEST(inside_try_clause_nested_in_rethrow_catch_clause) {
     } catch (...) {
         try {
             std::exception_ptr p = std::current_exception();
-            expect(num_exception_instances == 1);
-            expect(p != nullptr);
+            ASSERT(num_exception_instances == 1);
+            ASSERT(p != nullptr);
             throw;
         } catch (...) {
-            expect(num_exception_instances == 1);
+            ASSERT(num_exception_instances == 1);
         }
-        expect(num_exception_instances == 1);
+        ASSERT(num_exception_instances == 1);
     }
-    expect(num_exception_instances == 0);
+    ASSERT(num_exception_instances == 0);
 }
 
 TEST(inside_catch_clause_nested_in_rethrow_catch_clause) {
@@ -139,12 +139,12 @@ TEST(inside_catch_clause_nested_in_rethrow_catch_clause) {
             throw;
         } catch (...) {
             std::exception_ptr p = std::current_exception();
-            expect(num_exception_instances == 1);
-            expect(p != nullptr);
+            ASSERT(num_exception_instances == 1);
+            ASSERT(p != nullptr);
         }
-        expect(num_exception_instances == 1);
+        ASSERT(num_exception_instances == 1);
     }
-    expect(num_exception_instances == 0);
+    ASSERT(num_exception_instances == 0);
 }
 
 TEST(inside_catch_clause_nested_in_rethrow_catch_clause_stored_in_top_level_exception_ptr) {
@@ -156,14 +156,14 @@ TEST(inside_catch_clause_nested_in_rethrow_catch_clause_stored_in_top_level_exce
             throw;
         } catch (...) {
             p = std::current_exception();
-            expect(num_exception_instances == 1);
-            expect(p != nullptr);
+            ASSERT(num_exception_instances == 1);
+            ASSERT(p != nullptr);
         }
-        expect(num_exception_instances == 1);
+        ASSERT(num_exception_instances == 1);
     }
-    expect(num_exception_instances == 1);
+    ASSERT(num_exception_instances == 1);
     p = nullptr;
-    expect(num_exception_instances == 0);
+    ASSERT(num_exception_instances == 0);
 }
 
 TEST(inside_catch_clause_after_nested_rethrow) {
@@ -173,13 +173,13 @@ TEST(inside_catch_clause_after_nested_rethrow) {
         try {
             throw;
         } catch (...) {
-            expect(num_exception_instances == 1);
+            ASSERT(num_exception_instances == 1);
         }
         std::exception_ptr p = std::current_exception();
-        expect(num_exception_instances == 1);
-        expect(p != nullptr);
+        ASSERT(num_exception_instances == 1);
+        ASSERT(p != nullptr);
     }
-    expect(num_exception_instances == 0);
+    ASSERT(num_exception_instances == 0);
 }
 
 TEST(after_eh_clauses) {
@@ -190,8 +190,8 @@ TEST(after_eh_clauses) {
             throw;
         } catch (...) {}
     }
-    expect(num_exception_instances == 0);
+    ASSERT(num_exception_instances == 0);
     std::exception_ptr p = std::current_exception();
-    expect(num_exception_instances == 0);
-    expect(p == nullptr);
+    ASSERT(num_exception_instances == 0);
+    ASSERT(p == nullptr);
 }

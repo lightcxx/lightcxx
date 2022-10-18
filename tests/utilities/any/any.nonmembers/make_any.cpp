@@ -37,74 +37,74 @@ int func(int a, int b) {
 TEST(make_any_small) {
     cnttype::reset();
     std::any any_val = std::make_any<cnttype>(7);
-    expect(any_val.has_value());
-    expect(any_cast<cnttype>(&any_val)->val == 7);
-    expect(any_val.type() == typeid(cnttype));
-    expect(cnttype::copy_ctor_count == 0);
-    expect(cnttype::move_ctor_count == 0);
+    ASSERT(any_val.has_value());
+    ASSERT(any_cast<cnttype>(&any_val)->val == 7);
+    ASSERT(any_val.type() == typeid(cnttype));
+    ASSERT(cnttype::copy_ctor_count == 0);
+    ASSERT(cnttype::move_ctor_count == 0);
 }
 
 TEST(make_any_non_const_array) {
     cnttype val[3]{};
     cnttype::reset();
     std::any any_val = std::make_any<cnttype[3]>(val);
-    expect(any_val.has_value());
-    expect(any_val.type() == typeid(cnttype*));
-    expect(any_cast<cnttype*>(any_val) == val);
-    expect(cnttype::copy_ctor_count == 0);
-    expect(cnttype::move_ctor_count == 0);
+    ASSERT(any_val.has_value());
+    ASSERT(any_val.type() == typeid(cnttype*));
+    ASSERT(any_cast<cnttype*>(any_val) == val);
+    ASSERT(cnttype::copy_ctor_count == 0);
+    ASSERT(cnttype::move_ctor_count == 0);
 }
 
 TEST(make_any_const_array) {
     const cnttype val[3]{};
     cnttype::reset();
     std::any any_val = std::make_any<const cnttype[3]>(val);
-    expect(any_val.has_value());
-    expect(any_val.type() == typeid(const cnttype*));
-    expect(any_cast<const cnttype*>(any_val) == val);
-    expect(cnttype::copy_ctor_count == 0);
-    expect(cnttype::move_ctor_count == 0);
+    ASSERT(any_val.has_value());
+    ASSERT(any_val.type() == typeid(const cnttype*));
+    ASSERT(any_cast<const cnttype*>(any_val) == val);
+    ASSERT(cnttype::copy_ctor_count == 0);
+    ASSERT(cnttype::move_ctor_count == 0);
 }
 
 TEST(make_any_function) {
     std::any any_val = std::make_any<int(int, int)>(func);
-    expect(any_val.has_value());
-    expect(any_val.type() == typeid(int (*)(int, int)));
-    expect(any_cast<int (*)(int, int)>(any_val) == &func);
+    ASSERT(any_val.has_value());
+    ASSERT(any_val.type() == typeid(int (*)(int, int)));
+    ASSERT(any_cast<int (*)(int, int)>(any_val) == &func);
 }
 
 TEST(make_any_exception) {
     throwing_ctor val{};
     try {
         std::any any_val = std::make_any<throwing_ctor>(val);
-        fail();
+        FAIL();
     } catch (const throwing_ctor::copy_exc&) {
     }
     try {
         std::any any_val = std::make_any<throwing_ctor>(std::move(val));
-        fail();
+        FAIL();
     } catch (const throwing_ctor::move_exc&) {
     }
 }
 
 TEST(make_any_initlist_ctor) {
     std::any any_val = std::make_any<init_list_ctor>({1, 2, 3});
-    expect(any_val.has_value());
-    expect(any_cast<init_list_ctor>(&any_val) != nullptr);
-    expect(any_val.type() == typeid(init_list_ctor));
+    ASSERT(any_val.has_value());
+    ASSERT(any_cast<init_list_ctor>(&any_val) != nullptr);
+    ASSERT(any_val.type() == typeid(init_list_ctor));
 }
 
 TEST(make_any_initlist_ctor_extra_arg) {
     std::any any_val = std::make_any<init_list_ctor>({1, 2, 3}, 1);
-    expect(any_val.has_value());
-    expect(any_cast<init_list_ctor>(&any_val) != nullptr);
-    expect(any_val.type() == typeid(init_list_ctor));
+    ASSERT(any_val.has_value());
+    ASSERT(any_cast<init_list_ctor>(&any_val) != nullptr);
+    ASSERT(any_val.type() == typeid(init_list_ctor));
 }
 
 TEST(make_any_initlist_ctor_exception) {
     try {
         std::any any_val = std::make_any<init_list_ctor>({1, 2, 3}, 1, 2);
-        fail();
+        FAIL();
     } catch (const init_list_ctor::exc&) {
     }
 }

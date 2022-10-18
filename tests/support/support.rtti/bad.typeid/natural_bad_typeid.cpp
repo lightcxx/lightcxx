@@ -11,10 +11,10 @@ TEST() {
     S* p{};
     try {
         typeid(*p).name();
-        fail();
+        FAIL();
     } catch (const std::bad_typeid& e) {
-        expect(default_constructed.what() == e.what());
+        ASSERT(default_constructed.what() == e.what());
     } catch (...) {
-        fail();
+        FAIL();
     }
 }

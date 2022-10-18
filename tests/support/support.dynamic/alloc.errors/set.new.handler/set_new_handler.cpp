@@ -9,7 +9,7 @@ TEST() {
     std::new_handler g = []() { step("new_handler"); };
     std::new_handler h = []() { throw std::bad_alloc(); };
 
-    expect(std::set_new_handler(g) == nullptr);
+    ASSERT(std::set_new_handler(g) == nullptr);
 
     // return nullptr once from malloc.
     libc.malloc.replace([](std::size_t) -> void* {
@@ -23,8 +23,8 @@ TEST() {
     compiler_forget(ptr);
     delete ptr;
 
-    expect(std::set_new_handler(h) == g);
-    expect(std::set_new_handler(nullptr) == h);
+    ASSERT(std::set_new_handler(h) == g);
+    ASSERT(std::set_new_handler(nullptr) == h);
 
     // return nullptr once from malloc.
     libc.malloc.replace([](std::size_t) -> void* {
@@ -36,10 +36,10 @@ TEST() {
     try {
         [[maybe_unused]] auto failed_ptr = ::operator new(4);
         compiler_forget(failed_ptr);
-        fail();
+        FAIL();
     } catch (std::bad_alloc&) {
         step("catch");
     }
 
-    expect(std::set_new_handler(g) == nullptr);
+    ASSERT(std::set_new_handler(g) == nullptr);
 }

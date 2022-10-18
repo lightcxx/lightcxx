@@ -16,6 +16,6 @@ TEST() {
 
     std::raise(SIGUSR1);
 
-    expect(caught_signal);
-    expect(caught_correct_signal);
+    ASSERT(caught_signal);
+    ASSERT(caught_correct_signal);
 }

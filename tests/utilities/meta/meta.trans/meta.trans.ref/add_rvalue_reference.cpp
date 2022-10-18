@@ -1,6 +1,6 @@
 #include <type_traits>
 
-#include "meta/test_unary_trait.h"
+#include "test_unary_trait.h"
 #include "testing.h"
 
 static_assert(std::is_same_v<std::add_rvalue_reference_t<int&>, int&&>);
