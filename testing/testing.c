@@ -8,9 +8,13 @@ extern __attribute__((__noreturn__)) void _Exit(int);
 extern long write(int, const char*, size_t);
 
 typedef void (*test_def_t)(void);
+struct test_mem_buf {
+  struct test_mem_buf* next;
+  test_def_t test;
+};
 
-static void** tests_tail;
-static void** tests_head;
+static struct test_mem_buf* tests_tail;
+static struct test_mem_buf* tests_head;
 
 static void write_str(const char* buf) {
     size_t len = 0;
@@ -48,21 +52,21 @@ void step(const char* msg) {
     write_str("\n");
 }
 
-void testing_register_test(test_def_t test, void* buffer[2]) {
+void testing_register_test(test_def_t test, struct test_mem_buf* buf) {
     if (tests_head == 0) {
-        tests_head = buffer;
+        tests_head = buf;
     }
-    buffer[0] = 0;
-    buffer[1] = (void*)test;
+    buf->next = 0;
+    buf->test = test;
     if (tests_tail != 0) {
-        tests_tail[0] = buffer;
+        tests_tail->next = buf;
     }
-    tests_tail = buffer;
+    tests_tail = buf;
 }
 
 int main(void) {
-    for (void** ptr = tests_head; ptr != 0; ptr = (void**)ptr[0]) {
-        ((test_def_t)ptr[1])();
+    for (struct test_mem_buf* ptr = tests_head; ptr != 0; ptr = ptr->next) {
+        ptr->test();
     }
     return 0;
 }

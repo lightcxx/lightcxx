@@ -27,13 +27,9 @@ void compiler_forget(auto& value) {
 #define TO_STR1(L) #L
 #define TO_STR(L) TO_STR1(L)
 
-#define FAIL()                                                       \
-    do {                                                             \
-        if (__builtin_is_constant_evaluated()) {                     \
-            throw 1;                                                 \
-        } else {                                                     \
-            testing_fail_impl(__func__, __FILE__, TO_STR(__LINE__)); \
-        }                                                            \
+#define FAIL()                                                   \
+    do {                                                         \
+        testing_fail_impl(__func__, __FILE__, TO_STR(__LINE__)); \
     } while (false)
 
 #define ASSERT(condition)   \

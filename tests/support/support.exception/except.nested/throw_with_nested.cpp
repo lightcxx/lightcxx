@@ -5,8 +5,8 @@
 struct WithoutNested {
     int x;
 
-    explicit WithoutNested(int x)
-            : x(x) {}
+    explicit WithoutNested(int x_)
+            : x(x_) {}
 
     virtual ~WithoutNested() = default;
 };
@@ -14,8 +14,8 @@ struct WithoutNested {
 struct WithNested : std::nested_exception {
     int x;
 
-    explicit WithNested(int x)
-            : x(x) {}
+    explicit WithNested(int x_)
+            : x(x_) {}
 
     ~WithNested() override = default;
 };

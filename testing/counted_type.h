@@ -27,8 +27,8 @@ struct cnttype {
     cnttype() noexcept {
         default_ctor_count++;
     }
-    explicit cnttype(int val) noexcept
-            : val(val) {
+    explicit cnttype(int v) noexcept
+            : val(v) {
         value_ctor_count++;
     }
     cnttype(const cnttype& other) noexcept
@@ -74,8 +74,8 @@ struct cnttype_copy {
     cnttype_copy() noexcept {
         default_ctor_count++;
     }
-    explicit cnttype_copy(int val) noexcept
-            : val(val) {
+    explicit cnttype_copy(int v) noexcept
+            : val(v) {
         value_ctor_count++;
     }
     cnttype_copy(const cnttype_copy& other) noexcept
@@ -114,8 +114,8 @@ struct cnttype_move {
     cnttype_move() noexcept {
         default_ctor_count++;
     }
-    explicit cnttype_move(int val) noexcept
-            : val(val) {
+    explicit cnttype_move(int v) noexcept
+            : val(v) {
         value_ctor_count++;
     }
     cnttype_move(const cnttype_move& other) = delete;

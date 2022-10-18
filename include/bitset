@@ -84,8 +84,8 @@ class bitset {
         bitset* __bitset;
         size_t __pos;
 
-        reference(bitset* __bitset, size_t __pos)
-                : __bitset(__bitset), __pos(__pos) {}
+        reference(bitset* __bits, size_t __p)
+                : __bitset(__bits), __pos(__p) {}
 
       public:
         reference(const reference&) = default;

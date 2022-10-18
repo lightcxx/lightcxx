@@ -26,8 +26,8 @@ class CFunctionInterceptor<R(Args...)> {
     Replacement* replacement = nullptr;
 
   public:
-    CFunctionInterceptor(const char* symbol)
-            : symbol(symbol) {}
+    CFunctionInterceptor(const char* sym)
+            : symbol(sym) {}
 
     void reset() {
         raw_replacement = nullptr;
@@ -74,3 +74,4 @@ extern struct LibCInterceptors {
 }  // namespace Testing
 
 #endif
+

@@ -10,8 +10,8 @@ struct CountedException {
         ++num_exception_instances;
     }
 
-    explicit CountedException(int data)
-            : data(data) {
+    explicit CountedException(int dat)
+            : data(dat) {
         ++num_exception_instances;
     }
 

@@ -45,8 +45,8 @@ struct source_location {
     }
 
   private:
-    constexpr source_location(uint_least32_t __line, uint_least32_t __column, const char* __file_name, const char* __function_name)
-            : __line(__line), __column(__column), __file_name(__file_name), __function_name(__function_name) {}
+    constexpr source_location(uint_least32_t __l, uint_least32_t __c, const char* __file, const char* __func)
+            : __line(__l), __column(__c), __file_name(__file), __function_name(__func) {}
 
     uint_least32_t __line;
     uint_least32_t __column;

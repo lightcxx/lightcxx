@@ -97,8 +97,8 @@ _EXPORT exception_ptr::~exception_ptr() noexcept {
     __cxa_decrement_exception_refcount(__ptr);
 }
 
-_EXPORT exception_ptr::exception_ptr(void* __ptr)
-        : __ptr(__ptr) {}
+_EXPORT exception_ptr::exception_ptr(void* __p)
+        : __ptr(__p) {}
 
 _EXPORT nested_exception::nested_exception() noexcept
         : __nested_ptr(current_exception()) {}
