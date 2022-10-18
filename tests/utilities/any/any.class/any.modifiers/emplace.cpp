@@ -41,26 +41,26 @@ TEST(emplace_to_no_val) {
     cnttype::reset();
     std::any target;
     auto& result = target.emplace<cnttype>(7);
-    expect_type(cnttype&, result);
-    expect(result.val == 7);
-    expect(target.has_value());
-    expect(any_cast<cnttype>(&target)->val == 7);
-    expect(target.type() == typeid(cnttype));
-    expect(cnttype::copy_ctor_count == 0);
-    expect(cnttype::move_ctor_count == 0);
+    ASSERT_TYPE(cnttype&, result);
+    ASSERT(result.val == 7);
+    ASSERT(target.has_value());
+    ASSERT(any_cast<cnttype&>(target).val == 7);
+    ASSERT(target.type() == typeid(cnttype));
+    ASSERT(cnttype::copy_ctor_count == 0);
+    ASSERT(cnttype::move_ctor_count == 0);
 }
 
 TEST(emplace_initlist_to_no_val) {
     cnttype::reset();
     std::any target;
     auto& result = target.emplace<large_cnttype>({1, 2, 3});
-    expect_type(large_cnttype&, result);
-    expect(result.nested.val == -777);
-    expect(target.has_value());
-    expect(any_cast<large_cnttype>(&target)->nested.val == -777);
-    expect(target.type() == typeid(large_cnttype));
-    expect(cnttype::copy_ctor_count == 0);
-    expect(cnttype::move_ctor_count == 0);
+    ASSERT_TYPE(large_cnttype&, result);
+    ASSERT(result.nested.val == -777);
+    ASSERT(target.has_value());
+    ASSERT(any_cast<large_cnttype&>(target).nested.val == -777);
+    ASSERT(target.type() == typeid(large_cnttype));
+    ASSERT(cnttype::copy_ctor_count == 0);
+    ASSERT(cnttype::move_ctor_count == 0);
 }
 
 TEST(emplace_non_const_array_to_no_val) {
@@ -68,12 +68,12 @@ TEST(emplace_non_const_array_to_no_val) {
     cnttype::reset();
     std::any target;
     auto& result = (target.emplace<cnttype[3]>(source));
-    expect(result == source);
-    expect(target.has_value());
-    expect(target.type() == typeid(cnttype*));
-    expect(any_cast<cnttype*>(target) == source);
-    expect(cnttype::copy_ctor_count == 0);
-    expect(cnttype::move_ctor_count == 0);
+    ASSERT(result == source);
+    ASSERT(target.has_value());
+    ASSERT(target.type() == typeid(cnttype*));
+    ASSERT(any_cast<cnttype*>(target) == source);
+    ASSERT(cnttype::copy_ctor_count == 0);
+    ASSERT(cnttype::move_ctor_count == 0);
 }
 
 TEST(emplace_const_array_to_no_val) {
@@ -81,21 +81,21 @@ TEST(emplace_const_array_to_no_val) {
     cnttype::reset();
     std::any target;
     auto& result = (target.emplace<const cnttype[3]>(source));
-    expect(result == source);
-    expect(target.has_value());
-    expect(target.type() == typeid(const cnttype*));
-    expect(any_cast<const cnttype*>(target) == source);
-    expect(cnttype::copy_ctor_count == 0);
-    expect(cnttype::move_ctor_count == 0);
+    ASSERT(result == source);
+    ASSERT(target.has_value());
+    ASSERT(target.type() == typeid(const cnttype*));
+    ASSERT(any_cast<const cnttype*>(target) == source);
+    ASSERT(cnttype::copy_ctor_count == 0);
+    ASSERT(cnttype::move_ctor_count == 0);
 }
 
 TEST(emplace_function_to_no_val) {
     std::any target;
     auto& result = (target.emplace<int(int, int)>(func));
-    expect(result == func);
-    expect(target.has_value());
-    expect(target.type() == typeid(int (*)(int, int)));
-    expect(any_cast<int (*)(int, int)>(target) == &func);
+    ASSERT(result == func);
+    ASSERT(target.has_value());
+    ASSERT(target.type() == typeid(int (*)(int, int)));
+    ASSERT(any_cast<int (*)(int, int)>(target) == &func);
 }
 
 TEST(emplace_exception_copy_to_no_val) {
@@ -103,10 +103,10 @@ TEST(emplace_exception_copy_to_no_val) {
     std::any target;
     try {
         target.emplace<throwing_ctor>(source);
-        fail();
+        FAIL();
     } catch (const throwing_ctor::copy_exc&) {
     }
-    expect(!target.has_value());
+    ASSERT(!target.has_value());
 }
 
 TEST(emplace_exception_move_to_no_val) {
@@ -114,48 +114,48 @@ TEST(emplace_exception_move_to_no_val) {
     std::any target;
     try {
         target.emplace<throwing_ctor>(std::move(source));
-        fail();
+        FAIL();
     } catch (const throwing_ctor::move_exc&) {
     }
-    expect(!target.has_value());
+    ASSERT(!target.has_value());
 }
 
 TEST(emplace_initlist_exception_to_no_val) {
     std::any target;
     try {
         target.emplace<large_cnttype>({1, 2, 3}, 1, 2);
-        fail();
+        FAIL();
     } catch (const large_cnttype::exc&) {
     }
-    expect(!target.has_value());
+    ASSERT(!target.has_value());
 }
 
 TEST(emplace_to_small_val) {
     std::any target{std::in_place_type<cnttype>};
     cnttype::reset();
     auto& result = target.emplace<cnttype>(7);
-    expect_type(cnttype&, result);
-    expect(result.val == 7);
-    expect(target.has_value());
-    expect(any_cast<cnttype>(&target)->val == 7);
-    expect(target.type() == typeid(cnttype));
-    expect(cnttype::dtor_count == 1);
-    expect(cnttype::copy_ctor_count == 0);
-    expect(cnttype::move_ctor_count == 0);
+    ASSERT_TYPE(cnttype&, result);
+    ASSERT(result.val == 7);
+    ASSERT(target.has_value());
+    ASSERT(any_cast<cnttype&>(target).val == 7);
+    ASSERT(target.type() == typeid(cnttype));
+    ASSERT(cnttype::dtor_count == 1);
+    ASSERT(cnttype::copy_ctor_count == 0);
+    ASSERT(cnttype::move_ctor_count == 0);
 }
 
 TEST(emplace_initlist_to_small_val) {
     std::any target{std::in_place_type<cnttype>};
     cnttype::reset();
     auto& result = target.emplace<large_cnttype>({1, 2, 3});
-    expect_type(large_cnttype&, result);
-    expect(result.nested.val == -777);
-    expect(target.has_value());
-    expect(any_cast<large_cnttype>(&target)->nested.val == -777);
-    expect(target.type() == typeid(large_cnttype));
-    expect(cnttype::dtor_count == 1);
-    expect(cnttype::copy_ctor_count == 0);
-    expect(cnttype::move_ctor_count == 0);
+    ASSERT_TYPE(large_cnttype&, result);
+    ASSERT(result.nested.val == -777);
+    ASSERT(target.has_value());
+    ASSERT(any_cast<large_cnttype&>(target).nested.val == -777);
+    ASSERT(target.type() == typeid(large_cnttype));
+    ASSERT(cnttype::dtor_count == 1);
+    ASSERT(cnttype::copy_ctor_count == 0);
+    ASSERT(cnttype::move_ctor_count == 0);
 }
 
 TEST(emplace_non_const_array_to_small_val) {
@@ -163,14 +163,14 @@ TEST(emplace_non_const_array_to_small_val) {
     std::any target{std::in_place_type<cnttype>};
     cnttype::reset();
     auto& result = (target.emplace<cnttype[3]>(source));
-    expect_type(cnttype*&, result);
-    expect(result == source);
-    expect(target.has_value());
-    expect(target.type() == typeid(cnttype*));
-    expect(any_cast<cnttype*>(target) == source);
-    expect(cnttype::dtor_count == 1);
-    expect(cnttype::copy_ctor_count == 0);
-    expect(cnttype::move_ctor_count == 0);
+    ASSERT_TYPE(cnttype*&, result);
+    ASSERT(result == source);
+    ASSERT(target.has_value());
+    ASSERT(target.type() == typeid(cnttype*));
+    ASSERT(any_cast<cnttype*>(target) == source);
+    ASSERT(cnttype::dtor_count == 1);
+    ASSERT(cnttype::copy_ctor_count == 0);
+    ASSERT(cnttype::move_ctor_count == 0);
 }
 
 TEST(emplace_const_array_to_small_val) {
@@ -178,27 +178,27 @@ TEST(emplace_const_array_to_small_val) {
     std::any target{std::in_place_type<cnttype>};
     cnttype::reset();
     auto& result = target.emplace<const cnttype[3]>(source);
-    expect_type(const cnttype*&, result);
-    expect(result == source);
-    expect(target.has_value());
-    expect(target.type() == typeid(const cnttype*));
-    expect(any_cast<const cnttype*>(target) == source);
-    expect(cnttype::dtor_count == 1);
-    expect(cnttype::copy_ctor_count == 0);
-    expect(cnttype::move_ctor_count == 0);
+    ASSERT_TYPE(const cnttype*&, result);
+    ASSERT(result == source);
+    ASSERT(target.has_value());
+    ASSERT(target.type() == typeid(const cnttype*));
+    ASSERT(any_cast<const cnttype*>(target) == source);
+    ASSERT(cnttype::dtor_count == 1);
+    ASSERT(cnttype::copy_ctor_count == 0);
+    ASSERT(cnttype::move_ctor_count == 0);
 }
 
 TEST(emplace_function_to_small_val) {
     std::any target{std::in_place_type<cnttype>};
     cnttype::reset();
     auto& result = target.emplace<int(int, int)>(func);
-    expect(result == func);
-    expect(target.has_value());
-    expect(target.type() == typeid(int (*)(int, int)));
-    expect(any_cast<int (*)(int, int)>(target) == &func);
-    expect(cnttype::dtor_count == 1);
-    expect(cnttype::copy_ctor_count == 0);
-    expect(cnttype::move_ctor_count == 0);
+    ASSERT(result == func);
+    ASSERT(target.has_value());
+    ASSERT(target.type() == typeid(int (*)(int, int)));
+    ASSERT(any_cast<int (*)(int, int)>(target) == &func);
+    ASSERT(cnttype::dtor_count == 1);
+    ASSERT(cnttype::copy_ctor_count == 0);
+    ASSERT(cnttype::move_ctor_count == 0);
 }
 
 TEST(emplace_exception_copy_to_small_val) {
@@ -208,13 +208,13 @@ TEST(emplace_exception_copy_to_small_val) {
     try {
         target.emplace<throwing_ctor>(source);
         compiler_forget(target);
-        fail();
+        FAIL();
     } catch (const throwing_ctor::copy_exc&) {
     }
-    expect(!target.has_value());
-    expect(cnttype::dtor_count == 1);
-    expect(cnttype::copy_ctor_count == 0);
-    expect(cnttype::move_ctor_count == 0);
+    ASSERT(!target.has_value());
+    ASSERT(cnttype::dtor_count == 1);
+    ASSERT(cnttype::copy_ctor_count == 0);
+    ASSERT(cnttype::move_ctor_count == 0);
 }
 
 TEST(emplace_exception_move_to_small_val) {
@@ -224,13 +224,13 @@ TEST(emplace_exception_move_to_small_val) {
     try {
         target.emplace<throwing_ctor>(std::move(source));
         compiler_forget(target);
-        fail();
+        FAIL();
     } catch (const throwing_ctor::move_exc&) {
     }
-    expect(!target.has_value());
-    expect(cnttype::dtor_count == 1);
-    expect(cnttype::copy_ctor_count == 0);
-    expect(cnttype::move_ctor_count == 0);
+    ASSERT(!target.has_value());
+    ASSERT(cnttype::dtor_count == 1);
+    ASSERT(cnttype::copy_ctor_count == 0);
+    ASSERT(cnttype::move_ctor_count == 0);
 }
 
 TEST(emplace_initlist_exception_to_small_val) {
@@ -239,43 +239,43 @@ TEST(emplace_initlist_exception_to_small_val) {
     try {
         target.emplace<large_cnttype>({1, 2, 3}, 1, 2);
         compiler_forget(target);
-        fail();
+        FAIL();
     } catch (const large_cnttype::exc&) {
     }
-    expect(!target.has_value());
+    ASSERT(!target.has_value());
     // the throw is inside the body, after full construction finished for the
     // cnttype nested field of large_cnttype, so ~cnttype() gets called in the constructor of large_cnttype
-    expect(cnttype::dtor_count == 2);
-    expect(cnttype::copy_ctor_count == 0);
-    expect(cnttype::move_ctor_count == 0);
+    ASSERT(cnttype::dtor_count == 2);
+    ASSERT(cnttype::copy_ctor_count == 0);
+    ASSERT(cnttype::move_ctor_count == 0);
 }
 
 TEST(emplace_to_large_val) {
     std::any target{std::in_place_type<large_cnttype>};
     cnttype::reset();
     auto& result = target.emplace<cnttype>(7);
-    expect_type(cnttype&, result);
-    expect(result.val == 7);
-    expect(target.has_value());
-    expect(any_cast<cnttype>(&target)->val == 7);
-    expect(target.type() == typeid(cnttype));
-    expect(cnttype::dtor_count == 1);
-    expect(cnttype::copy_ctor_count == 0);
-    expect(cnttype::move_ctor_count == 0);
+    ASSERT_TYPE(cnttype&, result);
+    ASSERT(result.val == 7);
+    ASSERT(target.has_value());
+    ASSERT(any_cast<cnttype&>(target).val == 7);
+    ASSERT(target.type() == typeid(cnttype));
+    ASSERT(cnttype::dtor_count == 1);
+    ASSERT(cnttype::copy_ctor_count == 0);
+    ASSERT(cnttype::move_ctor_count == 0);
 }
 
 TEST(emplace_initlist_to_large_val) {
     std::any target{std::in_place_type<large_cnttype>};
     cnttype::reset();
     auto& result = target.emplace<large_cnttype>({1, 2, 3});
-    expect_type(large_cnttype&, result);
-    expect(result.nested.val == -777);
-    expect(target.has_value());
-    expect(any_cast<large_cnttype>(&target)->nested.val == -777);
-    expect(target.type() == typeid(large_cnttype));
-    expect(cnttype::dtor_count == 1);
-    expect(cnttype::copy_ctor_count == 0);
-    expect(cnttype::move_ctor_count == 0);
+    ASSERT_TYPE(large_cnttype&, result);
+    ASSERT(result.nested.val == -777);
+    ASSERT(target.has_value());
+    ASSERT(any_cast<large_cnttype&>(target).nested.val == -777);
+    ASSERT(target.type() == typeid(large_cnttype));
+    ASSERT(cnttype::dtor_count == 1);
+    ASSERT(cnttype::copy_ctor_count == 0);
+    ASSERT(cnttype::move_ctor_count == 0);
 }
 
 TEST(emplace_non_const_array_to_large_val) {
@@ -283,14 +283,14 @@ TEST(emplace_non_const_array_to_large_val) {
     std::any target{std::in_place_type<large_cnttype>};
     cnttype::reset();
     auto& result = (target.emplace<cnttype[3]>(source));
-    expect_type(cnttype*&, result);
-    expect(result == source);
-    expect(target.has_value());
-    expect(target.type() == typeid(cnttype*));
-    expect(any_cast<cnttype*>(target) == source);
-    expect(cnttype::dtor_count == 1);
-    expect(cnttype::copy_ctor_count == 0);
-    expect(cnttype::move_ctor_count == 0);
+    ASSERT_TYPE(cnttype*&, result);
+    ASSERT(result == source);
+    ASSERT(target.has_value());
+    ASSERT(target.type() == typeid(cnttype*));
+    ASSERT(any_cast<cnttype*>(target) == source);
+    ASSERT(cnttype::dtor_count == 1);
+    ASSERT(cnttype::copy_ctor_count == 0);
+    ASSERT(cnttype::move_ctor_count == 0);
 }
 
 TEST(emplace_const_array_to_large_val) {
@@ -298,27 +298,27 @@ TEST(emplace_const_array_to_large_val) {
     std::any target{std::in_place_type<large_cnttype>};
     cnttype::reset();
     auto& result = target.emplace<const cnttype[3]>(source);
-    expect_type(const cnttype*&, result);
-    expect(result == source);
-    expect(target.has_value());
-    expect(target.type() == typeid(const cnttype*));
-    expect(any_cast<const cnttype*>(target) == source);
-    expect(cnttype::dtor_count == 1);
-    expect(cnttype::copy_ctor_count == 0);
-    expect(cnttype::move_ctor_count == 0);
+    ASSERT_TYPE(const cnttype*&, result);
+    ASSERT(result == source);
+    ASSERT(target.has_value());
+    ASSERT(target.type() == typeid(const cnttype*));
+    ASSERT(any_cast<const cnttype*>(target) == source);
+    ASSERT(cnttype::dtor_count == 1);
+    ASSERT(cnttype::copy_ctor_count == 0);
+    ASSERT(cnttype::move_ctor_count == 0);
 }
 
 TEST(emplace_function_to_large_val) {
     std::any target{std::in_place_type<large_cnttype>};
     cnttype::reset();
     auto& result = target.emplace<int(int, int)>(func);
-    expect(result == func);
-    expect(target.has_value());
-    expect(target.type() == typeid(int (*)(int, int)));
-    expect(any_cast<int (*)(int, int)>(target) == &func);
-    expect(cnttype::dtor_count == 1);
-    expect(cnttype::copy_ctor_count == 0);
-    expect(cnttype::move_ctor_count == 0);
+    ASSERT(result == func);
+    ASSERT(target.has_value());
+    ASSERT(target.type() == typeid(int (*)(int, int)));
+    ASSERT(any_cast<int (*)(int, int)>(target) == &func);
+    ASSERT(cnttype::dtor_count == 1);
+    ASSERT(cnttype::copy_ctor_count == 0);
+    ASSERT(cnttype::move_ctor_count == 0);
 }
 
 TEST(emplace_exception_copy_to_large_val) {
@@ -328,13 +328,13 @@ TEST(emplace_exception_copy_to_large_val) {
     try {
         target.emplace<throwing_ctor>(source);
         compiler_forget(target);
-        fail();
+        FAIL();
     } catch (const throwing_ctor::copy_exc&) {
     }
-    expect(!target.has_value());
-    expect(cnttype::dtor_count == 1);
-    expect(cnttype::copy_ctor_count == 0);
-    expect(cnttype::move_ctor_count == 0);
+    ASSERT(!target.has_value());
+    ASSERT(cnttype::dtor_count == 1);
+    ASSERT(cnttype::copy_ctor_count == 0);
+    ASSERT(cnttype::move_ctor_count == 0);
 }
 
 TEST(emplace_exception_move_to_large_val) {
@@ -344,13 +344,13 @@ TEST(emplace_exception_move_to_large_val) {
     try {
         target.emplace<throwing_ctor>(std::move(source));
         compiler_forget(target);
-        fail();
+        FAIL();
     } catch (const throwing_ctor::move_exc&) {
     }
-    expect(!target.has_value());
-    expect(cnttype::dtor_count == 1);
-    expect(cnttype::copy_ctor_count == 0);
-    expect(cnttype::move_ctor_count == 0);
+    ASSERT(!target.has_value());
+    ASSERT(cnttype::dtor_count == 1);
+    ASSERT(cnttype::copy_ctor_count == 0);
+    ASSERT(cnttype::move_ctor_count == 0);
 }
 
 TEST(emplace_initlist_exception_to_large_val) {
@@ -359,13 +359,13 @@ TEST(emplace_initlist_exception_to_large_val) {
     try {
         target.emplace<large_cnttype>({1, 2, 3}, 1, 2);
         compiler_forget(target);
-        fail();
+        FAIL();
     } catch (const large_cnttype::exc&) {
     }
-    expect(!target.has_value());
+    ASSERT(!target.has_value());
     // the throw is inside the body, after full construction finished for the
     // cnttype nested field of large_cnttype, so ~cnttype() gets called in the constructor of large_cnttype
-    expect(cnttype::dtor_count == 2);
-    expect(cnttype::copy_ctor_count == 0);
-    expect(cnttype::move_ctor_count == 0);
+    ASSERT(cnttype::dtor_count == 2);
+    ASSERT(cnttype::copy_ctor_count == 0);
+    ASSERT(cnttype::move_ctor_count == 0);
 }

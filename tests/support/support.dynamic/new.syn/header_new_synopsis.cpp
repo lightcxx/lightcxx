@@ -19,18 +19,18 @@ TEST() {
     [[maybe_unused]] constexpr auto delete_v = delete_f(::std::destroying_delete);
 
     constexpr ::std::align_val_t align_v{10};
-    expect_ct_and_rt(static_cast<::std::size_t>(align_v) == 10);
+    ASSERT_CT_RT(static_cast<::std::size_t>(align_v) == 10);
 
     [[maybe_unused]] ::std::nothrow_t nt_v = nothrow_f(::std::nothrow);
 
     ::std::new_handler h = []() { printf("Failed to allocate."); };
     const auto old_handler = ::std::set_new_handler(h);
-    expect(old_handler == nullptr);
-    expect(::std::get_new_handler() == h);
+    ASSERT(old_handler == nullptr);
+    ASSERT(::std::get_new_handler() == h);
     ::std::set_new_handler(nullptr);
 
-    expect_ct_and_rt(::std::hardware_constructive_interference_size >= alignof(void*));
-    expect_ct_and_rt(::std::hardware_destructive_interference_size >= alignof(void*));
+    ASSERT_CT_RT(::std::hardware_constructive_interference_size >= alignof(void*));
+    ASSERT_CT_RT(::std::hardware_destructive_interference_size >= alignof(void*));
 
     using Tp = void*;
 
@@ -38,7 +38,7 @@ TEST() {
     ::operator delete(ptr1_explicit);
 
     compiler_forget(ptr1_explicit);
-    expect(::std::launder(ptr1_explicit) == ptr1_explicit);
+    ASSERT(::std::launder(ptr1_explicit) == ptr1_explicit);
 
     const auto ptr1_natural = new Tp();
     delete ptr1_natural;
@@ -100,18 +100,18 @@ TEST() {
     alignas(Tp) char space[sizeof(Tp)];
 
     const auto placed_ptr_explicit = ::operator new(sizeof(Tp), static_cast<void*>(space));
-    expect(placed_ptr_explicit == static_cast<void*>(space));
+    ASSERT(placed_ptr_explicit == static_cast<void*>(space));
     ::operator delete(placed_ptr_explicit, space);
 
     const auto placed_ptr_natural = new (static_cast<void*>(space)) Tp();
-    expect(placed_ptr_natural == static_cast<void*>(space));
+    ASSERT(placed_ptr_natural == static_cast<void*>(space));
     ::operator delete(placed_ptr_natural, space);
 
     const auto placed_arr_explicit = ::operator new[](sizeof(Tp), static_cast<void*>(space));
-    expect(placed_arr_explicit == static_cast<void*>(space));
+    ASSERT(placed_arr_explicit == static_cast<void*>(space));
     ::operator delete[](placed_arr_explicit, space);
 
     const auto placed_arr_natural = new (static_cast<void*>(space)) Tp[1];
-    expect(placed_arr_natural == static_cast<void*>(space));
+    ASSERT(placed_arr_natural == static_cast<void*>(space));
     ::operator delete[](placed_arr_natural, space);
 }

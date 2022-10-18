@@ -1,6 +1,6 @@
 #include <type_traits>
 
-#include "meta/test_unary_trait.h"
+#include "test_unary_trait.h"
 
 template<class T, unsigned I, std::size_t e>
 constexpr bool test_extent() {

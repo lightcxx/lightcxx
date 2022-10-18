@@ -8,77 +8,77 @@ struct bitset_members_tests {
         auto bit_a = Testing::build_bitset<N>(Testing::random_bits);
         const auto bit_b = Testing::build_bitset<N>(Testing::random_bits_2);
         auto& result = bit_a ^= bit_b;
-        expect(&result == &bit_a);
+        ASSERT(&result == &bit_a);
         std::size_t num_set_bits = 0;
         for (std::size_t i = 0; i < N; i++) {
             const auto bit = (Testing::random_bits[i] == '1') != (Testing::random_bits_2[i] == '1');
-            expect(result.test(i) == bit);
-            expect(result[i] == bit);
+            ASSERT(result.test(i) == bit);
+            ASSERT(result[i] == bit);
             num_set_bits += bit;
         }
-        expect(result.count() == num_set_bits);
-        expect(result.size() == N);
-        expect(result.all() == (num_set_bits == N));
-        expect(result.none() == (num_set_bits == 0));
-        expect(result.any() == (num_set_bits != 0));
+        ASSERT(result.count() == num_set_bits);
+        ASSERT(result.size() == N);
+        ASSERT(result.all() == (num_set_bits == N));
+        ASSERT(result.none() == (num_set_bits == 0));
+        ASSERT(result.any() == (num_set_bits != 0));
     }
 
     static void test_and_eq() {
         auto bit_a = Testing::build_bitset<N>(Testing::random_bits);
         const auto bit_b = Testing::build_bitset<N>(Testing::random_bits_2);
         auto& result = bit_a &= bit_b;
-        expect(&result == &bit_a);
+        ASSERT(&result == &bit_a);
         std::size_t num_set_bits = 0;
         for (std::size_t i = 0; i < N; i++) {
             const auto bit = (Testing::random_bits[i] == '1') && (Testing::random_bits_2[i] == '1');
-            expect(result.test(i) == bit);
-            expect(result[i] == bit);
+            ASSERT(result.test(i) == bit);
+            ASSERT(result[i] == bit);
             num_set_bits += bit;
         }
-        expect(result.count() == num_set_bits);
-        expect(result.size() == N);
-        expect(result.all() == (num_set_bits == N));
-        expect(result.none() == (num_set_bits == 0));
-        expect(result.any() == (num_set_bits != 0));
+        ASSERT(result.count() == num_set_bits);
+        ASSERT(result.size() == N);
+        ASSERT(result.all() == (num_set_bits == N));
+        ASSERT(result.none() == (num_set_bits == 0));
+        ASSERT(result.any() == (num_set_bits != 0));
     }
 
     static void test_or_eq() {
         auto bit_a = Testing::build_bitset<N>(Testing::random_bits);
         const auto bit_b = Testing::build_bitset<N>(Testing::random_bits_2);
         auto& result = bit_a |= bit_b;
-        expect(&result == &bit_a);
+        ASSERT(&result == &bit_a);
         std::size_t num_set_bits = 0;
         for (std::size_t i = 0; i < N; i++) {
             const auto bit = (Testing::random_bits[i] == '1') || (Testing::random_bits_2[i] == '1');
-            expect(result.test(i) == bit);
-            expect(result[i] == bit);
+            ASSERT(result.test(i) == bit);
+            ASSERT(result[i] == bit);
             num_set_bits += bit;
         }
-        expect(result.count() == num_set_bits);
-        expect(result.size() == N);
-        expect(result.all() == (num_set_bits == N));
-        expect(result.none() == (num_set_bits == 0));
-        expect(result.any() == (num_set_bits != 0));
+        ASSERT(result.count() == num_set_bits);
+        ASSERT(result.size() == N);
+        ASSERT(result.all() == (num_set_bits == N));
+        ASSERT(result.none() == (num_set_bits == 0));
+        ASSERT(result.any() == (num_set_bits != 0));
     }
 
     static void expect_shr(const std::bitset<N>& result, std::size_t I) {
         std::size_t num_set_bits = 0;
         for (std::size_t i = 0; i < N; i++) {
             if (i < I) {
-                expect(!result.test(i));
-                expect(!result[i]);
+                ASSERT(!result.test(i));
+                ASSERT(!result[i]);
             } else {
                 const auto bit = Testing::random_bits[i - I] == '1';
                 num_set_bits += bit;
-                expect(result.test(i) == bit);
-                expect(result[i] == bit);
+                ASSERT(result.test(i) == bit);
+                ASSERT(result[i] == bit);
             }
         }
-        expect(result.count() == num_set_bits);
-        expect(result.size() == N);
-        expect(result.all() == (num_set_bits == N));
-        expect(result.none() == (num_set_bits == 0));
-        expect(result.any() == (num_set_bits != 0));
+        ASSERT(result.count() == num_set_bits);
+        ASSERT(result.size() == N);
+        ASSERT(result.all() == (num_set_bits == N));
+        ASSERT(result.none() == (num_set_bits == 0));
+        ASSERT(result.any() == (num_set_bits != 0));
     }
 
     static void test_shr(std::size_t I) {
@@ -90,7 +90,7 @@ struct bitset_members_tests {
     static void test_shr_eq(std::size_t I) {
         auto bit_a = Testing::build_bitset<N>(Testing::random_bits);
         auto& shr_eq_result = bit_a <<= I;
-        expect(&shr_eq_result == &bit_a);
+        ASSERT(&shr_eq_result == &bit_a);
         expect_shr(bit_a, I);
     }
 
@@ -98,20 +98,20 @@ struct bitset_members_tests {
         std::size_t num_set_bits = 0;
         for (std::size_t i = 0; i < N; i++) {
             if (I >= N - i) {
-                expect(!result.test(i));
-                expect(!result[i]);
+                ASSERT(!result.test(i));
+                ASSERT(!result[i]);
             } else {
                 const auto bit = Testing::random_bits[i + I] == '1';
                 num_set_bits += bit;
-                expect(result.test(i) == bit);
-                expect(result[i] == bit);
+                ASSERT(result.test(i) == bit);
+                ASSERT(result[i] == bit);
             }
         }
-        expect(result.count() == num_set_bits);
-        expect(result.size() == N);
-        expect(result.all() == (num_set_bits == N));
-        expect(result.none() == (num_set_bits == 0));
-        expect(result.any() == (num_set_bits != 0));
+        ASSERT(result.count() == num_set_bits);
+        ASSERT(result.size() == N);
+        ASSERT(result.all() == (num_set_bits == N));
+        ASSERT(result.none() == (num_set_bits == 0));
+        ASSERT(result.any() == (num_set_bits != 0));
     }
 
     static void test_shl(std::size_t I) {
@@ -123,7 +123,7 @@ struct bitset_members_tests {
     static void test_shl_eq(std::size_t I) {
         auto bit_a = Testing::build_bitset<N>(Testing::random_bits);
         auto& shr_eq_result = bit_a >>= I;
-        expect(&shr_eq_result == &bit_a);
+        ASSERT(&shr_eq_result == &bit_a);
         expect_shl(bit_a, I);
     }
 
@@ -150,16 +150,16 @@ struct bitset_members_tests {
     static void test_set_no_args() {
         auto bit_a = Testing::build_bitset<N>(Testing::random_bits);
         auto& result = bit_a.set();
-        expect(&result == &bit_a);
+        ASSERT(&result == &bit_a);
         for (std::size_t i = 0; i < N; i++) {
-            expect(bit_a.test(i));
-            expect(bool(bit_a[i]));
+            ASSERT(bit_a.test(i));
+            ASSERT(bool(bit_a[i]));
         }
-        expect(bit_a.size() == N);
-        expect(bit_a.count() == N);
-        expect(bit_a.any());
-        expect(bit_a.all());
-        expect(!bit_a.none());
+        ASSERT(bit_a.size() == N);
+        ASSERT(bit_a.count() == N);
+        ASSERT(bit_a.any());
+        ASSERT(bit_a.all());
+        ASSERT(!bit_a.none());
     }
 
     static void test_set() {
@@ -167,37 +167,37 @@ struct bitset_members_tests {
         for (std::size_t i = 0; i < N; i++) {
             bool bit = (Testing::random_bits_2[i] == '1');
             auto& result = bit_a.set(i, bit);
-            expect(&result == &bit_a);
+            ASSERT(&result == &bit_a);
             for (std::size_t j = 0; j < N; j++) {
                 if (j <= i) {
-                    expect(bit_a.test(j) == (Testing::random_bits_2[j] == '1'));
+                    ASSERT(bit_a.test(j) == (Testing::random_bits_2[j] == '1'));
                 } else {
-                    expect(bit_a.test(j) == (Testing::random_bits[j] == '1'));
+                    ASSERT(bit_a.test(j) == (Testing::random_bits[j] == '1'));
                 }
             }
         }
 
         for (std::size_t i = 0; i < N; i++) {
             auto& result = bit_a.set(i);
-            expect(&result == &bit_a);
+            ASSERT(&result == &bit_a);
             for (std::size_t j = 0; j < N; j++) {
                 if (j <= i) {
-                    expect(bit_a.test(j));
+                    ASSERT(bit_a.test(j));
                 } else {
-                    expect(bit_a.test(j) == (Testing::random_bits_2[j] == '1'));
+                    ASSERT(bit_a.test(j) == (Testing::random_bits_2[j] == '1'));
                 }
             }
         }
 
         try {
             bit_a.set(N + 1, false);
-            fail();
+            FAIL();
         } catch (std::out_of_range&) {
         }
 
         try {
             bit_a.set(N + 1);
-            fail();
+            FAIL();
         } catch (std::out_of_range&) {
         }
     }
@@ -205,35 +205,35 @@ struct bitset_members_tests {
     static void test_reset_no_args() {
         auto bit_a = Testing::build_bitset<N>(Testing::random_bits);
         auto& result = bit_a.reset();
-        expect(&result == &bit_a);
+        ASSERT(&result == &bit_a);
         for (std::size_t i = 0; i < N; i++) {
-            expect(!bit_a.test(i));
-            expect(!bool(bit_a[i]));
+            ASSERT(!bit_a.test(i));
+            ASSERT(!bool(bit_a[i]));
         }
-        expect(bit_a.size() == N);
-        expect(bit_a.count() == 0);
-        expect(!bit_a.any());
-        expect(!bit_a.all());
-        expect(bit_a.none());
+        ASSERT(bit_a.size() == N);
+        ASSERT(bit_a.count() == 0);
+        ASSERT(!bit_a.any());
+        ASSERT(!bit_a.all());
+        ASSERT(bit_a.none());
     }
 
     static void test_reset() {
         auto bit_a = Testing::build_bitset<N>(Testing::random_bits);
         for (std::size_t i = 0; i < N; i++) {
             auto& result = bit_a.reset(i);
-            expect(&result == &bit_a);
+            ASSERT(&result == &bit_a);
             for (std::size_t j = 0; j < N; j++) {
                 if (j <= i) {
-                    expect(!bit_a.test(j));
+                    ASSERT(!bit_a.test(j));
                 } else {
-                    expect(bit_a.test(j) == (Testing::random_bits[j] == '1'));
+                    ASSERT(bit_a.test(j) == (Testing::random_bits[j] == '1'));
                 }
             }
         }
 
         try {
             bit_a.reset(N + 1);
-            fail();
+            FAIL();
         } catch (std::out_of_range&) {
         }
     }
@@ -245,51 +245,51 @@ struct bitset_members_tests {
         for (std::size_t i = 0; i < N; i++) {
             const auto bit = Testing::random_bits[i] == '0';
             num_set_bits += bit;
-            expect(result.test(i) == bit);
-            expect(result[i] == bit);
+            ASSERT(result.test(i) == bit);
+            ASSERT(result[i] == bit);
         }
-        expect(result.count() == num_set_bits);
-        expect(result.size() == N);
-        expect(result.all() == (num_set_bits == N));
-        expect(result.none() == (num_set_bits == 0));
-        expect(result.any() == (num_set_bits != 0));
+        ASSERT(result.count() == num_set_bits);
+        ASSERT(result.size() == N);
+        ASSERT(result.all() == (num_set_bits == N));
+        ASSERT(result.none() == (num_set_bits == 0));
+        ASSERT(result.any() == (num_set_bits != 0));
     }
 
     static void test_flip_no_args() {
         auto bit_a = Testing::build_bitset<N>(Testing::random_bits);
         auto& result = bit_a.flip();
-        expect(&result == &bit_a);
+        ASSERT(&result == &bit_a);
         std::size_t num_set_bits = 0;
         for (std::size_t i = 0; i < N; i++) {
             const auto bit = Testing::random_bits[i] == '0';
             num_set_bits += bit;
-            expect(bit_a.test(i) == bit);
-            expect(bit_a[i] == bit);
+            ASSERT(bit_a.test(i) == bit);
+            ASSERT(bit_a[i] == bit);
         }
-        expect(bit_a.count() == num_set_bits);
-        expect(bit_a.size() == N);
-        expect(bit_a.all() == (num_set_bits == N));
-        expect(bit_a.none() == (num_set_bits == 0));
-        expect(bit_a.any() == (num_set_bits != 0));
+        ASSERT(bit_a.count() == num_set_bits);
+        ASSERT(bit_a.size() == N);
+        ASSERT(bit_a.all() == (num_set_bits == N));
+        ASSERT(bit_a.none() == (num_set_bits == 0));
+        ASSERT(bit_a.any() == (num_set_bits != 0));
     }
 
     static void test_flip() {
         auto bit_a = Testing::build_bitset<N>(Testing::random_bits);
         for (std::size_t i = 0; i < N; i++) {
             auto& result = bit_a.flip(i);
-            expect(&result == &bit_a);
+            ASSERT(&result == &bit_a);
             for (std::size_t j = 0; j < N; j++) {
                 if (j <= i) {
-                    expect(bit_a.test(j) == (Testing::random_bits[j] == '0'));
+                    ASSERT(bit_a.test(j) == (Testing::random_bits[j] == '0'));
                 } else {
-                    expect(bit_a.test(j) == (Testing::random_bits[j] == '1'));
+                    ASSERT(bit_a.test(j) == (Testing::random_bits[j] == '1'));
                 }
             }
         }
 
         try {
             bit_a.flip(N + 1);
-            fail();
+            FAIL();
         } catch (std::out_of_range&) {
         }
     }
@@ -303,8 +303,8 @@ struct bitset_members_tests {
         }
         for (std::size_t i = 0; i < 50; i++) {
             if (i < mx) {
-                expect(i == to_integer(std::bitset<N>(i)));
-                expect(mx - i == to_integer(std::bitset<N>(mx - i)));
+                ASSERT(i == to_integer(std::bitset<N>(i)));
+                ASSERT(mx - i == to_integer(std::bitset<N>(mx - i)));
             }
         }
     }
@@ -313,14 +313,14 @@ struct bitset_members_tests {
         const auto a = Testing::build_bitset<N>(Testing::random_bits);
         const auto a_2 = Testing::build_bitset<N>(Testing::random_bits);
         const auto b = Testing::build_bitset<N>(Testing::random_bits_2);
-        expect(a == a);
-        expect(a == a_2);
-        expect(!(a == b));
+        ASSERT(a == a);
+        ASSERT(a == a_2);
+        ASSERT(!(a == b));
 
         if (N > 160) {
             const auto d1 = Testing::build_bitset<N>("0101110101101110111010100000111101010111111111100100000110110101011011010101001010001000111110100000011111000011100101101000111010101011010111111100000001111011110100000011");
             const auto d2 = Testing::build_bitset<N>("0101110101101110111010100000111101010111111111100100000110110101011011010101001010001000111110100000011111000011100101101000111010101011010111111100000001111011010100000011");
-            expect(!(d1 == d2));
+            ASSERT(!(d1 == d2));
         }
     }
 
@@ -332,21 +332,21 @@ struct bitset_members_tests {
             auto ref = bit_a[i];
             auto& result1 = (ref = bit);
             auto& result2 = (ref = bit_b[i]);
-            expect(&result1 == &ref);
-            expect(&result2 == &ref);
+            ASSERT(&result1 == &ref);
+            ASSERT(&result2 == &ref);
             for (std::size_t j = 0; j < N; j++) {
                 if (j <= i) {
-                    expect(bool(bit_a[j]) == (Testing::random_bits_2[j] == '1'));
-                    expect((~bit_a[j]) == (Testing::random_bits_2[j] == '0'));
+                    ASSERT(bool(bit_a[j]) == (Testing::random_bits_2[j] == '1'));
+                    ASSERT((~bit_a[j]) == (Testing::random_bits_2[j] == '0'));
                 } else {
-                    expect(bool(bit_a[j]) == (Testing::random_bits[j] == '1'));
-                    expect((~bit_a[j]) == (Testing::random_bits[j] == '0'));
+                    ASSERT(bool(bit_a[j]) == (Testing::random_bits[j] == '1'));
+                    ASSERT((~bit_a[j]) == (Testing::random_bits[j] == '0'));
                 }
             }
             bit_a[i].flip();
-            expect(bit_a.test(i) != bit);
+            ASSERT(bit_a.test(i) != bit);
             bit_a[i].flip();
-            expect(bit_a.test(i) == bit);
+            ASSERT(bit_a.test(i) == bit);
         }
     }
 

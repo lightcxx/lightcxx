@@ -1,6 +1,6 @@
 #include <type_traits>
 
-#include "meta/test_unary_trait.h"
+#include "test_unary_trait.h"
 
 #define DECLARE_CLASS(NAME, DFLT_CTOR, CP_CTOR, MV_CTOR, CP_ASSIGN, MV_ASSIGN, DTOR) \
     struct NAME {                                                                    \

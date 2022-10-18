@@ -6,9 +6,9 @@ using P = std::partial_ordering;
 using W = std::weak_ordering;
 using S = std::strong_ordering;
 
-#define expect_common_comparison_category(expected, ...)                            \
-    expect_same_type(expected, std::common_comparison_category<__VA_ARGS__>::type); \
-    expect_same_type(expected, std::common_comparison_category_t<__VA_ARGS__>)
+#define expect_common_comparison_category(expected, ...)                                    \
+    static_assert(::Testing::same_type<expected, std::common_comparison_category<__VA_ARGS__>::type>); \
+    static_assert(::Testing::same_type<expected, std::common_comparison_category_t<__VA_ARGS__>>)
 
 TEST(empty_type_list) {
     expect_common_comparison_category(S, );

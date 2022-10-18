@@ -15,10 +15,10 @@ TEST() {
     Bar b;
     try {
         (void)dynamic_cast<Foo&>(b);
-        fail();
+        FAIL();
     } catch (const std::bad_cast& e) {
-        expect(default_constructed.what() == e.what());
+        ASSERT(default_constructed.what() == e.what());
     } catch (...) {
-        fail();
+        FAIL();
     }
 }

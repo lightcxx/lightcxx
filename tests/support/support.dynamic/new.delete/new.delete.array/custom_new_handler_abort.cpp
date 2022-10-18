@@ -18,5 +18,5 @@ TEST() {
     });
 
     [[maybe_unused]] const auto const_ptr = ::operator new[](256);
-    fail();
+    FAIL();
 }

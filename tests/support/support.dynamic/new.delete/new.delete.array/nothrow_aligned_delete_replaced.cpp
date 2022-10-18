@@ -13,7 +13,7 @@ void operator delete[](void* ptr, std::align_val_t, const std::nothrow_t&) noexc
 TEST() {
     auto ptr = ::operator new[](256, std::align_val_t{128}, std::nothrow);
     compiler_forget(ptr);
-    expect(!called_handler);
+    ASSERT(!called_handler);
     ::operator delete[] (ptr, std::align_val_t{128}, std::nothrow);
-    expect(called_handler);
+    ASSERT(called_handler);
 }

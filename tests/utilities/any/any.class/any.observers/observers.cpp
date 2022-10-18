@@ -4,18 +4,18 @@
 
 TEST(observers_noexcept) {
     const std::any a;
-    expect_is_noexcept(a.has_value());
-    expect_is_noexcept(a.type());
+    ASSERT_NOEXCEPT(a.has_value());
+    ASSERT_NOEXCEPT(a.type());
 }
 
 TEST(observers_empty) {
     const std::any a;
-    expect(!a.has_value());
-    expect(a.type() == typeid(void));
+    ASSERT(!a.has_value());
+    ASSERT(a.type() == typeid(void));
 }
 
 TEST(observers_nonempty) {
     const std::any a(3);
-    expect(a.has_value());
-    expect(a.type() == typeid(int));
+    ASSERT(a.has_value());
+    ASSERT(a.type() == typeid(int));
 }

@@ -10,13 +10,13 @@ struct StandardLayoutStructure {
 };
 
 TEST() {
-    expect_ct_and_rt(offsetof(StandardLayoutStructure, c) == sizeof(int) + sizeof(int));
-    expect_is_noexcept(offsetof(StandardLayoutStructure, c));
+    ASSERT_CT_RT(offsetof(StandardLayoutStructure, c) == sizeof(int) + sizeof(int));
+    ASSERT_NOEXCEPT(offsetof(StandardLayoutStructure, c));
 
     static_assert(std::is_signed_v<::std::ptrdiff_t>);
 
     static_assert(std::is_unsigned_v<::std::size_t>);
 
-    expect_ct_and_rt(alignof(::std::max_align_t) >= alignof(long double));
-    expect_ct_and_rt(alignof(::std::max_align_t) >= alignof(long long));
+    ASSERT_CT_RT(alignof(::std::max_align_t) >= alignof(long double));
+    ASSERT_CT_RT(alignof(::std::max_align_t) >= alignof(long long));
 }

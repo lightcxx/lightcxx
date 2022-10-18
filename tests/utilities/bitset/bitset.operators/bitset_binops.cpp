@@ -13,45 +13,45 @@ struct bitset_binary_ops_tests {
             std::size_t num_bits = 0;
             for (std::size_t i = 0; i < N; i++) {
                 const auto bit = (Testing::random_bits[i] == '1') != (Testing::random_bits_2[i] == '1');
-                expect(result[i] == bit);
-                expect(result.test(i) == bit);
+                ASSERT(result[i] == bit);
+                ASSERT(result.test(i) == bit);
                 num_bits += bit;
             }
-            expect(result.count() == num_bits);
-            expect(result.size() == N);
-            expect(result.all() == (num_bits == N));
-            expect(result.none() == (num_bits == 0));
-            expect(result.any() == (num_bits != 0));
+            ASSERT(result.count() == num_bits);
+            ASSERT(result.size() == N);
+            ASSERT(result.all() == (num_bits == N));
+            ASSERT(result.none() == (num_bits == 0));
+            ASSERT(result.any() == (num_bits != 0));
         }
         {
             const auto result = bit_a | bit_b;
             std::size_t num_bits = 0;
             for (std::size_t i = 0; i < N; i++) {
                 const auto bit = (Testing::random_bits[i] == '1') || (Testing::random_bits_2[i] == '1');
-                expect(result[i] == bit);
-                expect(result.test(i) == bit);
+                ASSERT(result[i] == bit);
+                ASSERT(result.test(i) == bit);
                 num_bits += bit;
             }
-            expect(result.count() == num_bits);
-            expect(result.size() == N);
-            expect(result.all() == (num_bits == N));
-            expect(result.none() == (num_bits == 0));
-            expect(result.any() == (num_bits != 0));
+            ASSERT(result.count() == num_bits);
+            ASSERT(result.size() == N);
+            ASSERT(result.all() == (num_bits == N));
+            ASSERT(result.none() == (num_bits == 0));
+            ASSERT(result.any() == (num_bits != 0));
         }
         {
             const auto result = bit_a & bit_b;
             std::size_t num_bits = 0;
             for (std::size_t i = 0; i < N; i++) {
                 const auto bit = (Testing::random_bits[i] == '1') && (Testing::random_bits_2[i] == '1');
-                expect(result[i] == bit);
-                expect(result.test(i) == bit);
+                ASSERT(result[i] == bit);
+                ASSERT(result.test(i) == bit);
                 num_bits += bit;
             }
-            expect(result.count() == num_bits);
-            expect(result.size() == N);
-            expect(result.all() == (num_bits == N));
-            expect(result.none() == (num_bits == 0));
-            expect(result.any() == (num_bits != 0));
+            ASSERT(result.count() == num_bits);
+            ASSERT(result.size() == N);
+            ASSERT(result.all() == (num_bits == N));
+            ASSERT(result.none() == (num_bits == 0));
+            ASSERT(result.any() == (num_bits != 0));
         }
     }
 };

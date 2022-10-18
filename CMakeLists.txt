@@ -13,6 +13,7 @@ set(COMMON_CLANG_GCC_C_CXX_WARNINGS
         -Wall
         -Wextra # reasonable and standard
         -Wunused # warn on anything being unused
+        -Wshadow # this is very restrictive for general code, but in a brand-new project it can work
         -Wpedantic # warn if non-standard C/C++ is used
         -Wconversion # warn on type conversions that may lose data
         -Wsign-conversion # warn on sign conversions
@@ -139,7 +140,10 @@ install(DIRECTORY include DESTINATION .)
 install(TARGETS lightcxx lightcxx_static DESTINATION lib)
 
 if (LIGHTCXX_ENABLE_TESTS)
-    add_library(testing STATIC ${CMAKE_CURRENT_SOURCE_DIR}/testing/testing.c)
+    add_library(testing STATIC
+            ${CMAKE_CURRENT_SOURCE_DIR}/testing/intercept_libc.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/testing/testing.c
+            )
     AddTargetCompileWarnings(testing)
 
     add_executable(test_runner ${CMAKE_CURRENT_SOURCE_DIR}/testing/test_runner.c)

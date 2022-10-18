@@ -5,14 +5,14 @@
 template<std::size_t N>
 static void test_bitset_default_ctor() {
     std::bitset<N> b;
-    expect(b.to_ulong() == 0);
-    expect(b.to_ullong() == 0);
-    expect(b.count() == 0);
-    expect(b.none());
-    expect(!b.any());
-    expect(!b.all());
+    ASSERT(b.to_ulong() == 0);
+    ASSERT(b.to_ullong() == 0);
+    ASSERT(b.count() == 0);
+    ASSERT(b.none());
+    ASSERT(!b.any());
+    ASSERT(!b.all());
     for (std::size_t i = 0; i < N; i++) {
-        expect(!b.test(i));
+        ASSERT(!b.test(i));
     }
 }
 
@@ -47,17 +47,17 @@ static void test_bitset_ullong_ctor(unsigned long long value) {
     }
 
     std::bitset<N> b(value);
-    expect(b.to_ulong() == expected);
-    expect(b.to_ullong() == expected);
-    expect(b.count() == static_cast<std::size_t>(std::popcount(expected)));
-    expect(b.none() == (expected == 0));
-    expect(b.any() == !(expected == 0));
-    expect(b.all() == (std::popcount(expected) == N));
+    ASSERT(b.to_ulong() == expected);
+    ASSERT(b.to_ullong() == expected);
+    ASSERT(b.count() == static_cast<std::size_t>(std::popcount(expected)));
+    ASSERT(b.none() == (expected == 0));
+    ASSERT(b.any() == !(expected == 0));
+    ASSERT(b.all() == (std::popcount(expected) == N));
     for (std::size_t i = 0; i < N; i++) {
         if (i < std::_Light::__n_bits<unsigned long long>()) {
-            expect(b.test(i) == ((expected & (1ull << i)) != 0));
+            ASSERT(b.test(i) == ((expected & (1ull << i)) != 0));
         } else {
-            expect(!b.test(i));
+            ASSERT(!b.test(i));
         }
     }
 }

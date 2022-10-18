@@ -12,7 +12,7 @@ TEST() {
         ::std::abort();
     });
 
-    ::std::atexit([] { fail(); });
+    ::std::atexit([] { FAIL(); });
     ::std::atexit([] {
         step("second atexit");
         throw 5;

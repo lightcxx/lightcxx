@@ -21,48 +21,48 @@ struct B {
 };
 
 void function_with_default_parameter(std::source_location loc = std::source_location::current()) {
-    expect(loc.line() == 43);
-    expect(loc.column() > 0);
-    expect(strcmp(loc.function_name(), "test_") == 0);
-    expect(strstr(loc.file_name(), "construction.cpp") != nullptr);
+    ASSERT(loc.line() == 43);
+    ASSERT(loc.column() > 0);
+    ASSERT(strcmp(loc.function_name(), "test") == 0);
+    ASSERT(strstr(loc.file_name(), "construction.cpp") != nullptr);
 }
 
 TEST() {
     std::source_location loc;
-    expect(loc.line() == 0);
-    expect(loc.column() == 0);
-    expect(strcmp(loc.function_name(), "") == 0);
-    expect(strcmp(loc.file_name(), "") == 0);
+    ASSERT(loc.line() == 0);
+    ASSERT(loc.column() == 0);
+    ASSERT(strcmp(loc.function_name(), "") == 0);
+    ASSERT(strcmp(loc.file_name(), "") == 0);
 
     std::source_location current = std::source_location::current();
-    expect(current.line() == 37);
-    expect(current.column() > 0);
-    expect(strcmp(current.function_name(), "test_") == 0);
-    expect(strstr(current.file_name(), "construction.cpp") != nullptr);
+    ASSERT(current.line() == 37);
+    ASSERT(current.column() > 0);
+    ASSERT(strcmp(current.function_name(), "test") == 0);
+    ASSERT(strstr(current.file_name(), "construction.cpp") != nullptr);
 
     function_with_default_parameter();
 
     A a1;
-    expect(a1.loc.line() == 10);
-    expect(a1.loc.column() > 0);
-    expect(strcmp(a1.loc.function_name(), "A") == 0);
-    expect(strstr(a1.loc.file_name(), "construction.cpp") != nullptr);
+    ASSERT(a1.loc.line() == 10);
+    ASSERT(a1.loc.column() > 0);
+    ASSERT(strcmp(a1.loc.function_name(), "A") == 0);
+    ASSERT(strstr(a1.loc.file_name(), "construction.cpp") != nullptr);
 
     A a2(3);
-    expect(a2.loc.line() == 10);
-    expect(a2.loc.column() > 0);
-    expect(strcmp(a2.loc.function_name(), "A") == 0);
-    expect(strstr(a2.loc.file_name(), "construction.cpp") != nullptr);
+    ASSERT(a2.loc.line() == 10);
+    ASSERT(a2.loc.column() > 0);
+    ASSERT(strcmp(a2.loc.function_name(), "A") == 0);
+    ASSERT(strstr(a2.loc.file_name(), "construction.cpp") != nullptr);
 
     B b1;
-    expect(b1.a.loc.line() == 10);
-    expect(b1.a.loc.column() > 0);
-    expect(strcmp(b1.a.loc.function_name(), "A") == 0);
-    expect(strstr(b1.a.loc.file_name(), "construction.cpp") != nullptr);
+    ASSERT(b1.a.loc.line() == 10);
+    ASSERT(b1.a.loc.column() > 0);
+    ASSERT(strcmp(b1.a.loc.function_name(), "A") == 0);
+    ASSERT(strstr(b1.a.loc.file_name(), "construction.cpp") != nullptr);
 
     B b2(3);
-    expect(b2.a.loc.line() == 10);
-    expect(b2.a.loc.column() > 0);
-    expect(strcmp(b2.a.loc.function_name(), "A") == 0);
-    expect(strstr(b2.a.loc.file_name(), "construction.cpp") != nullptr);
+    ASSERT(b2.a.loc.line() == 10);
+    ASSERT(b2.a.loc.column() > 0);
+    ASSERT(strcmp(b2.a.loc.function_name(), "A") == 0);
+    ASSERT(strstr(b2.a.loc.file_name(), "construction.cpp") != nullptr);
 }

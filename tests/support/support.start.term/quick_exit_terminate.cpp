@@ -12,7 +12,7 @@ TEST() {
         ::std::abort();
     });
 
-    ::std::at_quick_exit([] { fail(); });
+    ::std::at_quick_exit([] { FAIL(); });
     ::std::at_quick_exit([] {
         step("second at_quick_exit");
         throw 5;

@@ -7,8 +7,8 @@
 
 TEST() {
     libc.aligned_alloc.replace([](std::size_t align, std::size_t size) -> void* {
-        expect(align == 128);
-        expect(size == 256);
+        ASSERT(align == 128);
+        ASSERT(size == 256);
         step("aligned_alloc");
         return nullptr;
     });
@@ -19,5 +19,5 @@ TEST() {
     });
 
     const auto const_ptr = ::operator new[](256, std::align_val_t{128}, std::nothrow);
-    expect(const_ptr == nullptr);
+    ASSERT(const_ptr == nullptr);
 }

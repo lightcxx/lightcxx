@@ -7,7 +7,7 @@
 
 struct FailPrinter {
     ~FailPrinter() {
-        fail();
+        FAIL();
     }
 };
 
@@ -19,7 +19,7 @@ TEST() {
     thread_local FailPrinter inline_t_local{};
     FailPrinter local;
 
-    ::std::atexit([] { fail(); });
+    ::std::atexit([] { FAIL(); });
 
     ::std::at_quick_exit([] { step("at_quick_exit"); });
 

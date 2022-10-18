@@ -26,8 +26,8 @@ class CFunctionInterceptor<R(Args...)> {
     Replacement* replacement = nullptr;
 
   public:
-    CFunctionInterceptor(const char* symbol)
-            : symbol(symbol) {}
+    CFunctionInterceptor(const char* sym)
+            : symbol(sym) {}
 
     void reset() {
         raw_replacement = nullptr;
@@ -64,7 +64,7 @@ class CFunctionInterceptor<R(Args...)> {
     }
 };
 
-struct LibCInterceptors {
+extern struct LibCInterceptors {
     CFunctionInterceptor<void*(::size_t)> malloc{"malloc"};
     CFunctionInterceptor<void(void*)> free{"free"};
     CFunctionInterceptor<void*(::size_t, ::size_t)> aligned_alloc{"aligned_alloc"};
@@ -73,22 +73,5 @@ struct LibCInterceptors {
 
 }  // namespace Testing
 
-extern "C" void* malloc(size_t size) {
-    return Testing::libc.malloc.invoke(size);
-}
-
-extern "C" void free(void* ptr) {
-    return Testing::libc.free.invoke(ptr);
-}
-
-extern "C" void* aligned_alloc(size_t align, size_t size) {
-    return Testing::libc.aligned_alloc.invoke(align, size);
-}
-
-extern "C" void abort() {
-    Testing::libc.abort.invoke();
-    printf("EXPECTATION FAILED: abort() did not abort.\n");
-    ::_Exit(1);
-}
-
 #endif
+

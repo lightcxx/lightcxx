@@ -24,12 +24,12 @@ TEST() {
         new int[one]{1, 2, 3};  // too many initializers: bad_array_new_length
         CLANG_DIAGNOSTIC_POP()
         GCC_DIAGNOSTIC_POP()
-        fail();
+        FAIL();
     } catch (const std::bad_array_new_length& e) {
-        expect(default_constructed.what() == e.what());
+        ASSERT(default_constructed.what() == e.what());
     } catch (std::bad_alloc& e) {
-        fail();
+        FAIL();
     } catch (...) {
-        fail();
+        FAIL();
     }
 }

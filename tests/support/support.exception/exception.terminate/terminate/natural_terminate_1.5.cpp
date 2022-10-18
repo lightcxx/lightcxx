@@ -1,5 +1,5 @@
 // EXPECT:STEPS terminate
-// EXPECT:EXIT KILLED BY SIGNAL SIGABRT
+// EXPECT:EXIT CODE = 3
 
 // This is based on clause [except.terminate], situation 1.5 from the note.
 
@@ -12,7 +12,7 @@ struct SetTerminateGlobal {
     SetTerminateGlobal() {
         std::set_terminate([]() {
             step("terminate");
-            ::abort();
+            ::_Exit(3);
         });
     }
 };

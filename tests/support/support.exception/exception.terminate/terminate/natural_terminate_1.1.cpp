@@ -33,7 +33,7 @@ TEST() {
     try {
         throw NonCompliantException();
     } catch (NonCompliantException copy) {
-        fail();
+        FAIL();
     }
 }
 GCC_DIAGNOSTIC_POP()
