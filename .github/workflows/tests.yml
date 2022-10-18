@@ -15,7 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Check
-        run: ${{github.workspace}}/tools/scripts/check_ci.sh clang clang++ ${{ matrix.build_type }}
+        run: ${{github.workspace}}/scripts/check_ci.sh clang clang++ ${{ matrix.build_type }}
 
   clang-ubuntu-22-04:
     strategy:
@@ -27,7 +27,7 @@ jobs:
       - name: Install Clang
         run: sudo apt install -y clang
       - name: Check
-        run: ${{github.workspace}}/tools/scripts/check_ci.sh clang clang++ ${{ matrix.build_type }}
+        run: ${{github.workspace}}/scripts/check_ci.sh clang clang++ ${{ matrix.build_type }}
 
   gcc-ubuntu-22-04:
     strategy:
@@ -39,4 +39,4 @@ jobs:
       - name: Install GCC
         run: sudo apt install -y gcc g++
       - name: Check
-        run: ${{github.workspace}}/tools/scripts/check_ci.sh gcc g++ ${{ matrix.build_type }}
+        run: ${{github.workspace}}/scripts/check_ci.sh gcc g++ ${{ matrix.build_type }}
