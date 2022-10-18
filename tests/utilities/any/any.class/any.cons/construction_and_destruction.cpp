@@ -152,7 +152,7 @@ TEST(value_ctor_lvalue) {
     cnttype::reset();
     std::any any_val(val);
     ASSERT(any_val.has_value());
-    ASSERT(any_cast<cnttype>(&any_val)->val == 7);
+    ASSERT(any_cast<cnttype&>(any_val).val == 7);
     ASSERT(any_val.type() == typeid(cnttype));
     ASSERT(cnttype::copy_ctor_count == 1);
     ASSERT(cnttype::move_ctor_count == 0);
@@ -163,7 +163,7 @@ TEST(value_ctor_rvalue_move) {
     cnttype::reset();
     std::any any_val(std::move(val));
     ASSERT(any_val.has_value());
-    ASSERT(any_cast<cnttype>(&any_val)->val == 7);
+    ASSERT(any_cast<cnttype&>(any_val).val == 7);
     ASSERT(any_val.type() == typeid(cnttype));
     ASSERT(cnttype::copy_ctor_count == 0);
     ASSERT(cnttype::move_ctor_count == 1);
@@ -173,7 +173,7 @@ TEST(value_ctor_rvalue_temporary) {
     cnttype::reset();
     std::any any_val(cnttype{7});
     ASSERT(any_val.has_value());
-    ASSERT(any_cast<cnttype>(&any_val)->val == 7);
+    ASSERT(any_cast<cnttype&>(any_val).val == 7);
     ASSERT(any_val.type() == typeid(cnttype));
     ASSERT(cnttype::copy_ctor_count == 0);
     ASSERT(cnttype::move_ctor_count == 1);
@@ -226,7 +226,7 @@ TEST(value_ctor_implicit) {
     cnttype::reset();
     [](std::any any_val) {
         ASSERT(any_val.has_value());
-        ASSERT(any_cast<cnttype>(&any_val)->val == 7);
+        ASSERT(any_cast<cnttype&>(any_val).val == 7);
         ASSERT(any_val.type() == typeid(cnttype));
     }(cnttype{7});
     ASSERT(cnttype::move_ctor_count <= 1);
@@ -236,7 +236,7 @@ TEST(in_place_ctor_small) {
     cnttype::reset();
     std::any any_val(std::in_place_type<cnttype>, 7);
     ASSERT(any_val.has_value());
-    ASSERT(any_cast<cnttype>(&any_val)->val == 7);
+    ASSERT(any_cast<cnttype&>(any_val).val == 7);
     ASSERT(any_val.type() == typeid(cnttype));
     ASSERT(cnttype::copy_ctor_count == 0);
     ASSERT(cnttype::move_ctor_count == 0);
@@ -322,3 +322,4 @@ TEST(dtor) {
     }
     ASSERT(cnttype::dtor_count == 2);  // deleted moved-from instance
 }
+

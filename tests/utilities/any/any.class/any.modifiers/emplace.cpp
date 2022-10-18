@@ -44,7 +44,7 @@ TEST(emplace_to_no_val) {
     ASSERT_TYPE(cnttype&, result);
     ASSERT(result.val == 7);
     ASSERT(target.has_value());
-    ASSERT(any_cast<cnttype>(&target)->val == 7);
+    ASSERT(any_cast<cnttype&>(target).val == 7);
     ASSERT(target.type() == typeid(cnttype));
     ASSERT(cnttype::copy_ctor_count == 0);
     ASSERT(cnttype::move_ctor_count == 0);
@@ -57,7 +57,7 @@ TEST(emplace_initlist_to_no_val) {
     ASSERT_TYPE(large_cnttype&, result);
     ASSERT(result.nested.val == -777);
     ASSERT(target.has_value());
-    ASSERT(any_cast<large_cnttype>(&target)->nested.val == -777);
+    ASSERT(any_cast<large_cnttype&>(target).nested.val == -777);
     ASSERT(target.type() == typeid(large_cnttype));
     ASSERT(cnttype::copy_ctor_count == 0);
     ASSERT(cnttype::move_ctor_count == 0);
@@ -137,7 +137,7 @@ TEST(emplace_to_small_val) {
     ASSERT_TYPE(cnttype&, result);
     ASSERT(result.val == 7);
     ASSERT(target.has_value());
-    ASSERT(any_cast<cnttype>(&target)->val == 7);
+    ASSERT(any_cast<cnttype&>(target).val == 7);
     ASSERT(target.type() == typeid(cnttype));
     ASSERT(cnttype::dtor_count == 1);
     ASSERT(cnttype::copy_ctor_count == 0);
@@ -151,7 +151,7 @@ TEST(emplace_initlist_to_small_val) {
     ASSERT_TYPE(large_cnttype&, result);
     ASSERT(result.nested.val == -777);
     ASSERT(target.has_value());
-    ASSERT(any_cast<large_cnttype>(&target)->nested.val == -777);
+    ASSERT(any_cast<large_cnttype&>(target).nested.val == -777);
     ASSERT(target.type() == typeid(large_cnttype));
     ASSERT(cnttype::dtor_count == 1);
     ASSERT(cnttype::copy_ctor_count == 0);
@@ -257,7 +257,7 @@ TEST(emplace_to_large_val) {
     ASSERT_TYPE(cnttype&, result);
     ASSERT(result.val == 7);
     ASSERT(target.has_value());
-    ASSERT(any_cast<cnttype>(&target)->val == 7);
+    ASSERT(any_cast<cnttype&>(target).val == 7);
     ASSERT(target.type() == typeid(cnttype));
     ASSERT(cnttype::dtor_count == 1);
     ASSERT(cnttype::copy_ctor_count == 0);
@@ -271,7 +271,7 @@ TEST(emplace_initlist_to_large_val) {
     ASSERT_TYPE(large_cnttype&, result);
     ASSERT(result.nested.val == -777);
     ASSERT(target.has_value());
-    ASSERT(any_cast<large_cnttype>(&target)->nested.val == -777);
+    ASSERT(any_cast<large_cnttype&>(target).nested.val == -777);
     ASSERT(target.type() == typeid(large_cnttype));
     ASSERT(cnttype::dtor_count == 1);
     ASSERT(cnttype::copy_ctor_count == 0);

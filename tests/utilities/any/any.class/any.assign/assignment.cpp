@@ -109,12 +109,12 @@ TEST(copy_assign_small_val_to_small_val) {
     ASSERT(cnttype::copy_ctor_count == 1);
     ASSERT(target.has_value());
     ASSERT(target.type() == typeid(cnttype));
-    ASSERT(any_cast<cnttype>(&target) != nullptr);
-    ASSERT(any_cast<cnttype>(&target)->val == 345);
+    auto* ptr = any_cast<cnttype>(&target);
+    ASSERT(ptr != nullptr && ptr->val == 345);
     ASSERT(source.has_value());
     ASSERT(source.type() == typeid(cnttype));
-    ASSERT(any_cast<cnttype>(&source) != nullptr);
-    ASSERT(any_cast<cnttype>(&source)->val == 345);
+    ptr = any_cast<cnttype>(&source);
+    ASSERT(ptr != nullptr && ptr->val == 345);
 }
 
 TEST(copy_assign_large_val_to_small_val) {
@@ -128,12 +128,12 @@ TEST(copy_assign_large_val_to_small_val) {
     ASSERT(cnttype::copy_ctor_count == 1);
     ASSERT(target.has_value());
     ASSERT(target.type() == typeid(large_cnttype));
-    ASSERT(any_cast<large_cnttype>(&target) != nullptr);
-    ASSERT(any_cast<large_cnttype>(&target)->nested.val == 345);
+    auto* ptr = any_cast<large_cnttype>(&target);
+    ASSERT(ptr != nullptr && ptr->nested.val == 345);
     ASSERT(source.has_value());
     ASSERT(source.type() == typeid(large_cnttype));
-    ASSERT(any_cast<large_cnttype>(&source) != nullptr);
-    ASSERT(any_cast<large_cnttype>(&source)->nested.val == 345);
+    ptr = any_cast<large_cnttype>(&source);
+    ASSERT(ptr != nullptr && ptr->nested.val == 345);
 }
 
 TEST(copy_assign_exception_to_small_val) {
@@ -150,8 +150,8 @@ TEST(copy_assign_exception_to_small_val) {
     ASSERT(cnttype::dtor_count == 0);
     ASSERT(target.has_value());
     ASSERT(target.type() == typeid(cnttype));
-    ASSERT(any_cast<cnttype>(&target) != nullptr);
-    ASSERT(any_cast<cnttype>(&target)->val == 777);
+    auto* ptr = any_cast<cnttype>(&target);
+    ASSERT(ptr != nullptr && ptr->val == 777);
     ASSERT(source.has_value());
     ASSERT(source.type() == typeid(throwing_ctor));
     ASSERT(any_cast<throwing_ctor>(&source) != nullptr);
@@ -180,12 +180,12 @@ TEST(copy_assign_small_val_to_large_val) {
     ASSERT(cnttype::copy_ctor_count == 1);
     ASSERT(target.has_value());
     ASSERT(target.type() == typeid(cnttype));
-    ASSERT(any_cast<cnttype>(&target) != nullptr);
-    ASSERT(any_cast<cnttype>(&target)->val == 345);
+    auto* ptr = any_cast<cnttype>(&target);
+    ASSERT(ptr != nullptr && ptr->val == 345);
     ASSERT(source.has_value());
     ASSERT(source.type() == typeid(cnttype));
-    ASSERT(any_cast<cnttype>(&source) != nullptr);
-    ASSERT(any_cast<cnttype>(&source)->val == 345);
+    ptr = any_cast<cnttype>(&source);
+    ASSERT(ptr != nullptr && ptr->val == 345);
 }
 
 TEST(copy_assign_large_val_to_large_val) {
@@ -199,12 +199,12 @@ TEST(copy_assign_large_val_to_large_val) {
     ASSERT(cnttype::copy_ctor_count == 1);
     ASSERT(target.has_value());
     ASSERT(target.type() == typeid(large_cnttype));
-    ASSERT(any_cast<large_cnttype>(&target) != nullptr);
-    ASSERT(any_cast<large_cnttype>(&target)->nested.val == 345);
+    auto* ptr = any_cast<large_cnttype>(&target);
+    ASSERT(ptr != nullptr && ptr->nested.val == 345);
     ASSERT(source.has_value());
     ASSERT(source.type() == typeid(large_cnttype));
-    ASSERT(any_cast<large_cnttype>(&source) != nullptr);
-    ASSERT(any_cast<large_cnttype>(&source)->nested.val == 345);
+    ptr = any_cast<large_cnttype>(&source);
+    ASSERT(ptr != nullptr && ptr->nested.val == 345);
 }
 
 TEST(copy_assign_exception_to_large_val) {
@@ -221,8 +221,8 @@ TEST(copy_assign_exception_to_large_val) {
     ASSERT(cnttype::dtor_count == 0);
     ASSERT(target.has_value());
     ASSERT(target.type() == typeid(large_cnttype));
-    ASSERT(any_cast<large_cnttype>(&target) != nullptr);
-    ASSERT(any_cast<large_cnttype>(&target)->nested.val == 777);
+    auto* ptr = any_cast<large_cnttype>(&target);
+    ASSERT(ptr != nullptr && ptr->nested.val == 777);
     ASSERT(source.has_value());
     ASSERT(source.type() == typeid(throwing_ctor));
     ASSERT(any_cast<throwing_ctor>(&source) != nullptr);
@@ -242,8 +242,8 @@ TEST(copy_assign_self_assign) {
     ASSERT(cnttype::dtor_count == 0);
     ASSERT(source.has_value());
     ASSERT(source.type() == typeid(large_cnttype));
-    ASSERT(any_cast<large_cnttype>(&source) != nullptr);
-    ASSERT(any_cast<large_cnttype>(&source)->nested.val == 345);
+    auto* ptr = any_cast<large_cnttype>(&source);
+    ASSERT(ptr != nullptr && ptr->nested.val == 345);
 }
 
 TEST(move_assign_no_val_to_no_val) {
@@ -313,8 +313,8 @@ TEST(move_assign_small_val_to_small_val) {
     ASSERT(cnttype::move_ctor_count <= 1);
     ASSERT(target.has_value());
     ASSERT(target.type() == typeid(cnttype));
-    ASSERT(any_cast<cnttype>(&target) != nullptr);
-    ASSERT(any_cast<cnttype>(&target)->val == 345);
+    auto* ptr = any_cast<cnttype>(&target);
+    ASSERT(ptr != nullptr && ptr->val == 345);
     ASSERT(!source.has_value());
 }
 
@@ -330,8 +330,8 @@ TEST(move_assign_large_val_to_small_val) {
     ASSERT(cnttype::move_ctor_count == 0);
     ASSERT(target.has_value());
     ASSERT(target.type() == typeid(large_cnttype));
-    ASSERT(any_cast<large_cnttype>(&target) != nullptr);
-    ASSERT(any_cast<large_cnttype>(&target)->nested.val == 345);
+    auto* ptr = any_cast<large_cnttype>(&target);
+    ASSERT(ptr != nullptr && ptr->nested.val == 345);
     ASSERT(!source.has_value());
 }
 
@@ -361,8 +361,8 @@ TEST(move_assign_small_val_to_large_val) {
     ASSERT(cnttype::move_ctor_count <= 1);
     ASSERT(target.has_value());
     ASSERT(target.type() == typeid(cnttype));
-    ASSERT(any_cast<cnttype>(&target) != nullptr);
-    ASSERT(any_cast<cnttype>(&target)->val == 345);
+    auto* ptr = any_cast<cnttype>(&target);
+    ASSERT(ptr != nullptr && ptr->val == 345);
     ASSERT(!source.has_value());
 }
 
@@ -378,8 +378,8 @@ TEST(move_assign_large_val_to_large_val) {
     ASSERT(cnttype::move_ctor_count == 0);
     ASSERT(target.has_value());
     ASSERT(target.type() == typeid(large_cnttype));
-    ASSERT(any_cast<large_cnttype>(&target) != nullptr);
-    ASSERT(any_cast<large_cnttype>(&target)->nested.val == 345);
+    auto* ptr = any_cast<large_cnttype>(&target);
+    ASSERT(ptr != nullptr && ptr->nested.val == 345);
     ASSERT(!source.has_value());
 }
 
@@ -397,8 +397,8 @@ TEST(move_assign_self_assign) {
     ASSERT(cnttype::dtor_count == 0);
     ASSERT(source.has_value());
     ASSERT(source.type() == typeid(large_cnttype));
-    ASSERT(any_cast<large_cnttype>(&source) != nullptr);
-    ASSERT(any_cast<large_cnttype>(&source)->nested.val == 345);
+    auto* ptr = any_cast<large_cnttype>(&source);
+    ASSERT(ptr != nullptr && ptr->nested.val == 345);
 }
 
 TEST(value_assign_lvalue_to_no_val) {
@@ -408,7 +408,8 @@ TEST(value_assign_lvalue_to_no_val) {
     auto& result = (target = source);
     ASSERT(&result == &target);
     ASSERT(target.has_value());
-    ASSERT(any_cast<cnttype>(&target)->val == 7);
+    auto* ptr = any_cast<cnttype>(&target);
+    ASSERT(ptr != nullptr && ptr->val == 7);
     ASSERT(target.type() == typeid(cnttype));
     ASSERT(cnttype::copy_ctor_count == 1);
     ASSERT(cnttype::move_ctor_count == 0);
@@ -421,7 +422,8 @@ TEST(value_assign_rvalue_move_to_no_val) {
     auto& result = (target = std::move(source));
     ASSERT(&result == &target);
     ASSERT(target.has_value());
-    ASSERT(any_cast<cnttype>(&target)->val == 7);
+    auto* ptr = any_cast<cnttype>(&target);
+    ASSERT(ptr != nullptr && ptr->val == 7);
     ASSERT(target.type() == typeid(cnttype));
     ASSERT(cnttype::copy_ctor_count == 0);
     ASSERT(cnttype::move_ctor_count == 1);
@@ -433,7 +435,8 @@ TEST(value_assign_rvalue_temporary_to_no_val) {
     auto& result = (target = cnttype{7});
     ASSERT(&result == &target);
     ASSERT(target.has_value());
-    ASSERT(any_cast<cnttype>(&target)->val == 7);
+    auto* ptr = any_cast<cnttype>(&target);
+    ASSERT(ptr != nullptr && ptr->val == 7);
     ASSERT(target.type() == typeid(cnttype));
     ASSERT(cnttype::copy_ctor_count == 0);
     ASSERT(cnttype::move_ctor_count == 1);
@@ -499,7 +502,8 @@ TEST(value_assign_lvalue_to_small_val) {
     auto& result = (target = source);
     ASSERT(&result == &target);
     ASSERT(target.has_value());
-    ASSERT(any_cast<cnttype>(&target)->val == 7);
+    auto* ptr = any_cast<cnttype>(&target);
+    ASSERT(ptr != nullptr && ptr->val == 7);
     ASSERT(target.type() == typeid(cnttype));
     ASSERT(cnttype::dtor_count == 1);
     ASSERT(cnttype::copy_ctor_count == 1);
@@ -513,7 +517,8 @@ TEST(value_assign_rvalue_move_to_small_val) {
     auto& result = (target = std::move(source));
     ASSERT(&result == &target);
     ASSERT(target.has_value());
-    ASSERT(any_cast<cnttype>(&target)->val == 7);
+    auto* ptr = any_cast<cnttype>(&target);
+    ASSERT(ptr != nullptr && ptr->val == 7);
     ASSERT(target.type() == typeid(cnttype));
     ASSERT(cnttype::dtor_count == 1);
     ASSERT(cnttype::copy_ctor_count == 0);
@@ -526,7 +531,8 @@ TEST(value_assign_rvalue_temporary_to_small_val) {
     auto& result = (target = cnttype{7});
     ASSERT(&result == &target);
     ASSERT(target.has_value());
-    ASSERT(any_cast<cnttype>(&target)->val == 7);
+    auto* ptr = any_cast<cnttype>(&target);
+    ASSERT(ptr != nullptr && ptr->val == 7);
     ASSERT(target.type() == typeid(cnttype));
     ASSERT(cnttype::dtor_count == 2);  // one for the temporary variable
     ASSERT(cnttype::copy_ctor_count == 0);
@@ -600,7 +606,8 @@ TEST(value_assign_exception_move_to_small_val) {
     } catch (const throwing_ctor::move_exc&) {
     }
     ASSERT(target.has_value());
-    ASSERT(any_cast<cnttype>(&target)->val == 7);
+    auto* ptr = any_cast<cnttype>(&target);
+    ASSERT(ptr != nullptr && ptr->val == 7);
     ASSERT(target.type() == typeid(cnttype));
 }
 
@@ -611,7 +618,8 @@ TEST(value_assign_lvalue_to_large_val) {
     auto& result = (target = source);
     ASSERT(&result == &target);
     ASSERT(target.has_value());
-    ASSERT(any_cast<cnttype>(&target)->val == 7);
+    auto* ptr = any_cast<cnttype>(&target);
+    ASSERT(ptr != nullptr && ptr->val == 7);
     ASSERT(target.type() == typeid(cnttype));
     ASSERT(cnttype::dtor_count == 1);
     ASSERT(cnttype::copy_ctor_count == 1);
@@ -625,7 +633,8 @@ TEST(value_assign_rvalue_move_to_large_val) {
     auto& result = (target = std::move(source));
     ASSERT(&result == &target);
     ASSERT(target.has_value());
-    ASSERT(any_cast<cnttype>(&target)->val == 7);
+    auto* ptr = any_cast<cnttype>(&target);
+    ASSERT(ptr != nullptr && ptr->val == 7);
     ASSERT(target.type() == typeid(cnttype));
     ASSERT(cnttype::dtor_count == 1);
     ASSERT(cnttype::copy_ctor_count == 0);
@@ -638,7 +647,8 @@ TEST(value_assign_rvalue_temporary_to_large_val) {
     auto& result = (target = cnttype{7});
     ASSERT(&result == &target);
     ASSERT(target.has_value());
-    ASSERT(any_cast<cnttype>(&target)->val == 7);
+    auto* ptr = any_cast<cnttype>(&target);
+    ASSERT(ptr != nullptr && ptr->val == 7);
     ASSERT(target.type() == typeid(cnttype));
     ASSERT(cnttype::dtor_count == 2);  // one for the temporary variable
     ASSERT(cnttype::copy_ctor_count == 0);
@@ -697,7 +707,8 @@ TEST(value_assign_exception_copy_to_large_val) {
     } catch (const throwing_ctor::copy_exc&) {
     }
     ASSERT(target.has_value());
-    ASSERT(any_cast<large_cnttype>(&target)->nested.val == 7);
+    auto* ptr = any_cast<large_cnttype>(&target);
+    ASSERT(ptr != nullptr && ptr->nested.val == 7);
     ASSERT(target.type() == typeid(large_cnttype));
 }
 
@@ -712,6 +723,8 @@ TEST(value_assign_exception_move_to_large_val) {
     } catch (const throwing_ctor::move_exc&) {
     }
     ASSERT(target.has_value());
-    ASSERT(any_cast<large_cnttype>(&target)->nested.val == 7);
+    auto* ptr = any_cast<large_cnttype>(&target);
+    ASSERT(ptr != nullptr && ptr->nested.val == 7);
     ASSERT(target.type() == typeid(large_cnttype));
 }
+

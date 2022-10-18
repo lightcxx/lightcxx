@@ -19,8 +19,8 @@ TEST(any_cast_const_ptr_with_incorrect_value) {
 
 TEST(any_cast_const_ptr_with_correct_value) {
     const std::any a(7);
-    ASSERT(any_cast<const int>(&a) != nullptr);
-    ASSERT(*any_cast<const int>(&a) == 7);
+    auto* ptr = any_cast<const int>(&a);
+    ASSERT(ptr != nullptr && *ptr == 7);
 }
 
 TEST(any_cast_nonconst_ptr_no_value) {
@@ -39,10 +39,10 @@ TEST(any_cast_nonconst_ptr_with_incorrect_value) {
 
 TEST(any_cast_nonconst_ptr_with_correct_value) {
     std::any a(7);
-    ASSERT(any_cast<int>(&a) != nullptr);
-    ASSERT(*any_cast<int>(&a) == 7);
-    ASSERT(any_cast<const int>(&a) != nullptr);
-    ASSERT(*any_cast<const int>(&a) == 7);
+    auto* ptr = any_cast<int>(&a);
+    ASSERT(ptr != nullptr && *ptr == 7);
+    auto* c_ptr = any_cast<const int>(&a);
+    ASSERT(c_ptr != nullptr && *c_ptr == 7);
 }
 
 TEST(any_cast_const_ref_no_value) {
@@ -372,3 +372,4 @@ TEST(any_cast_rvalue_ref_valid_value) {
     ASSERT(cnttype::move_assign_count == 0);
     ASSERT(cnttype::dtor_count == 0);
 }
+

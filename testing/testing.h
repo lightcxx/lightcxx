@@ -3,7 +3,7 @@
 
 extern "C" void step(const char* msg);
 
-extern "C" void testing_fail_impl(const char* func, const char* file, const char* line);
+extern "C" [[noreturn]] void testing_fail_impl(const char* func, const char* file, const char* line);
 
 extern "C" void testing_register_test(void (*test)(), void* buffer[2]);
 

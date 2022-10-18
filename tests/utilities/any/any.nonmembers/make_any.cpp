@@ -38,7 +38,7 @@ TEST(make_any_small) {
     cnttype::reset();
     std::any any_val = std::make_any<cnttype>(7);
     ASSERT(any_val.has_value());
-    ASSERT(any_cast<cnttype>(&any_val)->val == 7);
+    ASSERT(any_cast<cnttype&>(any_val).val == 7);
     ASSERT(any_val.type() == typeid(cnttype));
     ASSERT(cnttype::copy_ctor_count == 0);
     ASSERT(cnttype::move_ctor_count == 0);

@@ -24,7 +24,7 @@ TEST(swap_no_val_small_val) {
     a.swap(b);
     ASSERT(a.has_value());
     ASSERT(a.type() == typeid(cnttype));
-    ASSERT(any_cast<cnttype>(&a)->val == 5);
+    ASSERT(any_cast<cnttype&>(a).val == 5);
     ASSERT(!b.has_value());
     ASSERT(cnttype::copy_assign_count == 0);
     ASSERT(cnttype::copy_ctor_count == 0);
@@ -38,7 +38,7 @@ TEST(swap_small_val_no_val) {
     b.swap(a);
     ASSERT(a.has_value());
     ASSERT(a.type() == typeid(cnttype));
-    ASSERT(any_cast<cnttype>(&a)->val == 5);
+    ASSERT(any_cast<cnttype&>(a).val == 5);
     ASSERT(!b.has_value());
     ASSERT(cnttype::copy_assign_count == 0);
     ASSERT(cnttype::copy_ctor_count == 0);
@@ -52,10 +52,10 @@ TEST(swap_small_val_small_val) {
     a.swap(b);
     ASSERT(a.has_value());
     ASSERT(a.type() == typeid(cnttype));
-    ASSERT(any_cast<cnttype>(&a)->val == 5);
+    ASSERT(any_cast<cnttype&>(a).val == 5);
     ASSERT(b.has_value());
     ASSERT(b.type() == typeid(cnttype));
-    ASSERT(any_cast<cnttype>(&b)->val == 7);
+    ASSERT(any_cast<cnttype&>(b).val == 7);
     ASSERT(cnttype::copy_assign_count == 0);
     ASSERT(cnttype::copy_ctor_count == 0);
     ASSERT(cnttype::dtor_count == 0);
