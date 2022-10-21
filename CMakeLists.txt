@@ -126,6 +126,7 @@ set(LIGHTCXX_SRCS
         ${CMAKE_CURRENT_SOURCE_DIR}/src/handler.c
         ${CMAKE_CURRENT_SOURCE_DIR}/src/new.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/stdexcept.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/system_error.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/typeinfo.cpp)
 
 add_library(lightcxx_static STATIC ${LIGHTCXX_SRCS} $<TARGET_OBJECTS:third_party_libcxxabi_object>)
