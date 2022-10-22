@@ -16,4 +16,4 @@ echo "Install locally"
 make -C ${CMAKE_BUILD_DIR} install
 
 echo "Run tests"
-make -C ${CMAKE_BUILD_DIR} test
+make -C ${CMAKE_BUILD_DIR} test systest

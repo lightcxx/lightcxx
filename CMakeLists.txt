@@ -183,4 +183,26 @@ if (LIGHTCXX_ENABLE_TESTS)
         target_link_libraries(test_sources PUBLIC lightcxx_static testing)
         target_include_directories(test_sources PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/testing)
     endif ()
+
+    add_library(systest_light OBJECT
+            ${CMAKE_CURRENT_SOURCE_DIR}/systest/errno_light.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/systest/stdint_light.cpp
+            )
+    target_link_libraries(systest_light PRIVATE lightcxx_static)
+    AddTargetCompileWarnings(systest_light)
+
+    add_library(systest_libc OBJECT
+            ${CMAKE_CURRENT_SOURCE_DIR}/systest/errno_libc.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/systest/stdint_libc.cpp
+            )
+    target_compile_options(systest_libc PRIVATE $<$<COMPILE_LANGUAGE:CXX>:-nostdinc++>)
+    target_include_directories(systest_libc PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+    AddTargetCompileWarnings(systest_libc)
+
+    add_executable(systest_exe
+            ${CMAKE_CURRENT_SOURCE_DIR}/systest/main.cpp
+            $<TARGET_OBJECTS:systest_light>
+            $<TARGET_OBJECTS:systest_libc>)
+    target_link_libraries(systest_exe lightcxx_static)
+    add_custom_target(systest COMMAND systest_exe DEPENDS systest_exe)
 endif ()
