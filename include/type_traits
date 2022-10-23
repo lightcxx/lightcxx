@@ -48,8 +48,15 @@ inline constexpr bool is_same_v = false;
 template<class _T>
 inline constexpr bool is_same_v<_T, _T> = true;
 
+namespace _Light {
+
 template<class _T, class _U>
-concept same_as = is_same_v<_T, _U>;
+concept __same_as = is_same_v<_T, _U>;
+
+}  // namespace _Light
+
+template<class _T, class _U>
+concept same_as = _Light::__same_as<_T, _U> && _Light::__same_as<_U, _T>;
 
 // endregion
 

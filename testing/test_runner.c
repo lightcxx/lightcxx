@@ -1628,6 +1628,10 @@ int main(int argc, char** argv) {
     struct tests_db tests;
     tests_db_init(&tests, num_jobs);
     tests_db_scan(&tests, test_dir, cache_dir);
+    double duration_millis = chronometer_ms_elapsed(timer);
+    printf("\nFound %zu test files in %.3lfms\n", tests.num_tests, duration_millis);
+
+    timer = chronometer_start();
     tests_db_prepare(&tests);
 
     size_t num_test_files = tests.num_tests + tests.num_mis_configured_tests;
@@ -1652,6 +1656,12 @@ int main(int argc, char** argv) {
            tests.num_neg_compile_tests > 1 ? "s" : "");
 
     size_t num_tests_succeeded = tests_db_execute(&tests);
+    duration_millis = chronometer_ms_elapsed(timer);
+    const char* duration_suffix = "ms";
+    if (duration_millis > 100) {
+        duration_millis /= 1000;
+        duration_suffix = "s";
+    }
 
     if (tests.num_mis_configured_tests > 0) {
         printf("%s%zu test%s mis-configured.%s\n",

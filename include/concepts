@@ -1,0 +1,32 @@
+#ifndef _LIGHTCXX_GUARD_CONCEPTS
+#define _LIGHTCXX_GUARD_CONCEPTS
+
+#include <type_traits>
+
+namespace std {
+
+using ::std::same_as;  // defined in <type_traits>
+
+template<class _Derived, class _Base>
+concept derived_from = is_base_of_v<_Base, _Derived> && is_convertible_v<const volatile _Derived*, const volatile _Base*>;
+
+template<class _From, class _To>
+concept convertible_to = is_convertible_v<_From, _To> && requires(add_rvalue_reference_t<_From> (&__f)()) {
+                                                             static_cast<_To>(__f());
+                                                         };
+
+template<class _T>
+concept integral = is_integral_v<_T>;
+
+template<class _T>
+concept signed_integral = integral<_T> && is_signed_v<_T>;
+
+template<class _T>
+concept unsigned_integral = integral<_T> && !signed_integral<_T>;
+
+template<class _T>
+concept floating_point = is_floating_point_v<_T>;
+
+}  // namespace std
+
+#endif
