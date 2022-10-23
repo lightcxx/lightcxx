@@ -28,18 +28,38 @@ const char* describe_type_alias(char* buf, const char* name) {
 }
 
 template<class T>
-const char* describe_constant(char* buf, const char* name, T value) {
-    constexpr const char* hex_digits = "0123456789ABCDEF";
+void describe_constant_value(char* buf, T) {
+    *buf  = '\0';
+}
 
-    auto offset = sprintf(buf,
-                          "const=%s size=%zu alignment=%zu rtti='%s' (%p) value=0x",
-                          name, sizeof(decltype(value)), alignof(decltype(value)),
-                          typeid(value).name(), static_cast<const void*>(typeid(value).name()));
+inline void describe_constant_value(char* buf, int value) {
+    sprintf(buf, " (%d)", value);
+}
+
+inline void describe_constant_value(char* buf, unsigned int value) {
+    sprintf(buf, " (%u)", value);
+}
+
+inline void describe_constant_value(char* buf, long value) {
+    sprintf(buf, " (%ld)", value);
+}
+
+inline void describe_constant_value(char* buf, unsigned long value) {
+    sprintf(buf, " (%lu)", value);
+}
+
+template<class T>
+const char* describe_constant(char* buf, const char* name, T value) {
+    int offset = sprintf(buf,
+                         "const=%s size=%zu alignment=%zu rtti='%s' (%p) value=0x",
+                         name, sizeof(decltype(value)), alignof(decltype(value)),
+                         typeid(value).name(), static_cast<const void*>(typeid(value).name()));
+    constexpr const char* hex_digits = "0123456789ABCDEF";
     const unsigned char* bytes = reinterpret_cast<const unsigned char*>(&value);
     for (int i = 0; i < static_cast<int>(sizeof(value)); i++) {
         buf[offset++] = hex_digits[bytes[i] >> 4];
         buf[offset++] = hex_digits[bytes[i] & 15];
     }
-    buf[offset] = '\0';
+    describe_constant_value(buf + offset, value);
     return buf;
 }

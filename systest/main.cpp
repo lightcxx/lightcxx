@@ -12,6 +12,7 @@ struct test_case {
 
 static int run_test_case(test_case t_case, int index) {
     int test_index;
+    int result = EXIT_SUCCESS;
     for (test_index = 0;; test_index++) {
         auto a = t_case.light(test_index);
         auto b = t_case.reference(test_index);
@@ -37,12 +38,13 @@ static int run_test_case(test_case t_case, int index) {
                    "  light     stream line: %s\n"
                    "  reference stream line: %s\n",
                    index, t_case.name, test_index, a, b);
-            return EXIT_FAILURE;
+            result = EXIT_FAILURE;
+        } else {
+            printf("systest case %d %s: test %d succeeded: %s\n",
+                   index,  t_case.name, test_index, a);
         }
-        printf("systest case %d %s: test %d succeeded: %s\n",
-               index,  t_case.name, test_index, a);
     }
-    return EXIT_SUCCESS;
+    return result;
 }
 
 template<size_t N>
