@@ -1,6 +1,31 @@
 #ifndef _LIGHTCXX_GUARD_CSTDINT
 #define _LIGHTCXX_GUARD_CSTDINT
 
+// TODO: Clang's values diverge from libc implementation, investigate further / file a bug!
+#ifdef __clang__
+#    ifdef __linux__
+#        undef __INT_FAST16_TYPE__
+#        define __INT_FAST16_TYPE__ long
+#        undef __INT_FAST16_MAX__
+#        define __INT_FAST16_MAX__ 9223372036854775807L
+
+#        undef __INT_FAST32_TYPE__
+#        define __INT_FAST32_TYPE__ long
+#        undef __INT_FAST32_MAX__
+#        define __INT_FAST32_MAX__ 9223372036854775807L
+
+#        undef __UINT_FAST16_TYPE__
+#        define __UINT_FAST16_TYPE__ unsigned long
+#        undef __UINT_FAST16_MAX__
+#        define __UINT_FAST16_MAX__ 18446744073709551615UL
+
+#        undef __UINT_FAST32_TYPE__
+#        define __UINT_FAST32_TYPE__ unsigned long
+#        undef __UINT_FAST32_MAX__
+#        define __UINT_FAST32_MAX__ 18446744073709551615UL
+#    endif
+#endif
+
 namespace std {
 
 using int8_t = __INT8_TYPE__;
@@ -65,29 +90,6 @@ using uintptr_t = __UINTPTR_TYPE__;
 #    define WINT_MIN __WINT_MIN__
 #endif
 #define WINT_MAX __WINT_MAX__
-
-// TODO: Clang's values diverge from libc implementation, investigate further / file a bug!
-#if __clang__ && !__APPLE__
-#    undef __INT_FAST16_TYPE__
-#    define __INT_FAST16_TYPE__ long
-#    undef __INT_FAST16_MAX__
-#    define __INT_FAST16_MAX__ 9223372036854775807L
-
-#    undef __INT_FAST32_TYPE__
-#    define __INT_FAST32_TYPE__ long
-#    undef __INT_FAST32_MAX__
-#    define __INT_FAST32_MAX__ 9223372036854775807L
-
-#    undef __UINT_FAST16_TYPE__
-#    define __UINT_FAST16_TYPE__ unsigned long
-#    undef __UINT_FAST16_MAX__
-#    define __UINT_FAST16_MAX__ 18446744073709551615UL
-
-#    undef __UINT_FAST32_TYPE__
-#    define __UINT_FAST32_TYPE__ unsigned long
-#    undef __UINT_FAST32_MAX__
-#    define __UINT_FAST32_MAX__ 18446744073709551615UL
-#endif
 
 #define INT8_MIN (-__INT8_MAX__ - 1)
 #define INT8_MAX __INT8_MAX__
