@@ -29,12 +29,6 @@
 #ifndef COMPILER
 #    error "Please define COMPILER macro to path to the compiler to use."
 #endif
-#ifndef COMPILER_IS_CLANG
-#    error "Please define COMPILER_IS_CLANG 0/1."
-#endif
-#ifndef COMPILER_IS_GCC
-#    error "Please define COMPILER_IS_GCC 0/1."
-#endif
 #ifndef OPT_IS_DEBUG
 #    error "Please define OPT_IS_DEBUG 0/1."
 #endif
@@ -98,10 +92,10 @@ static char cmd_line_compile[]
     "-Wold-style-cast\0"
     "-Wcast-align\0"
     "-Woverloaded-virtual\0"
-#if COMPILER_IS_CLANG
+#if __clang__
     "-Wno-deprecated-volatile\0"     // TODO: fix this flag.
 #endif
-#if COMPILER_IS_GCC
+#if __GNUC__ && !__clang__
     "-Wmisleading-indentation\0"
     "-Wduplicated-cond\0"
     "-Wduplicated-branches\0"
@@ -122,7 +116,7 @@ static char cmd_line_neg_compile[]
 
 static char cmd_line_link[]
   =
-#if COMPILER_IS_GCC
+#if __GNUC__ && !__clang__
     "-nodefaultlibs\0"
 #else
     "-nostdlib++\0"
@@ -132,7 +126,7 @@ static char cmd_line_link[]
     "@path_to_exe_file@\0"
     "" LIB_DIR PATH_SEP_STR "liblightcxx_static.a\0"
     "" LIB_DIR PATH_SEP_STR "libtesting.a\0"
-#if COMPILER_IS_GCC
+#if __GNUC__ && !__clang__
     "-lgcc\0"
     "-lgcc_eh\0"
 #endif
@@ -144,7 +138,7 @@ static char cmd_line_link[]
 #if __APPLE__
     "-L/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib\0"
 #endif
-#if __APPLE__ && COMPILER_IS_GCC
+#if __APPLE__ && !__clang__
     "-lSystem\0"
 #endif
   ;

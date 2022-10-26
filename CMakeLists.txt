@@ -157,11 +157,6 @@ if (LIGHTCXX_ENABLE_TESTS)
             -DLIB_DIR="${CMAKE_CURRENT_BINARY_DIR}"
             -DDEFAULT_TEST_DIR="${CMAKE_CURRENT_SOURCE_DIR}/tests"
             -DDEFAULT_CACHE_DIR="${CMAKE_CURRENT_BINARY_DIR}/tests")
-    if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-        target_compile_options(test_runner PRIVATE -DCOMPILER_IS_CLANG=0 -DCOMPILER_IS_GCC=1)
-    else ()
-        target_compile_options(test_runner PRIVATE -DCOMPILER_IS_CLANG=1 -DCOMPILER_IS_GCC=0)
-    endif ()
     if (CMAKE_BUILD_TYPE STREQUAL "Debug")
         target_compile_options(test_runner PRIVATE -DOPT_IS_DEBUG=1 -DOPT_IS_RELEASE=0)
     elseif (CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
