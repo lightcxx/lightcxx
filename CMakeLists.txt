@@ -166,10 +166,6 @@ if (LIGHTCXX_ENABLE_TESTS)
     endif ()
     file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/tests)
 
-    add_custom_target(test
-            COMMAND $<TARGET_FILE:test_runner> -i=no -T -v -ja
-            DEPENDS lightcxx_static testing test_runner)
-
     if ($ENV{CLION_IDE})
         message(STATUS "Adding all test files to a target for CLion integration")
         file(GLOB_RECURSE TEST_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/tests/*.cpp)
@@ -194,10 +190,14 @@ if (LIGHTCXX_ENABLE_TESTS)
     target_include_directories(systest_libc PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
     AddTargetCompileWarnings(systest_libc)
 
-    add_executable(systest_exe
+    add_executable(systest
             ${CMAKE_CURRENT_SOURCE_DIR}/systest/main.cpp
             $<TARGET_OBJECTS:systest_light>
             $<TARGET_OBJECTS:systest_libc>)
-    target_link_libraries(systest_exe lightcxx_static)
-    add_custom_target(systest COMMAND systest_exe DEPENDS systest_exe)
+    target_link_libraries(systest lightcxx_static)
+
+    add_custom_target(test
+            COMMAND $<TARGET_FILE:test_runner> -i=no -T -v -ja
+            COMMAND systest
+            DEPENDS lightcxx_static testing test_runner systest)
 endif ()
